@@ -1,11 +1,11 @@
-package net.sf.redmine_mylyn.api.model.container;
+package net.sf.redmine_mylyn.internal.api.model.container;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.redmine_mylyn.api.model.Property;
+import net.sf.redmine_mylyn.internal.api.model.Property;
 
 public abstract class AbstractPropertyContainer<T extends Property> {
 

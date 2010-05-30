@@ -4,6 +4,8 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
 
+import net.sf.redmine_mylyn.internal.api.model.SortedProperty;
+
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name="issueStatus")

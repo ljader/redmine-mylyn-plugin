@@ -10,6 +10,8 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="3.5.0",
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: javax.xml.bind
 Export-Package: 
- net.sf.redmine_mylyn.api.model;x-friends:="net.sf.redmine_mylyn.api-test",
- net.sf.redmine_mylyn.api.model.container;x-friends:="net.sf.redmine_mylyn.api-test",
- net.sf.redmine_mylyn.api.parser;x-friends:="net.sf.redmine_mylyn.api-test"
+ net.sf.redmine_mylyn.api.model,
+ net.sf.redmine_mylyn.api.model.container,
+ net.sf.redmine_mylyn.api.parser;x-friends:="net.sf.redmine_mylyn.api-test",
+ net.sf.redmine_mylyn.internal.api.model;x-friends:="net.sf.redmine_mylyn.api-test",
+ net.sf.redmine_mylyn.internal.api.model.container;x-friends:="net.sf.redmine_mylyn.api-test"

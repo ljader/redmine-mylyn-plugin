@@ -1,4 +1,4 @@
-package net.sf.redmine_mylyn.api.model;
+package net.sf.redmine_mylyn.internal.api.model;
 
 import java.io.Serializable;
 

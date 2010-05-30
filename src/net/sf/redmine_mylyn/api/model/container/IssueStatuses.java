@@ -9,6 +9,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import net.sf.redmine_mylyn.api.model.IssueStatus;
+import net.sf.redmine_mylyn.internal.api.model.container.AbstractSortedPropertyContainer;
 
 @XmlRootElement(name="issueStatuses")
 @XmlAccessorType(XmlAccessType.NONE)
