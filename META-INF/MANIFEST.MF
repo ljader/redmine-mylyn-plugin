@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %Bundle-Name
+Bundle-SymbolicName: net.sf.redmine_mylyn.api-test
+Bundle-Version: 0.1.0.qualifier
+Bundle-Vendor: %Bundle-Vendor
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: net.sf.redmine_mylyn.api;bundle-version="0.1.0",
+ org.junit;bundle-version="3.8.0",
+ org.apache.commons.httpclient;bundle-version="3.0.0"
