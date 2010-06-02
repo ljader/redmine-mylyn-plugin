@@ -1,12 +1,22 @@
-package net.sf.redmine_mylyn.api.client;
+package net.sf.redmine_mylyn.internal.api.client;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
+import java.util.Arrays;
+
+import net.sf.redmine_mylyn.api.client.IApiClient;
+import net.sf.redmine_mylyn.api.client.RedmineApiPlugin;
+import net.sf.redmine_mylyn.api.client.RedmineApiStatusException;
+import net.sf.redmine_mylyn.internal.api.parser.IModelParser;
 
 import org.apache.commons.httpclient.Credentials;
+import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.HttpMethodBase;
+import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.NTCredentials;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
@@ -18,9 +28,14 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
 import org.eclipse.mylyn.commons.net.AuthenticationCredentials;
 import org.eclipse.mylyn.commons.net.AuthenticationType;
+import org.eclipse.mylyn.commons.net.Policy;
 import org.eclipse.mylyn.commons.net.WebUtil;
 
 public abstract class AbstractClient implements IApiClient {
+
+	protected final static String HEADER_STATUS = "status";
+
+	protected final static String HEADER_REDIRECT = "location";
 
 	protected final HttpClient httpClient;
 	
@@ -30,64 +45,67 @@ public abstract class AbstractClient implements IApiClient {
 	
 	protected AbstractWebLocation location;
 	
-	public AbstractClient() {
+	public AbstractClient(AbstractWebLocation location) {
+		this.location = location;
 		
 		MultiThreadedHttpConnectionManager connectionManager = new MultiThreadedHttpConnectionManager();
 		this.httpClient = new HttpClient(connectionManager);
 		this.httpClient.getParams().setCookiePolicy(CookiePolicy.RFC_2109);
-		
 	}
 
-//	protected <T extends Object> T executeMethod(HttpMethodBase method, IRedmineResponseParser<T> parser, IProgressMonitor monitor) throws RedmineException {
-//		return executeMethod(method, parser, monitor, HttpStatus.SC_OK);
-//	}
-//	
-//	protected <T extends Object> T executeMethod(HttpMethodBase method, IRedmineResponseParser<T> parser, IProgressMonitor monitor, int... expectedSC) throws RedmineException {
-//		monitor = Policy.monitorFor(monitor);
-//		method.setFollowRedirects(false);
-//		HostConfiguration hostConfiguration = WebUtil.createHostConfiguration(httpClient, location, monitor);
-//
-//		T response = null;
-//		try {
-//			int sc = executeMethod(method, hostConfiguration, monitor);
-//			
-//			if (parser!=null && expectedSC != null) {
-//				boolean found = false;
-//				for (int i : expectedSC) {
-//					if (i==sc) {
-//						InputStream input = WebUtil.getResponseBodyAsStream(method, monitor);
-//						try {
-//							found = true;
-//							response = parser.parseResponse(input, sc);
-//						} finally {
-//							input.close();
-//						}
-//						break;
-//					}
-//				}
-//				if(!found) {
+	protected <T extends Object> T executeMethod(HttpMethodBase method, IModelParser<T> parser, IProgressMonitor monitor) throws RedmineApiStatusException {
+		return executeMethod(method, parser, monitor, HttpStatus.SC_OK);
+	}
+	
+	protected <T extends Object> T executeMethod(HttpMethodBase method, IModelParser<T> parser, IProgressMonitor monitor, int... expectedSC) throws RedmineApiStatusException {
+		monitor = Policy.monitorFor(monitor);
+		method.setFollowRedirects(false);
+		HostConfiguration hostConfiguration = WebUtil.createHostConfiguration(httpClient, location, monitor);
+
+		T response = null;
+		try {
+			int sc = performExecuteMethod(method, hostConfiguration, monitor);
+
+			//HTTP-Status 500
+			if (sc==HttpStatus.SC_INTERNAL_SERVER_ERROR) {
+				Header statusHeader = method.getResponseHeader(HEADER_STATUS);
+				String msg = "Server Error";
+				if (statusHeader != null) {
+					msg += " : " + statusHeader.getValue().replace(""+HttpStatus.SC_INTERNAL_SERVER_ERROR, "").trim();
+				}
+				
+				IStatus status = new Status(IStatus.ERROR,  RedmineApiPlugin.PLUGIN_ID, "Execution of method failed");
+				throw new RedmineApiStatusException(status);
+			}
+
+			if (parser!=null && expectedSC != null) {
+				Arrays.sort(expectedSC);
+				if(Arrays.binarySearch(expectedSC, sc)>=0) {
+					InputStream input = WebUtil.getResponseBodyAsStream(method, monitor);
+					try {
+						response = parser.parseResponse(input, sc);
+					} finally {
+						input.close();
+					}
+				} else {
+					//TODO
 //					String msg = Messages.AbstractRedmineClient_UNEXPECTED_RESPONSE_CODE;
 //					msg = String.format(msg, sc, method.getPath(), method.getName());
 //					IStatus status = new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, msg);
 //					StatusHandler.fail(status);
 //					throw new RedmineStatusException(status);
-//				}
-//			}
-//		}catch (RedmineErrorException e) {
-//			IStatus status = RedmineCorePlugin.toStatus(e, null);
-//			StatusHandler.fail(status);
-//			throw new RedmineStatusException(status);
-//		}catch (IOException e) {
-//			IStatus status = RedmineCorePlugin.toStatus(e, null);
-//			StatusHandler.log(status);
-//			throw new RedmineStatusException(status);
-//		} finally {
-//			method.releaseConnection();
-//		}
-//		
-//		return response;
-//	}
-//	
+				}
+			}
+		} catch (IOException e) {
+			IStatus status = new Status(IStatus.ERROR, RedmineApiPlugin.PLUGIN_ID, "Execution of method failed", e);
+			throw new RedmineApiStatusException(status);
+		} finally {
+			method.releaseConnection();
+		}
+		
+		return response;
+	}
+	
 //	/**
 //	 * Execute the given method - handle authentication concerns.
 //	 * 

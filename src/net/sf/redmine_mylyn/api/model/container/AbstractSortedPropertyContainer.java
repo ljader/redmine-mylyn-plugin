@@ -1,9 +1,9 @@
-package net.sf.redmine_mylyn.internal.api.model.container;
+package net.sf.redmine_mylyn.api.model.container;
 
 import java.util.Collections;
 import java.util.List;
 
-import net.sf.redmine_mylyn.internal.api.model.SortedProperty;
+import net.sf.redmine_mylyn.api.model.SortedProperty;
 
 public abstract class AbstractSortedPropertyContainer<T extends SortedProperty> extends AbstractPropertyContainer<T> {
 

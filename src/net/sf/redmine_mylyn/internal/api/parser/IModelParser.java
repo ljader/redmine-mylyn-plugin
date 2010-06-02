@@ -1,4 +1,4 @@
-package net.sf.redmine_mylyn.api.parser;
+package net.sf.redmine_mylyn.internal.api.parser;
 
 import java.io.InputStream;
 

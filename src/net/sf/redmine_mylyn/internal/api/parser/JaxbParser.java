@@ -1,4 +1,4 @@
-package net.sf.redmine_mylyn.api.parser;
+package net.sf.redmine_mylyn.internal.api.parser;
 
 import java.io.InputStream;
 import java.util.Arrays;
@@ -23,6 +23,10 @@ public class JaxbParser<T extends Object> {
 	
 	protected JAXBContext ctx;
 	
+	JaxbParser(Class<T> modelClass) {
+		this(modelClass, new Class<?>[0]);
+	}
+
 	JaxbParser(Class<T> modelClass, Class<?>... requiredClasses) {
 		clazz = modelClass;
 		classes = Arrays.copyOf(requiredClasses, requiredClasses.length+1);
@@ -48,7 +52,7 @@ public class JaxbParser<T extends Object> {
 	
 	protected Unmarshaller getUnmarshaller() throws JAXBException {
 		if (ctx==null) {
-			ctx = JAXBContext.newInstance(classes);
+			ctx = JAXBContext.newInstance(clazz);
 		}
 		
 		return ctx.createUnmarshaller();

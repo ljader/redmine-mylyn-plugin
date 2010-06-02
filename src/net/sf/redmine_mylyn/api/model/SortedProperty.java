@@ -1,4 +1,4 @@
-package net.sf.redmine_mylyn.internal.api.model;
+package net.sf.redmine_mylyn.api.model;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
