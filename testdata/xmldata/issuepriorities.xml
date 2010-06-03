@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issuePriorities api="2.7.0.trunk" xmlns="http://redmin-mylyncon.sf.net/api">
+  <issuePriority id="8">
+    <name>Immediate</name>
+    <position>5</position>
+    <isDefault>false</isDefault>
+  </issuePriority>
+  <issuePriority id="4">
+    <name>Low</name>
+    <position>1</position>
+    <isDefault>false</isDefault>
+  </issuePriority>
+  <issuePriority id="6">
+    <name>High</name>
+    <position>2</position>
+    <isDefault>false</isDefault>
+  </issuePriority>
+  <issuePriority id="5">
+    <name>Normal</name>
+    <position>3</position>
+    <isDefault>true</isDefault>
+  </issuePriority>
+  <issuePriority id="7">
+    <name>Urgent</name>
+    <position>4</position>
+    <isDefault>false</isDefault>
+  </issuePriority>
+</issuePriorities>
