@@ -8,6 +8,7 @@ import net.sf.redmine_mylyn.api.client.RedmineApiPlugin;
 import net.sf.redmine_mylyn.api.client.RedmineApiStatusException;
 import net.sf.redmine_mylyn.api.model.container.AbstractPropertyContainer;
 import net.sf.redmine_mylyn.api.model.container.IssueCategories;
+import net.sf.redmine_mylyn.api.model.container.IssuePriorities;
 import net.sf.redmine_mylyn.api.model.container.IssueStatuses;
 
 import org.eclipse.core.runtime.IStatus;
@@ -20,6 +21,8 @@ public class Configuration implements Serializable{
 	private IssueStatuses issueStatuses;
 
 	private IssueCategories issueCategories;
+	
+	private IssuePriorities issuePriorities;
 
 	public void setPropertyContainer(AbstractPropertyContainer<? extends Property> container) throws RedmineApiStatusException {
 		try {
@@ -59,6 +62,13 @@ public class Configuration implements Serializable{
 			issueCategories = new IssueCategories();
 		}
 		return issueCategories;
+	}
+	
+	public IssuePriorities getIssuePriorities() {
+		if(issuePriorities==null) {
+			issuePriorities = new IssuePriorities();
+		}
+		return issuePriorities;
 	}
 	
 	
