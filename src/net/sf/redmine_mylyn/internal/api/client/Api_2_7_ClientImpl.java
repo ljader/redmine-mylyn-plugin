@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 import net.sf.redmine_mylyn.api.client.RedmineApiStatusException;
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.container.AbstractPropertyContainer;
+import net.sf.redmine_mylyn.api.model.container.IssueCategories;
 import net.sf.redmine_mylyn.api.model.container.IssueStatuses;
 import net.sf.redmine_mylyn.internal.api.parser.AttributeParser;
 import net.sf.redmine_mylyn.internal.api.parser.IModelParser;
@@ -20,6 +21,7 @@ import org.eclipse.mylyn.commons.net.Policy;
 public class Api_2_7_ClientImpl extends AbstractClient {
 
 	private final static String URL_ISSUE_STATUS = "/mylyn/issuestatus";
+	private final static String URL_ISSUE_CATEGORIES = "/mylyn/issuecategories";
 	
 	private Map<String, IModelParser<? extends AbstractPropertyContainer<?>>> parserByClass;
 
@@ -68,5 +70,6 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	private void buildParser() {
 		parserByClass = new HashMap<String, IModelParser<? extends AbstractPropertyContainer<?>>>();
 		parserByClass.put(URL_ISSUE_STATUS, new AttributeParser<IssueStatuses>(IssueStatuses.class));
+		parserByClass.put(URL_ISSUE_CATEGORIES, new AttributeParser<IssueCategories>(IssueCategories.class));
 	}
 }

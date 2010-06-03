@@ -7,6 +7,7 @@ import java.lang.reflect.Modifier;
 import net.sf.redmine_mylyn.api.client.RedmineApiPlugin;
 import net.sf.redmine_mylyn.api.client.RedmineApiStatusException;
 import net.sf.redmine_mylyn.api.model.container.AbstractPropertyContainer;
+import net.sf.redmine_mylyn.api.model.container.IssueCategories;
 import net.sf.redmine_mylyn.api.model.container.IssueStatuses;
 
 import org.eclipse.core.runtime.IStatus;
@@ -17,7 +18,9 @@ public class Configuration implements Serializable{
 	private static final long serialVersionUID = 1L;
 
 	private IssueStatuses issueStatuses;
-	
+
+	private IssueCategories issueCategories;
+
 	public void setPropertyContainer(AbstractPropertyContainer<? extends Property> container) throws RedmineApiStatusException {
 		try {
 			for (Field field : getClass().getDeclaredFields()) {
@@ -49,6 +52,13 @@ public class Configuration implements Serializable{
 			issueStatuses = new IssueStatuses();
 		}
 		return issueStatuses;
+	}
+
+	public IssueCategories getIssueCategories() {
+		if(issueCategories==null) {
+			issueCategories = new IssueCategories();
+		}
+		return issueCategories;
 	}
 	
 	
