@@ -1,5 +1,6 @@
 package net.sf.redmine_mylyn.internal.api.client;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -7,6 +8,8 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.regex.Matcher;
@@ -15,10 +18,15 @@ import java.util.regex.Pattern;
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.internal.api.IssueStatusValidator;
 
+import org.apache.commons.httpclient.HostConfiguration;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
 import org.eclipse.mylyn.commons.net.WebLocation;
+import org.eclipse.mylyn.commons.net.WebUtil;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -131,7 +139,6 @@ public class Api_2_7_ClientImplTest {
 	public void tearDown() throws Exception {
 	}
 
-	
 	@Test
 	public void testGetConfiguration() {
 		assertNotNull(testee.getConfiguration());
@@ -147,7 +154,54 @@ public class Api_2_7_ClientImplTest {
 		testee.updateConfiguration(null, true);
 
 		assertNotNull(configuration.getIssueStatuses());
-		assertEquals(6, configuration.getIssueStatuses().getAll().size());
+		assertEquals(IssueStatusValidator.COUNT, configuration.getIssueStatuses().getAll().size());
 		IssueStatusValidator.validateIssueStatus5(configuration.getIssueStatuses().get(5));
+	}
+
+	@Test
+	public void concurrencyRequests() throws Exception {
+		Class<AbstractClient> clazz = AbstractClient.class;
+		
+		Field httpClientField = clazz.getDeclaredField("httpClient");
+		httpClientField.setAccessible(true);
+		HttpClient httpClient = (HttpClient)httpClientField.get(testee);
+
+		Method executeMethod = clazz.getDeclaredMethod("performExecuteMethod", HttpMethod.class, HostConfiguration.class, IProgressMonitor.class);
+		executeMethod.setAccessible(true);
+		
+		HttpMethod firstMethod = new GetMethod("/mylyn/issuestatus");
+		HttpMethod secondMethod = new GetMethod("/mylyn/issuestatus");
+		
+		HostConfiguration hostConfiguration = WebUtil.createHostConfiguration(httpClient, location, monitor);
+		
+		InputStream stream = getClass().getResourceAsStream(IssueStatusValidator.RESOURCE_FILE);
+		int len = stream.available();
+		int partialLen = len/2;
+		
+		byte[] excpected = new byte[len];
+		stream.read(excpected, 0, len);
+		stream.close();
+		
+		byte[] firstBuffer = new byte[len];
+		byte[] secondBuffer = new byte[len];
+		
+		
+		try {
+			executeMethod.invoke(testee, firstMethod, hostConfiguration, monitor);
+			InputStream firstStream = firstMethod.getResponseBodyAsStream();
+			firstStream.read(firstBuffer, 0, partialLen);
+			
+			executeMethod.invoke(testee, secondMethod, hostConfiguration, monitor);
+			InputStream secondStream = secondMethod.getResponseBodyAsStream();
+			secondStream.read(secondBuffer, 0, len);
+			secondStream.close();
+			
+			firstStream.read(firstBuffer, partialLen, len-partialLen);
+			firstStream.close();
+			
+		} finally {
+			assertArrayEquals(excpected, firstBuffer);
+			assertArrayEquals(excpected, secondBuffer);
+		}
 	}
 }

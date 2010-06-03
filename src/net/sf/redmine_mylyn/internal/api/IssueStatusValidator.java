@@ -11,6 +11,10 @@ import net.sf.redmine_mylyn.api.model.container.IssueStatuses;
 
 public class IssueStatusValidator {
 
+	public final static String RESOURCE_FILE = "/xmldata/issuestatus.xml";
+	
+	public final static int COUNT = 6;
+	
 	public static void validateIssueStatus5(IssueStatus status) {
 		assertNotNull(status);
 		assertEquals(5, status.getId());

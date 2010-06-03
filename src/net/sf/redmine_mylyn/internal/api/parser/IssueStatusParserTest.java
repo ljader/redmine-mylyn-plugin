@@ -20,7 +20,7 @@ public class IssueStatusParserTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		input = getClass().getResourceAsStream("/xmldata/issuestatus.xml");
+		input = getClass().getResourceAsStream(IssueStatusValidator.RESOURCE_FILE);
 		testee = new  AttributeParser<IssueStatuses>(IssueStatuses.class);
 	}
 	
@@ -34,7 +34,7 @@ public class IssueStatusParserTest {
 		IssueStatuses statuses = testee.parseResponse(input, HttpStatus.SC_OK);
 		
 		assertNotNull(statuses);
-		assertEquals(6, statuses.getAll().size());
+		assertEquals(IssueStatusValidator.COUNT, statuses.getAll().size());
 		
 		IssueStatusValidator.validateIssueStatus5(statuses.get(5));
 		IssueStatusValidator.validateOrder(statuses);
