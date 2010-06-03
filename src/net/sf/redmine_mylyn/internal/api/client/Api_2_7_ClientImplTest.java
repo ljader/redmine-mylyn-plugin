@@ -16,6 +16,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.redmine_mylyn.api.model.Configuration;
+import net.sf.redmine_mylyn.internal.api.IssueCategoryValidator;
 import net.sf.redmine_mylyn.internal.api.IssueStatusValidator;
 
 import org.apache.commons.httpclient.HostConfiguration;
@@ -151,12 +152,19 @@ public class Api_2_7_ClientImplTest {
 		assertNotNull(configuration.getIssueStatuses());
 		assertEquals(0, configuration.getIssueStatuses().getAll().size());
 		
+		assertNotNull(configuration.getIssueCategories());
+		assertEquals(0, configuration.getIssueCategories().getAll().size());
+		
 		testee.updateConfiguration(null, true);
 
 		assertNotNull(configuration.getIssueStatuses());
 		assertEquals(IssueStatusValidator.COUNT, configuration.getIssueStatuses().getAll().size());
-		IssueStatusValidator.validateIssueStatus5(configuration.getIssueStatuses().get(5));
-	}
+		IssueStatusValidator.validate5(configuration.getIssueStatuses().get(5));
+
+		assertNotNull(configuration.getIssueCategories());
+		assertEquals(IssueCategoryValidator.COUNT, configuration.getIssueCategories().getAll().size());
+		IssueCategoryValidator.validate3(configuration.getIssueCategories().get(3));
+}
 
 	@Test
 	public void concurrencyRequests() throws Exception {

@@ -15,7 +15,7 @@ public class IssueStatusValidator {
 	
 	public final static int COUNT = 6;
 	
-	public static void validateIssueStatus5(IssueStatus status) {
+	public static void validate5(IssueStatus status) {
 		assertNotNull(status);
 		assertEquals(5, status.getId());
 		assertEquals("Closed", status.getName());

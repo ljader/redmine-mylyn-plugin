@@ -36,7 +36,7 @@ public class IssueStatusParserTest {
 		assertNotNull(statuses);
 		assertEquals(IssueStatusValidator.COUNT, statuses.getAll().size());
 		
-		IssueStatusValidator.validateIssueStatus5(statuses.get(5));
+		IssueStatusValidator.validate5(statuses.get(5));
 		IssueStatusValidator.validateOrder(statuses);
 	}
 
