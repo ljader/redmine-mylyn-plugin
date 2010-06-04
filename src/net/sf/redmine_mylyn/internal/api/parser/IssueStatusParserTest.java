@@ -38,6 +38,7 @@ public class IssueStatusParserTest {
 		
 		IssueStatusValidator.validate5(statuses.get(5));
 		IssueStatusValidator.validateOrder(statuses);
+		IssueStatusValidator.validateDefault(statuses.getDefault());
 	}
 
 }

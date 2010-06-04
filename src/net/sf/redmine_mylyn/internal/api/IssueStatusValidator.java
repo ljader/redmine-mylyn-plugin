@@ -35,4 +35,9 @@ public class IssueStatusValidator {
 		assertEquals(3, all.get(pos++).getId());
 	}
 
+	public static void validateDefault(IssueStatus obj) {
+		assertNotNull(obj);
+		assertEquals(5, obj.getId());
+	}
+
 }
