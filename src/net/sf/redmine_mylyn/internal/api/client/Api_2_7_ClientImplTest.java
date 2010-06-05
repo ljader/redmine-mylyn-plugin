@@ -19,6 +19,7 @@ import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.internal.api.IssueCategoryValidator;
 import net.sf.redmine_mylyn.internal.api.IssuePriorityValidator;
 import net.sf.redmine_mylyn.internal.api.IssueStatusValidator;
+import net.sf.redmine_mylyn.internal.api.TrackerValidator;
 
 import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
@@ -158,6 +159,9 @@ public class Api_2_7_ClientImplTest {
 		
 		assertNotNull(configuration.getIssuePriorities());
 		assertEquals(0, configuration.getIssuePriorities().getAll().size());
+
+		assertNotNull(configuration.getTrackers());
+		assertEquals(0, configuration.getTrackers().getAll().size());
 		
 		testee.updateConfiguration(null, true);
 
@@ -172,7 +176,10 @@ public class Api_2_7_ClientImplTest {
 		assertNotNull(configuration.getIssuePriorities());
 		assertEquals(IssuePriorityValidator.COUNT, configuration.getIssuePriorities().getAll().size());
 		IssuePriorityValidator.validate4(configuration.getIssuePriorities().get(4));
-		
+
+		assertNotNull(configuration.getTrackers());
+		assertEquals(TrackerValidator.COUNT, configuration.getTrackers().getAll().size());
+		TrackerValidator.validate2(configuration.getTrackers().getAll().get(2));
 	}
 
 	@Test
