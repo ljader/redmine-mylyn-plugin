@@ -10,6 +10,7 @@ import net.sf.redmine_mylyn.api.model.container.AbstractPropertyContainer;
 import net.sf.redmine_mylyn.api.model.container.IssueCategories;
 import net.sf.redmine_mylyn.api.model.container.IssuePriorities;
 import net.sf.redmine_mylyn.api.model.container.IssueStatuses;
+import net.sf.redmine_mylyn.api.model.container.Trackers;
 import net.sf.redmine_mylyn.internal.api.parser.AttributeParser;
 import net.sf.redmine_mylyn.internal.api.parser.IModelParser;
 
@@ -24,6 +25,7 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	private final static String URL_ISSUE_STATUS = "/mylyn/issuestatus";
 	private final static String URL_ISSUE_CATEGORIES = "/mylyn/issuecategories";
 	private final static String URL_ISSUE_PRIORITIES = "/mylyn/issuepriorities";
+	private final static String URL_TRACKERS = "/mylyn/trackers";
 	
 	private Map<String, IModelParser<? extends AbstractPropertyContainer<?>>> parserByClass;
 
@@ -74,5 +76,6 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 		parserByClass.put(URL_ISSUE_STATUS, new AttributeParser<IssueStatuses>(IssueStatuses.class));
 		parserByClass.put(URL_ISSUE_CATEGORIES, new AttributeParser<IssueCategories>(IssueCategories.class));
 		parserByClass.put(URL_ISSUE_PRIORITIES, new AttributeParser<IssuePriorities>(IssuePriorities.class));
+		parserByClass.put(URL_TRACKERS, new AttributeParser<Trackers>(Trackers.class));
 	}
 }
