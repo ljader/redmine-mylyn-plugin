@@ -7,6 +7,7 @@ import java.lang.reflect.Modifier;
 import net.sf.redmine_mylyn.api.client.RedmineApiPlugin;
 import net.sf.redmine_mylyn.api.client.RedmineApiStatusException;
 import net.sf.redmine_mylyn.api.model.container.AbstractPropertyContainer;
+import net.sf.redmine_mylyn.api.model.container.CustomFields;
 import net.sf.redmine_mylyn.api.model.container.IssueCategories;
 import net.sf.redmine_mylyn.api.model.container.IssuePriorities;
 import net.sf.redmine_mylyn.api.model.container.IssueStatuses;
@@ -24,6 +25,8 @@ public class Configuration implements Serializable{
 	private IssueCategories issueCategories;
 	
 	private IssuePriorities issuePriorities;
+	
+	private CustomFields customFields;
 	
 	private Trackers trackers;
 
@@ -79,6 +82,13 @@ public class Configuration implements Serializable{
 			trackers = new Trackers();
 		}
 		return trackers;
+	}
+	
+	public CustomFields getCustomFields() {
+		if(customFields==null) {
+			customFields = new CustomFields();
+		}
+		return customFields;
 	}
 	
 	

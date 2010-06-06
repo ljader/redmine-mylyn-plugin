@@ -1,24 +1,46 @@
 package net.sf.redmine_mylyn.api.model;
 
-import java.io.Serializable;
+import java.util.List;
 
-public class CustomField implements Serializable {
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlEnumValue;
+import javax.xml.bind.annotation.XmlType;
+
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name="customField")
+public class CustomField extends Property {
 	
-	enum Type {IssueCustomField, TimeEntryCustomField};
-
-	enum Format {STRING, TEXT, INT, FLOAT, LIST, DATE, BOOL};
-
 	private static final long serialVersionUID = 1L;
 
-	private int id;
-	
+	public enum Type {IssueCustomField, TimeEntryActivityCustomField};
+
+	public enum Format {
+		@XmlEnumValue("string")
+		STRING, 
+		@XmlEnumValue("text")
+		TEXT, 
+		@XmlEnumValue("int")
+		INT, 
+		@XmlEnumValue("float")
+		FLOAT, 
+		@XmlEnumValue("list")
+		LIST, 
+		@XmlEnumValue("date")
+		DATE, 
+		@XmlEnumValue("bool")
+		BOOL
+	};
+
 	private Type type;
-	
-	private String name;
 	
 	private Format fieldFormat;
 	
-	private String[] possibleValues; 
+	@XmlElementWrapper(name="possibleValues")
+	@XmlElement(name="possibleValue")
+	private List<String> possibleValues;
 	
 	private String regexp;
 	
@@ -33,5 +55,85 @@ public class CustomField implements Serializable {
 	private boolean isFilter;
 	
 	private String defaultValue;
+
+	public Type getType() {
+		return type;
+	}
+
+	public void setType(Type type) {
+		this.type = type;
+	}
+
+	public Format getFieldFormat() {
+		return fieldFormat;
+	}
+
+	public void setFieldFormat(Format fieldFormat) {
+		this.fieldFormat = fieldFormat;
+	}
+
+	public List<String> getPossibleValues() {
+		return possibleValues;
+	}
+
+	public void setPossibleValues(List<String> possibleValues) {
+		this.possibleValues = possibleValues;
+	}
+
+	public String getRegexp() {
+		return regexp;
+	}
+
+	public void setRegexp(String regexp) {
+		this.regexp = regexp;
+	}
+
+	public int getMinLength() {
+		return minLength;
+	}
+
+	public void setMinLength(int minLength) {
+		this.minLength = minLength;
+	}
+
+	public int getMaxLength() {
+		return maxLength;
+	}
+
+	public void setMaxLength(int maxLength) {
+		this.maxLength = maxLength;
+	}
+
+	public boolean isRequired() {
+		return isRequired;
+	}
+
+	public void setRequired(boolean isRequired) {
+		this.isRequired = isRequired;
+	}
+
+	public boolean isForAll() {
+		return isForAll;
+	}
+
+	public void setForAll(boolean isForAll) {
+		this.isForAll = isForAll;
+	}
+
+	public boolean isFilter() {
+		return isFilter;
+	}
+
+	public void setFilter(boolean isFilter) {
+		this.isFilter = isFilter;
+	}
+
+	public String getDefaultValue() {
+		return defaultValue;
+	}
+
+	public void setDefaultValue(String defaultValue) {
+		this.defaultValue = defaultValue;
+	}
 	
 }
