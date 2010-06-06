@@ -16,6 +16,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.redmine_mylyn.api.model.Configuration;
+import net.sf.redmine_mylyn.internal.api.CustomFieldValidator;
 import net.sf.redmine_mylyn.internal.api.IssueCategoryValidator;
 import net.sf.redmine_mylyn.internal.api.IssuePriorityValidator;
 import net.sf.redmine_mylyn.internal.api.IssueStatusValidator;
@@ -163,6 +164,9 @@ public class Api_2_7_ClientImplTest {
 		assertNotNull(configuration.getTrackers());
 		assertEquals(0, configuration.getTrackers().getAll().size());
 		
+		assertNotNull(configuration.getCustomFields());
+		assertEquals(0, configuration.getCustomFields().getAll().size());
+		
 		testee.updateConfiguration(null, true);
 
 		assertNotNull(configuration.getIssueStatuses());
@@ -179,8 +183,12 @@ public class Api_2_7_ClientImplTest {
 
 		assertNotNull(configuration.getTrackers());
 		assertEquals(TrackerValidator.COUNT, configuration.getTrackers().getAll().size());
-		TrackerValidator.validate2(configuration.getTrackers().getAll().get(2));
-	}
+		TrackerValidator.validate2(configuration.getTrackers().get(2));
+
+		assertNotNull(configuration.getCustomFields());
+		assertEquals(CustomFieldValidator.COUNT, configuration.getCustomFields().getAll().size());
+		CustomFieldValidator.validate1(configuration.getCustomFields().get(1));
+}
 
 	@Test
 	public void concurrencyRequests() throws Exception {

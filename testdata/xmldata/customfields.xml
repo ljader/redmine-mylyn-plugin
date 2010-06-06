@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<customFields api="2.7.0.trunk" xmlns="http://redmin-mylyncon.sf.net/api">
+  <customField id="1">
+    <name>Database</name>
+    <type>IssueCustomField</type>
+    <fieldFormat>list</fieldFormat>
+    <minLength>0</minLength>
+    <maxLength>0</maxLength>
+    <regexp/>
+    <possibleValues>
+      <possibleValue>MySQL</possibleValue>
+      <possibleValue>PostgreSQL</possibleValue>
+      <possibleValue>Oracle</possibleValue>
+    </possibleValues>
+    <defaultValue/>
+    <isRequired>false</isRequired>
+    <isFilter>true</isFilter>
+    <isForAll>true</isForAll>
+  </customField>
+  <customField id="2">
+    <name>Searchable field</name>
+    <type>IssueCustomField</type>
+    <fieldFormat>string</fieldFormat>
+    <minLength>1</minLength>
+    <maxLength>100</maxLength>
+    <regexp>^.*$</regexp>
+    <possibleValues>
+    </possibleValues>
+    <defaultValue>Default string</defaultValue>
+    <isRequired>false</isRequired>
+    <isFilter>false</isFilter>
+    <isForAll>true</isForAll>
+  </customField>
+  <customField id="3">
+    <name>Development status</name>
+    <type>ProjectCustomField</type>
+    <fieldFormat>list</fieldFormat>
+    <minLength>0</minLength>
+    <maxLength>0</maxLength>
+    <regexp/>
+    <possibleValues>
+      <possibleValue>Stable</possibleValue>
+      <possibleValue>Beta</possibleValue>
+      <possibleValue>Alpha</possibleValue>
+      <possibleValue>Planning</possibleValue>
+    </possibleValues>
+    <defaultValue/>
+    <isRequired>false</isRequired>
+    <isFilter>true</isFilter>
+    <isForAll>false</isForAll>
+  </customField>
+  <customField id="4">
+    <name>Phone number</name>
+    <type>UserCustomField</type>
+    <fieldFormat>string</fieldFormat>
+    <minLength>0</minLength>
+    <maxLength>0</maxLength>
+    <regexp/>
+    <possibleValues>
+    </possibleValues>
+    <defaultValue/>
+    <isRequired>false</isRequired>
+    <isFilter>false</isFilter>
+    <isForAll>false</isForAll>
+  </customField>
+  <customField id="5">
+    <name>Money</name>
+    <type>UserCustomField</type>
+    <fieldFormat>float</fieldFormat>
+    <minLength>0</minLength>
+    <maxLength>0</maxLength>
+    <regexp/>
+    <possibleValues>
+    </possibleValues>
+    <defaultValue/>
+    <isRequired>false</isRequired>
+    <isFilter>false</isFilter>
+    <isForAll>false</isForAll>
+  </customField>
+  <customField id="6">
+    <name>Float field</name>
+    <type>IssueCustomField</type>
+    <fieldFormat>float</fieldFormat>
+    <minLength>0</minLength>
+    <maxLength>0</maxLength>
+    <regexp/>
+    <possibleValues>
+    </possibleValues>
+    <defaultValue/>
+    <isRequired>false</isRequired>
+    <isFilter>false</isFilter>
+    <isForAll>true</isForAll>
+  </customField>
+  <customField id="7">
+    <name>Billable</name>
+    <type>TimeEntryActivityCustomField</type>
+    <fieldFormat>bool</fieldFormat>
+    <minLength>0</minLength>
+    <maxLength>0</maxLength>
+    <regexp/>
+    <possibleValues>
+    </possibleValues>
+    <defaultValue/>
+    <isRequired>false</isRequired>
+    <isFilter>true</isFilter>
+    <isForAll>false</isForAll>
+  </customField>
+  <customField id="8">
+    <name>Custom date</name>
+    <type>IssueCustomField</type>
+    <fieldFormat>date</fieldFormat>
+    <minLength>0</minLength>
+    <maxLength>0</maxLength>
+    <regexp/>
+    <possibleValues>
+    </possibleValues>
+    <defaultValue/>
+    <isRequired>false</isRequired>
+    <isFilter>false</isFilter>
+    <isForAll>true</isForAll>
+  </customField>
+  <customField id="9">
+    <name>Project 1 cf</name>
+    <type>IssueCustomField</type>
+    <fieldFormat>date</fieldFormat>
+    <minLength>0</minLength>
+    <maxLength>0</maxLength>
+    <regexp/>
+    <possibleValues>
+    </possibleValues>
+    <defaultValue/>
+    <isRequired>false</isRequired>
+    <isFilter>true</isFilter>
+    <isForAll>false</isForAll>
+  </customField>
+</customFields>
