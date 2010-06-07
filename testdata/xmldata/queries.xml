@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<queries api="2.7.0.trunk" xmlns="http://redmin-mylyncon.sf.net/api">
+  <query id="1">
+    <name>Multiple custom fields query</name>
+  </query>
+  <query id="5">
+    <name>Open issues by priority and tracker</name>
+  </query>
+  <query id="9">
+    <name>Open issues grouped by list custom field</name>
+  </query>
+  <query id="6">
+    <name>Open issues grouped by tracker</name>
+  </query>
+  <query id="4">
+    <name>Public query for all projects</name>
+  </query>
+</queries>
