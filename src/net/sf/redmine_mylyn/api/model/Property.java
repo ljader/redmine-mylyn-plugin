@@ -24,10 +24,6 @@ public class Property implements Serializable {
 		return id;
 	}
 
-	public void setId(int id) {
-		this.id = id;
-	}
-
 	public String getName() {
 		return name==null ? "" : name;
 	}
@@ -45,6 +41,7 @@ public class Property implements Serializable {
 	public int hashCode() {
 		int hash = 7;
 		hash = 31 * hash + id;
+		//TODO hash over class
 		return hash;
 	}
 
