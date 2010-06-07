@@ -11,6 +11,7 @@ import net.sf.redmine_mylyn.api.model.container.CustomFields;
 import net.sf.redmine_mylyn.api.model.container.IssueCategories;
 import net.sf.redmine_mylyn.api.model.container.IssuePriorities;
 import net.sf.redmine_mylyn.api.model.container.IssueStatuses;
+import net.sf.redmine_mylyn.api.model.container.TimeEntryActivities;
 import net.sf.redmine_mylyn.api.model.container.Trackers;
 import net.sf.redmine_mylyn.api.model.container.Users;
 
@@ -32,6 +33,8 @@ public class Configuration implements Serializable{
 	private Trackers trackers;
 
 	private Users user;
+	
+	private TimeEntryActivities timeEntryActivities;
 
 	public void setPropertyContainer(AbstractPropertyContainer<? extends Property> container) throws RedmineApiStatusException {
 		try {
@@ -99,6 +102,13 @@ public class Configuration implements Serializable{
 			user = new Users();
 		}
 		return user;
+	}
+	
+	public TimeEntryActivities getTimeEntryActivities() {
+		if(timeEntryActivities==null) {
+			timeEntryActivities = new TimeEntryActivities();
+		}
+		return timeEntryActivities;
 	}
 	
 	
