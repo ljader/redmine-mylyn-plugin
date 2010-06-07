@@ -21,6 +21,7 @@ import net.sf.redmine_mylyn.internal.api.IssueCategoryValidator;
 import net.sf.redmine_mylyn.internal.api.IssuePriorityValidator;
 import net.sf.redmine_mylyn.internal.api.IssueStatusValidator;
 import net.sf.redmine_mylyn.internal.api.TrackerValidator;
+import net.sf.redmine_mylyn.internal.api.UserValidator;
 
 import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
@@ -167,28 +168,30 @@ public class Api_2_7_ClientImplTest {
 		assertNotNull(configuration.getCustomFields());
 		assertEquals(0, configuration.getCustomFields().getAll().size());
 		
+		assertNotNull(configuration.getUsers());
+		assertEquals(0, configuration.getUsers().getAll().size());
+		
 		testee.updateConfiguration(null, true);
 
 		assertNotNull(configuration.getIssueStatuses());
 		assertEquals(IssueStatusValidator.COUNT, configuration.getIssueStatuses().getAll().size());
-		IssueStatusValidator.validate5(configuration.getIssueStatuses().get(5));
 
 		assertNotNull(configuration.getIssueCategories());
 		assertEquals(IssueCategoryValidator.COUNT, configuration.getIssueCategories().getAll().size());
-		IssueCategoryValidator.validate3(configuration.getIssueCategories().get(3));
 
 		assertNotNull(configuration.getIssuePriorities());
 		assertEquals(IssuePriorityValidator.COUNT, configuration.getIssuePriorities().getAll().size());
-		IssuePriorityValidator.validate4(configuration.getIssuePriorities().get(4));
 
 		assertNotNull(configuration.getTrackers());
 		assertEquals(TrackerValidator.COUNT, configuration.getTrackers().getAll().size());
-		TrackerValidator.validate2(configuration.getTrackers().get(2));
 
 		assertNotNull(configuration.getCustomFields());
 		assertEquals(CustomFieldValidator.COUNT, configuration.getCustomFields().getAll().size());
-		CustomFieldValidator.validate1(configuration.getCustomFields().get(1));
-}
+
+		assertNotNull(configuration.getUsers());
+		assertEquals(UserValidator.COUNT, configuration.getUsers().getAll().size());
+
+	}
 
 	@Test
 	public void concurrencyRequests() throws Exception {

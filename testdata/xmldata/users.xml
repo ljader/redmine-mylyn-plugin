@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<users api="2.7.0.trunk" xmlns="http://redmin-mylyncon.sf.net/api">
+  <user id="1">
+    <name>redMine Admin</name>
+    <login>admin</login>
+    <firstname>redMine</firstname>
+    <lastname>Admin</lastname>
+    <mail>admin@somenet.foo</mail>
+  </user>
+  <user id="2">
+    <name>John Smith</name>
+    <login>jsmith</login>
+    <firstname>John</firstname>
+    <lastname>Smith</lastname>
+    <mail>jsmith@somenet.foo</mail>
+  </user>
+  <user id="3">
+    <name>Dave Lopper</name>
+    <login>dlopper</login>
+    <firstname>Dave</firstname>
+    <lastname>Lopper</lastname>
+    <mail>dlopper@somenet.foo</mail>
+  </user>
+  <user id="4">
+    <name>Robert Hill</name>
+    <login>rhill</login>
+    <firstname>Robert</firstname>
+    <lastname>Hill</lastname>
+    <mail>rhill@somenet.foo</mail>
+  </user>
+  <user id="5">
+    <name>Dave2 Lopper2</name>
+    <login>dlopper2</login>
+    <firstname>Dave2</firstname>
+    <lastname>Lopper2</lastname>
+    <mail>dlopper2@somenet.foo</mail>
+  </user>
+  <user id="6">
+    <name>Anonymous</name>
+    <login/>
+    <firstname/>
+    <lastname>Anonymous</lastname>
+    <mail/>
+  </user>
+  <user id="7">
+    <name>Some One</name>
+    <login>someone</login>
+    <firstname>Some</firstname>
+    <lastname>One</lastname>
+    <mail>someone@foo.bar</mail>
+  </user>
+  <user id="8">
+    <name>User Misc</name>
+    <login>miscuser8</login>
+    <firstname>User</firstname>
+    <lastname>Misc</lastname>
+    <mail>miscuser8@foo.bar</mail>
+  </user>
+  <user id="9">
+    <name>User Misc</name>
+    <login>miscuser9</login>
+    <firstname>User</firstname>
+    <lastname>Misc</lastname>
+    <mail>miscuser9@foo.bar</mail>
+  </user>
+</users>
