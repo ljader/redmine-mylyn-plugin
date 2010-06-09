@@ -25,6 +25,7 @@ import net.sf.redmine_mylyn.internal.api.QueryValidator;
 import net.sf.redmine_mylyn.internal.api.TimeEntryActivityValidator;
 import net.sf.redmine_mylyn.internal.api.TrackerValidator;
 import net.sf.redmine_mylyn.internal.api.UserValidator;
+import net.sf.redmine_mylyn.internal.api.VersionValidator;
 
 import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
@@ -183,6 +184,9 @@ public class Api_2_7_ClientImplTest {
 		assertNotNull(configuration.getProjects());
 		assertEquals(0, configuration.getProjects().getAll().size());
 		
+		assertNotNull(configuration.getVersions());
+		assertEquals(0, configuration.getVersions().getAll().size());
+		
 		testee.updateConfiguration(null, true);
 
 		assertNotNull(configuration.getIssueStatuses());
@@ -211,6 +215,9 @@ public class Api_2_7_ClientImplTest {
 
 		assertNotNull(configuration.getProjects());
 		assertEquals(ProjectValidator.COUNT, configuration.getProjects().getAll().size());
+
+		assertNotNull(configuration.getVersions());
+		assertEquals(VersionValidator.COUNT, configuration.getVersions().getAll().size());
 
 	}
 
