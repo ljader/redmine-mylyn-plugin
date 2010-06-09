@@ -16,6 +16,7 @@ import net.sf.redmine_mylyn.api.model.container.Queries;
 import net.sf.redmine_mylyn.api.model.container.TimeEntryActivities;
 import net.sf.redmine_mylyn.api.model.container.Trackers;
 import net.sf.redmine_mylyn.api.model.container.Users;
+import net.sf.redmine_mylyn.api.model.container.Versions;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -41,6 +42,8 @@ public class Configuration implements Serializable{
 	private Queries queries;
 
 	private Projects projects;
+	
+	private Versions versions;
 
 	public void setPropertyContainer(AbstractPropertyContainer<? extends Property> container) throws RedmineApiStatusException {
 		try {
@@ -129,6 +132,13 @@ public class Configuration implements Serializable{
 			projects = new Projects();
 		}
 		return projects;
+	}
+	
+	public Versions getVersions() {
+		if(versions==null) {
+			versions = new Versions();
+		}
+		return versions;
 	}
 	
 }
