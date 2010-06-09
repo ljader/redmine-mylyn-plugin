@@ -20,6 +20,7 @@ import net.sf.redmine_mylyn.internal.api.CustomFieldValidator;
 import net.sf.redmine_mylyn.internal.api.IssueCategoryValidator;
 import net.sf.redmine_mylyn.internal.api.IssuePriorityValidator;
 import net.sf.redmine_mylyn.internal.api.IssueStatusValidator;
+import net.sf.redmine_mylyn.internal.api.ProjectValidator;
 import net.sf.redmine_mylyn.internal.api.QueryValidator;
 import net.sf.redmine_mylyn.internal.api.TimeEntryActivityValidator;
 import net.sf.redmine_mylyn.internal.api.TrackerValidator;
@@ -179,6 +180,9 @@ public class Api_2_7_ClientImplTest {
 		assertNotNull(configuration.getQueries());
 		assertEquals(0, configuration.getQueries().getAll().size());
 		
+		assertNotNull(configuration.getProjects());
+		assertEquals(0, configuration.getProjects().getAll().size());
+		
 		testee.updateConfiguration(null, true);
 
 		assertNotNull(configuration.getIssueStatuses());
@@ -204,6 +208,9 @@ public class Api_2_7_ClientImplTest {
 
 		assertNotNull(configuration.getQueries());
 		assertEquals(QueryValidator.COUNT, configuration.getQueries().getAll().size());
+
+		assertNotNull(configuration.getProjects());
+		assertEquals(ProjectValidator.COUNT, configuration.getProjects().getAll().size());
 
 	}
 

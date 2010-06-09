@@ -1,0 +1,57 @@
+package net.sf.redmine_mylyn.internal.api;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Arrays;
+import java.util.List;
+
+import net.sf.redmine_mylyn.api.model.Project;
+
+public class ProjectValidator {
+
+	public final static String RESOURCE_FILE = "/xmldata/projects.xml";
+	
+	public final static int COUNT = 2;
+	
+	public static void validate1(Project obj) {
+		assertNotNull(obj);
+		assertEquals(1, obj.getId());
+		assertEquals("eCookbook", obj.getName());
+		assertEquals("ecookbook", obj.getIdentifier());
+		
+		List<Integer> idlist=null;
+		idlist = obj.getTrackerIds();
+		assertNotNull(idlist);
+		assertEquals(3, idlist.size());
+		assertEquals("[1, 2, 3]", Arrays.toString(idlist.toArray()));
+		
+		idlist=null;
+		idlist = obj.getVersionIds();
+		assertNotNull(idlist);
+		assertEquals(6, idlist.size());
+		assertEquals("[1, 2, 3, 4, 6, 7]", Arrays.toString(idlist.toArray()));
+		
+		idlist=null;
+		idlist = obj.getIssueCategoryIds();
+		assertNotNull(idlist);
+		assertEquals(2, idlist.size());
+		assertEquals("[1, 2]", Arrays.toString(idlist.toArray()));
+		
+		assertNotNull(obj.getMembers());
+		assertEquals(2, obj.getMembers().size());
+		assertFalse(obj.getMembers().get(0).isAssignable());
+		assertEquals(2, obj.getMembers().get(0).getUserId());
+		assertTrue(obj.getMembers().get(1).isAssignable());
+		assertEquals(3, obj.getMembers().get(1).getUserId());
+		
+		assertNotNull(obj.getCustomFieldIdsByTrackerId());
+		assertEquals(3, obj.getCustomFieldIdsByTrackerId().size());
+		assertEquals("[1, 2, 6]", Arrays.toString(obj.getCustomFieldIdsByTrackerId().get(1).toArray()));
+		assertEquals("[6]", Arrays.toString(obj.getCustomFieldIdsByTrackerId().get(2).toArray()));
+		assertEquals("[2, 6]", Arrays.toString(obj.getCustomFieldIdsByTrackerId(3).toArray()));
+	}
+
+}

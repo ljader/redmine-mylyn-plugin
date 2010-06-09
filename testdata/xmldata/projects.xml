@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projects api="2.7.0.trunk" xmlns="http://redmin-mylyncon.sf.net/api">
+<project id="1">
+  <name>eCookbook</name>
+  <identifier>ecookbook</identifier>
+  <trackers>1 2 3</trackers>
+  <versions>1 2 3 4 6 7</versions>
+  <members>
+    <member userId="2" assignable="false"/>
+    <member userId="3" assignable="true"/>
+  </members>
+  <issueCategories>1 2</issueCategories>
+  <issueCustomFields>
+    <issueCustomFieldsByTracker trackerId="1">1 2 6</issueCustomFieldsByTracker>
+    <issueCustomFieldsByTracker trackerId="2">6</issueCustomFieldsByTracker>
+    <issueCustomFieldsByTracker trackerId="3">2 6</issueCustomFieldsByTracker>
+  </issueCustomFields>
+</project>
+<project id="3">
+  <name>eCookbook Subproject 1</name>
+  <identifier>subproject1</identifier>
+  <trackers>2 3</trackers>
+  <versions>4 6 7</versions>
+  <members>
+  </members>
+  <issueCategories/>
+  <issueCustomFields>
+    <issueCustomFieldsByTracker trackerId="2">6</issueCustomFieldsByTracker>
+    <issueCustomFieldsByTracker trackerId="3">2 6</issueCustomFieldsByTracker>
+  </issueCustomFields>
+</project>
+</projects>
