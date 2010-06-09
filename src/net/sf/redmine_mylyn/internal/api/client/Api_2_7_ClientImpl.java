@@ -11,6 +11,7 @@ import net.sf.redmine_mylyn.api.model.container.CustomFields;
 import net.sf.redmine_mylyn.api.model.container.IssueCategories;
 import net.sf.redmine_mylyn.api.model.container.IssuePriorities;
 import net.sf.redmine_mylyn.api.model.container.IssueStatuses;
+import net.sf.redmine_mylyn.api.model.container.Projects;
 import net.sf.redmine_mylyn.api.model.container.Queries;
 import net.sf.redmine_mylyn.api.model.container.TimeEntryActivities;
 import net.sf.redmine_mylyn.api.model.container.Trackers;
@@ -34,6 +35,7 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	private final static String URL_USERS = "/mylyn/users";
 	private final static String URL_TIMEENTRY_ACTIVITIES = "/mylyn/timeentryactivities";
 	private final static String URL_QUERIES = "/mylyn/queries";
+	private final static String URL_PROJECTS = "/mylyn/projects";
 	
 	private Map<String, IModelParser<? extends AbstractPropertyContainer<?>>> parserByClass;
 
@@ -89,5 +91,6 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 		parserByClass.put(URL_USERS, new AttributeParser<Users>(Users.class));
 		parserByClass.put(URL_TIMEENTRY_ACTIVITIES, new AttributeParser<TimeEntryActivities>(TimeEntryActivities.class));
 		parserByClass.put(URL_QUERIES, new AttributeParser<Queries>(Queries.class));
+		parserByClass.put(URL_PROJECTS, new AttributeParser<Projects>(Projects.class));
 	}
 }

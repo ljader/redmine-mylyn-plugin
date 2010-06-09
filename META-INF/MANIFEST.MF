@@ -13,4 +13,5 @@ Export-Package:
  net.sf.redmine_mylyn.api.model;uses:="net.sf.redmine_mylyn.api.model.container",
  net.sf.redmine_mylyn.api.model.container,
  net.sf.redmine_mylyn.internal.api.client;x-friends:="net.sf.redmine_mylyn.api-test",
- net.sf.redmine_mylyn.internal.api.parser;x-friends:="net.sf.redmine_mylyn.api-test"
+ net.sf.redmine_mylyn.internal.api.parser;x-friends:="net.sf.redmine_mylyn.api-test",
+ net.sf.redmine_mylyn.internal.api.parser.adapter.type;x-friends:="net.sf.redmine_mylyn.api-test"
