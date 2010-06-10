@@ -3,6 +3,7 @@ package net.sf.redmine_mylyn.internal.api.client;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -187,6 +188,8 @@ public class Api_2_7_ClientImplTest {
 		assertNotNull(configuration.getVersions());
 		assertEquals(0, configuration.getVersions().getAll().size());
 		
+		assertNull(configuration.getSettings());
+		
 		testee.updateConfiguration(null, true);
 
 		assertNotNull(configuration.getIssueStatuses());
@@ -218,6 +221,8 @@ public class Api_2_7_ClientImplTest {
 
 		assertNotNull(configuration.getVersions());
 		assertEquals(VersionValidator.COUNT, configuration.getVersions().getAll().size());
+
+		assertNotNull(configuration.getSettings());
 
 	}
 
