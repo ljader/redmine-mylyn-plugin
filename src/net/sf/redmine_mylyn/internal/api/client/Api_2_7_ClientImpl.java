@@ -19,6 +19,7 @@ import net.sf.redmine_mylyn.api.model.container.Users;
 import net.sf.redmine_mylyn.api.model.container.Versions;
 import net.sf.redmine_mylyn.internal.api.parser.AttributeParser;
 import net.sf.redmine_mylyn.internal.api.parser.IModelParser;
+import net.sf.redmine_mylyn.internal.api.parser.SettingsParser;
 
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -38,8 +39,11 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	private final static String URL_QUERIES = "/mylyn/queries";
 	private final static String URL_PROJECTS = "/mylyn/projects";
 	private final static String URL_VERSIONS = "/mylyn/versions";
+	private final static String URL_SETTINGS = "/mylyn/settings";
 	
 	private Map<String, IModelParser<? extends AbstractPropertyContainer<?>>> parserByClass;
+	
+	private SettingsParser settingsParser;
 
 	private Configuration configuration;
 	
@@ -77,9 +81,16 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 				conf.setPropertyContainer(propCt);
 				monitor.worked(1);
 			}
-			
 		}
-		
+
+		method = new GetMethod(URL_SETTINGS);
+		conf.setSettings(executeMethod(method, settingsParser, monitor));
+		if(monitor.isCanceled()) {
+			throw new OperationCanceledException();
+		} else {
+			monitor.worked(1);
+		}
+
 		getConfiguration().copy(conf);
 	}
 
@@ -95,5 +106,7 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 		parserByClass.put(URL_QUERIES, new AttributeParser<Queries>(Queries.class));
 		parserByClass.put(URL_PROJECTS, new AttributeParser<Projects>(Projects.class));
 		parserByClass.put(URL_VERSIONS, new AttributeParser<Versions>(Versions.class));
+		
+		settingsParser = new SettingsParser();
 	}
 }

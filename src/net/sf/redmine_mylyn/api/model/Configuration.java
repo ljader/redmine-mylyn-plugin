@@ -44,6 +44,17 @@ public class Configuration implements Serializable{
 	private Projects projects;
 	
 	private Versions versions;
+	
+	private Settings settings;
+
+	
+	public Settings getSettings() {
+		return settings;
+	}
+
+	public void setSettings(Settings settings) {
+		this.settings = settings;
+	}
 
 	public void setPropertyContainer(AbstractPropertyContainer<? extends Property> container) throws RedmineApiStatusException {
 		try {
@@ -140,5 +151,5 @@ public class Configuration implements Serializable{
 		}
 		return versions;
 	}
-	
+
 }
