@@ -13,6 +13,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -66,8 +69,14 @@ public class Api_2_7_ClientImplTest {
 		location = new WebLocation("http://localhost:1234", "jsmith", "jsmith");
 
 		server = new Thread(new Runnable() {
+			
 			@Override
 			public void run() {
+				Map <String, String> requestMap = new HashMap<String, String>();
+				requestMap.put("issues/updatedsince?issues=1,6,7,8&unixtime=123456789", "/xmldata/issues/updatedsince_1_7_8.xml");
+				requestMap.put("issues/updatedsince?issues=2,9&unixtime=123456789", "/xmldata/issues/updatedsince_2_9.xml");
+				
+				
 				try {
 					ServerSocket server = new ServerSocket(1234);
 					Pattern p = Pattern.compile("^(GET|POST)\\s+/mylyn/(\\S+).*$", Pattern.CASE_INSENSITIVE);
@@ -91,7 +100,15 @@ public class Api_2_7_ClientImplTest {
 							Matcher m = p.matcher(request);
 							if(m.find()) {
 								if(m.group(1).toUpperCase().equals("GET")) {
-									InputStream responseStream = getClass().getResourceAsStream("/xmldata/" + m.group(2) + ".xml");
+									String uri = m.group(2);
+									InputStream responseStream = null;
+									
+									if (requestMap.containsKey(uri)) {
+										responseStream = getClass().getResourceAsStream(requestMap.get(uri));
+									} else {
+										responseStream = getClass().getResourceAsStream("/xmldata/" + uri + ".xml");
+									}
+									
 									if (responseStream!=null) {
 										try {
 											flag = false;
@@ -223,7 +240,17 @@ public class Api_2_7_ClientImplTest {
 		assertEquals(VersionValidator.COUNT, configuration.getVersions().getAll().size());
 
 		assertNotNull(configuration.getSettings());
+	}
+	
+	@Test
+	public void testUpdatedIssues() throws Exception {
+		int[] ids = testee.getUpdatedIssueIds(new int[]{1,6,7,8}, 123456789l, monitor);
+		assertNotNull(ids);
+		assertEquals("[1, 7, 8]", Arrays.toString(ids));
 
+		ids = testee.getUpdatedIssueIds(new int[]{2,9}, 123456789l, monitor);
+		assertNotNull(ids);
+		assertEquals(0, ids.length);
 	}
 
 	@Test
