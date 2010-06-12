@@ -15,6 +15,8 @@ public interface IApiClient {
 	
 	public void updateConfiguration(IProgressMonitor monitor, boolean force) throws RedmineApiStatusException;
 	
+	public int[] getUpdatedIssueIds(int[] issues, long updatedSince, IProgressMonitor monitor) throws RedmineApiStatusException;
+	
 //		public List<Integer> getChangedTicketId(Integer projectId, Date changedSince, IProgressMonitor monitor) throws RedmineException;
 //		public void search(String searchParam, String projectId, String storedQueryId, List<RedmineTicket> tickets, IProgressMonitor monitor) throws RedmineException;
 //		

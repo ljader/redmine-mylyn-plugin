@@ -1,5 +1,6 @@
 package net.sf.redmine_mylyn.internal.api.client;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -20,10 +21,13 @@ import net.sf.redmine_mylyn.api.model.container.Versions;
 import net.sf.redmine_mylyn.internal.api.parser.AttributeParser;
 import net.sf.redmine_mylyn.internal.api.parser.IModelParser;
 import net.sf.redmine_mylyn.internal.api.parser.SettingsParser;
+import net.sf.redmine_mylyn.internal.api.parser.TypedParser;
+import net.sf.redmine_mylyn.internal.api.parser.adapter.type.UpdatedIssuesType;
 
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.equinox.service.weaving.ISupplementerRegistry;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
 import org.eclipse.mylyn.commons.net.Policy;
 
@@ -40,11 +44,16 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	private final static String URL_PROJECTS = "/mylyn/projects";
 	private final static String URL_VERSIONS = "/mylyn/versions";
 	private final static String URL_SETTINGS = "/mylyn/settings";
+
+	private final static String URL_ISSUES_UPDATED= "/mylyn/issues/updatedsince?issues=%s&unixtime=%d";
+	private final static String URL_ISSUES_LIST= "/mylyn/issues/list?issues=%s";
+	private final static String URL_ISSUE= "/mylyn/issue/%d";
 	
 	private Map<String, IModelParser<? extends AbstractPropertyContainer<?>>> parserByClass;
 	
 	private SettingsParser settingsParser;
-
+	private TypedParser<UpdatedIssuesType> updatedIssuesParser;
+	
 	private Configuration configuration;
 	
 	public Api_2_7_ClientImpl(AbstractWebLocation location) {
@@ -93,6 +102,29 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 
 		getConfiguration().copy(conf);
 	}
+	
+	@Override
+	public int[] getUpdatedIssueIds(int[] issues, long updatedSince, IProgressMonitor monitor) throws RedmineApiStatusException {
+		if (issues==null || issues.length==0) {
+			return null;
+		}
+		
+		monitor = Policy.monitorFor(monitor);
+		monitor.beginTask("Search updated issues", 1);
+
+		String uri = String.format(URL_ISSUES_UPDATED, Arrays.toString(issues).replaceAll("[\\[\\] ]", ""), updatedSince);
+		GetMethod method = new GetMethod(uri);
+		
+		UpdatedIssuesType result = executeMethod(method, updatedIssuesParser, monitor);
+
+		if(monitor.isCanceled()) {
+			throw new OperationCanceledException();
+		} else {
+			monitor.worked(1);
+		}
+		
+		return result.updatedIssueIds;
+	}
 
 	private void buildParser() {
 		parserByClass = new HashMap<String, IModelParser<? extends AbstractPropertyContainer<?>>>();
@@ -108,5 +140,7 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 		parserByClass.put(URL_VERSIONS, new AttributeParser<Versions>(Versions.class));
 		
 		settingsParser = new SettingsParser();
+		updatedIssuesParser = new TypedParser<UpdatedIssuesType>(UpdatedIssuesType.class);
 	}
+	
 }
