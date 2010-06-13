@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 
 import net.sf.redmine_mylyn.api.client.RedmineApiStatusException;
 import net.sf.redmine_mylyn.api.model.Configuration;
+import net.sf.redmine_mylyn.api.model.Issue;
 import net.sf.redmine_mylyn.api.model.container.AbstractPropertyContainer;
 import net.sf.redmine_mylyn.api.model.container.CustomFields;
 import net.sf.redmine_mylyn.api.model.container.IssueCategories;
@@ -22,12 +23,12 @@ import net.sf.redmine_mylyn.internal.api.parser.AttributeParser;
 import net.sf.redmine_mylyn.internal.api.parser.IModelParser;
 import net.sf.redmine_mylyn.internal.api.parser.SettingsParser;
 import net.sf.redmine_mylyn.internal.api.parser.TypedParser;
+import net.sf.redmine_mylyn.internal.api.parser.adapter.type.Issues;
 import net.sf.redmine_mylyn.internal.api.parser.adapter.type.UpdatedIssuesType;
 
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.equinox.service.weaving.ISupplementerRegistry;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
 import org.eclipse.mylyn.commons.net.Policy;
 
@@ -53,6 +54,8 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	
 	private SettingsParser settingsParser;
 	private TypedParser<UpdatedIssuesType> updatedIssuesParser;
+	private TypedParser<Issue> issueParser;
+	private TypedParser<Issues> issuesParser;
 	
 	private Configuration configuration;
 	
@@ -125,6 +128,52 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 		
 		return result.updatedIssueIds;
 	}
+	
+	@Override
+	public Issue getIssue(int id, IProgressMonitor monitor) throws RedmineApiStatusException {
+		if(id < 1) {
+			return null;
+		}
+		
+		monitor = Policy.monitorFor(monitor);
+		monitor.beginTask("Fetch issue", 1);
+
+		String uri = String.format(URL_ISSUE, id);
+		GetMethod method = new GetMethod(uri);
+		
+		Issue issue = executeMethod(method, issueParser, monitor);
+
+		if(monitor.isCanceled()) {
+			throw new OperationCanceledException();
+		} else {
+			monitor.worked(1);
+		}
+		
+		return issue;
+	}
+	
+	@Override
+	public Issue[] getIssues(IProgressMonitor monitor, int... issueIds) throws RedmineApiStatusException {
+		if (issueIds==null || issueIds.length==0) {
+			return null;
+		}
+		
+		monitor = Policy.monitorFor(monitor);
+		monitor.beginTask("Fetch issues", 1);
+
+		String uri = String.format(URL_ISSUES_LIST, Arrays.toString(issueIds).replaceAll("[\\[\\] ]", ""));
+		GetMethod method = new GetMethod(uri);
+		
+		Issues issues = executeMethod(method, issuesParser, monitor);
+
+		if(monitor.isCanceled()) {
+			throw new OperationCanceledException();
+		} else {
+			monitor.worked(1);
+		}
+		
+		return issues.getAll().toArray(new Issue[issues.getAll().size()]);
+	}
 
 	private void buildParser() {
 		parserByClass = new HashMap<String, IModelParser<? extends AbstractPropertyContainer<?>>>();
@@ -141,6 +190,8 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 		
 		settingsParser = new SettingsParser();
 		updatedIssuesParser = new TypedParser<UpdatedIssuesType>(UpdatedIssuesType.class);
+		issueParser = new TypedParser<Issue>(Issue.class);
+		issuesParser = new TypedParser<Issues>(Issues.class);
 	}
 	
 }
