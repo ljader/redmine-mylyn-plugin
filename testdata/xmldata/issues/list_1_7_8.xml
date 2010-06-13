@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues api="2.7.0.trunk" xmlns="http://redmin-mylyncon.sf.net/api">
+<issue editAllowed="false" id="1">
+  <subject>Can't print recipes</subject>
+  <description>Unable to print recipes</description>
+  <createdOn unixtime="1273183200">2010-05-07T00:00:00+02:00</createdOn>
+  <updatedOn unixtime="1273356000">2010-05-09T00:00:00+02:00</updatedOn>
+  <trackerId>1</trackerId>
+  <projectId>1</projectId>
+  <statusId>1</statusId>
+  <priorityId>4</priorityId>
+  <watched>false</watched>
+  <watchers/>
+  <startDate>2010-05-09</startDate>
+  <dueDate>2010-05-20</dueDate>
+  <doneRatio>0</doneRatio>
+  <authorId>2</authorId>
+  <categoryId>1</categoryId>
+  <availableStatus>1</availableStatus>
+  <customValues>
+    <customValue id="4" customFieldId="2">125</customValue>
+    <customValue id="10" customFieldId="6">2.1</customValue>
+    <customValue id="17" customFieldId="8">2009-12-01</customValue>
+  </customValues>
+  <journals>
+    <journal editAllowed="false" id="1">
+      <userId>1</userId>
+      <createdOn unixtime="1273269600">2010-05-08T00:00:00+02:00</createdOn>
+      <notes>Journal notes</notes>
+    </journal>
+    <journal editAllowed="false" id="2">
+      <userId>2</userId>
+      <createdOn unixtime="1273356000">2010-05-09T00:00:00+02:00</createdOn>
+      <notes>Some notes with Redmine links: #2, r2.</notes>
+    </journal>
+  </journals>
+  <attachments>
+  </attachments>
+  <issueRelations>
+  </issueRelations>
+  <timeEntries viewAllowed="true" newAllowed="false">
+    <sum>154.25</sum>
+    <timeEntry editAllowed="false" id="1">
+      <hours>4.25</hours>
+      <activityId>9</activityId>
+      <userId>2</userId>
+      <spentOn>2007-03-23</spentOn>
+      <comments>My hours</comments>
+      <customValues>
+      </customValues>
+    </timeEntry>
+    <timeEntry editAllowed="false" id="2">
+      <hours>150.0</hours>
+      <activityId>9</activityId>
+      <userId>1</userId>
+      <spentOn>2007-03-12</spentOn>
+      <comments/>
+      <customValues>
+      </customValues>
+    </timeEntry>
+  </timeEntries>
+</issue>
+<issue editAllowed="false" id="7">
+  <subject>Issue due today</subject>
+  <description>This is an issue that is due today</description>
+  <createdOn unixtime="1272578400">2010-04-30T00:00:00+02:00</createdOn>
+  <updatedOn unixtime="1272578400">2010-04-30T00:00:00+02:00</updatedOn>
+  <trackerId>1</trackerId>
+  <projectId>1</projectId>
+  <statusId>1</statusId>
+  <priorityId>5</priorityId>
+  <watched>false</watched>
+  <watchers/>
+  <startDate>2010-04-30</startDate>
+  <dueDate>2010-05-10</dueDate>
+  <doneRatio>0</doneRatio>
+  <authorId>2</authorId>
+  <availableStatus>1</availableStatus>
+  <customValues>
+    <customValue id="13" customFieldId="6"/>
+  </customValues>
+  <journals>
+  </journals>
+  <attachments>
+  </attachments>
+  <issueRelations>
+  </issueRelations>
+  <timeEntries viewAllowed="true" newAllowed="false">
+    <sum>0.0</sum>
+  </timeEntries>
+</issue>
+<issue editAllowed="false" id="8">
+  <subject>Closed issue</subject>
+  <description>This is a closed issue.</description>
+  <createdOn unixtime="1272578400">2010-04-30T00:00:00+02:00</createdOn>
+  <updatedOn unixtime="1272578400">2010-04-30T00:00:00+02:00</updatedOn>
+  <trackerId>1</trackerId>
+  <projectId>1</projectId>
+  <statusId>5</statusId>
+  <priorityId>5</priorityId>
+  <watched>false</watched>
+  <watchers/>
+  <doneRatio>0</doneRatio>
+  <authorId>2</authorId>
+  <availableStatus>5</availableStatus>
+  <customValues>
+  </customValues>
+  <journals>
+  </journals>
+  <attachments>
+  </attachments>
+  <issueRelations>
+  </issueRelations>
+  <timeEntries viewAllowed="true" newAllowed="false">
+    <sum>0.0</sum>
+  </timeEntries>
+</issue>
+</issues>

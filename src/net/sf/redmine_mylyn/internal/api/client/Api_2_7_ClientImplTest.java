@@ -20,10 +20,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.redmine_mylyn.api.model.Configuration;
+import net.sf.redmine_mylyn.api.model.Issue;
 import net.sf.redmine_mylyn.internal.api.CustomFieldValidator;
 import net.sf.redmine_mylyn.internal.api.IssueCategoryValidator;
 import net.sf.redmine_mylyn.internal.api.IssuePriorityValidator;
 import net.sf.redmine_mylyn.internal.api.IssueStatusValidator;
+import net.sf.redmine_mylyn.internal.api.IssueValidator;
 import net.sf.redmine_mylyn.internal.api.ProjectValidator;
 import net.sf.redmine_mylyn.internal.api.QueryValidator;
 import net.sf.redmine_mylyn.internal.api.TimeEntryActivityValidator;
@@ -73,8 +75,9 @@ public class Api_2_7_ClientImplTest {
 			@Override
 			public void run() {
 				Map <String, String> requestMap = new HashMap<String, String>();
-				requestMap.put("issues/updatedsince?issues=1,6,7,8&unixtime=123456789", "/xmldata/issues/updatedsince_1_7_8.xml");
-				requestMap.put("issues/updatedsince?issues=2,9&unixtime=123456789", "/xmldata/issues/updatedsince_2_9.xml");
+				requestMap.put("issues/updatedsince?issues=1,6,7,8&unixtime=123456789", IssueValidator.RESOURCE_FILE_UPDATED);
+				requestMap.put("issue/1", IssueValidator.RESOURCE_FILE_ISSUE_1);
+				requestMap.put("issues/list?issues=1,7,8", IssueValidator.RESOURCE_FILE_LIST);
 				
 				
 				try {
@@ -247,12 +250,25 @@ public class Api_2_7_ClientImplTest {
 		int[] ids = testee.getUpdatedIssueIds(new int[]{1,6,7,8}, 123456789l, monitor);
 		assertNotNull(ids);
 		assertEquals("[1, 7, 8]", Arrays.toString(ids));
-
-		ids = testee.getUpdatedIssueIds(new int[]{2,9}, 123456789l, monitor);
-		assertNotNull(ids);
-		assertEquals(0, ids.length);
 	}
+	
+	@Test
+	public void testGetIssue() throws Exception {
+		Issue issue = testee.getIssue(1, monitor);
+		assertNotNull(issue);
+		assertEquals(1, issue.getId());
+	} 
 
+	@Test
+	public void testGetIssues() throws Exception {
+		Issue[] issues = testee.getIssues(monitor, 1,7,8);
+		assertNotNull(issues);
+		assertEquals(3, issues.length);
+		assertEquals(1, issues[0].getId());
+		assertEquals(7, issues[1].getId());
+		assertEquals(8, issues[2].getId());
+	} 
+	
 	@Test
 	public void concurrencyRequests() throws Exception {
 		Class<AbstractClient> clazz = AbstractClient.class;
