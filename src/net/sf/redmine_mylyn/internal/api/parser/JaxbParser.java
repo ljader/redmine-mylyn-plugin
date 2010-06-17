@@ -8,6 +8,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.sax.SAXSource;
 
 import net.sf.redmine_mylyn.api.client.RedmineApiPlugin;
 import net.sf.redmine_mylyn.api.client.RedmineApiStatusException;
@@ -38,12 +39,24 @@ public class JaxbParser<T extends Object> {
 			Unmarshaller unmarshaller = getUnmarshaller();
 			XMLInputFactory inputFactory = XMLInputFactory.newInstance();
 			XMLStreamReader reader;
-
+			
 			reader = inputFactory.createXMLStreamReader(stream);
 			Object obj = unmarshaller.unmarshal(reader);
 			
 			return clazz.cast(obj);
 
+		} catch (Exception e) {
+			IStatus status = new Status(IStatus.ERROR, RedmineApiPlugin.PLUGIN_ID, "Execution of method failed", e);
+			throw new RedmineApiStatusException(status);
+		}
+	}
+	public T parseInputStream(SAXSource source) throws RedmineApiStatusException {
+		try {
+			Unmarshaller unmarshaller = getUnmarshaller();
+			Object obj = unmarshaller.unmarshal(source);
+			
+			return clazz.cast(obj);
+			
 		} catch (Exception e) {
 			IStatus status = new Status(IStatus.ERROR, RedmineApiPlugin.PLUGIN_ID, "Execution of method failed", e);
 			throw new RedmineApiStatusException(status);

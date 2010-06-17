@@ -3,6 +3,8 @@ package net.sf.redmine_mylyn.api.client;
 
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.Issue;
+import net.sf.redmine_mylyn.api.model.PartialIssue;
+import net.sf.redmine_mylyn.api.query.Query;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
@@ -17,6 +19,8 @@ public interface IApiClient {
 	public Issue getIssue(int id, IProgressMonitor monitor) throws RedmineApiStatusException;
 	
 	public Issue[] getIssues(IProgressMonitor monitor, int... issueIds) throws RedmineApiStatusException;
+	
+	public PartialIssue[] query(Query query, IProgressMonitor monitor) throws RedmineApiStatusException;
 	
 //		public void search(String searchParam, String projectId, String storedQueryId, List<RedmineTicket> tickets, IProgressMonitor monitor) throws RedmineException;
 //		

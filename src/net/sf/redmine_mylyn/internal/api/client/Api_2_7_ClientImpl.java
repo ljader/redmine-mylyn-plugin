@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import net.sf.redmine_mylyn.api.client.RedmineApiStatusException;
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.Issue;
+import net.sf.redmine_mylyn.api.model.PartialIssue;
 import net.sf.redmine_mylyn.api.model.container.AbstractPropertyContainer;
 import net.sf.redmine_mylyn.api.model.container.CustomFields;
 import net.sf.redmine_mylyn.api.model.container.IssueCategories;
@@ -19,6 +20,7 @@ import net.sf.redmine_mylyn.api.model.container.TimeEntryActivities;
 import net.sf.redmine_mylyn.api.model.container.Trackers;
 import net.sf.redmine_mylyn.api.model.container.Users;
 import net.sf.redmine_mylyn.api.model.container.Versions;
+import net.sf.redmine_mylyn.api.query.Query;
 import net.sf.redmine_mylyn.internal.api.parser.AttributeParser;
 import net.sf.redmine_mylyn.internal.api.parser.IModelParser;
 import net.sf.redmine_mylyn.internal.api.parser.SettingsParser;
@@ -175,6 +177,12 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 		return issues.getAll().toArray(new Issue[issues.getAll().size()]);
 	}
 
+	@Override
+	public PartialIssue[] query(Query query, IProgressMonitor monitor) throws RedmineApiStatusException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 	private void buildParser() {
 		parserByClass = new HashMap<String, IModelParser<? extends AbstractPropertyContainer<?>>>();
 		parserByClass.put(URL_ISSUE_STATUS, new AttributeParser<IssueStatuses>(IssueStatuses.class));
