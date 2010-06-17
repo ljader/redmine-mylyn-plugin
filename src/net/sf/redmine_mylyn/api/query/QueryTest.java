@@ -4,11 +4,9 @@ import static net.sf.redmine_mylyn.api.query.CompareOperator.IS_NOT;
 import static net.sf.redmine_mylyn.api.query.CompareOperator.OPEN;
 import static net.sf.redmine_mylyn.api.query.QueryField.STATUS;
 import static net.sf.redmine_mylyn.api.query.QueryField.TRACKER;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.httpclient.NameValuePair;
 import org.junit.Before;
