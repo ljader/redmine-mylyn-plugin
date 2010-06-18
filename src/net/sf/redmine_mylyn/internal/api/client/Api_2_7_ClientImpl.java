@@ -23,12 +23,16 @@ import net.sf.redmine_mylyn.api.model.container.Versions;
 import net.sf.redmine_mylyn.api.query.Query;
 import net.sf.redmine_mylyn.internal.api.parser.AttributeParser;
 import net.sf.redmine_mylyn.internal.api.parser.IModelParser;
+import net.sf.redmine_mylyn.internal.api.parser.PartialIssueParser;
 import net.sf.redmine_mylyn.internal.api.parser.SettingsParser;
 import net.sf.redmine_mylyn.internal.api.parser.TypedParser;
 import net.sf.redmine_mylyn.internal.api.parser.adapter.type.Issues;
+import net.sf.redmine_mylyn.internal.api.parser.adapter.type.PartialIssues;
 import net.sf.redmine_mylyn.internal.api.parser.adapter.type.UpdatedIssuesType;
 
+import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
@@ -48,9 +52,11 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	private final static String URL_VERSIONS = "/mylyn/versions";
 	private final static String URL_SETTINGS = "/mylyn/settings";
 
-	private final static String URL_ISSUES_UPDATED= "/mylyn/issues/updatedsince?issues=%s&unixtime=%d";
-	private final static String URL_ISSUES_LIST= "/mylyn/issues/list?issues=%s";
-	private final static String URL_ISSUE= "/mylyn/issue/%d";
+	private final static String URL_ISSUES_UPDATED = "/mylyn/issues/updatedsince?issues=%s&unixtime=%d";
+	private final static String URL_ISSUES_LIST = "/mylyn/issues/list?issues=%s";
+	private final static String URL_ISSUE = "/mylyn/issue/%d";
+	
+	private final static String URL_QUERY = "/issues.xml?set_filter=1";
 	
 	private Map<String, IModelParser<? extends AbstractPropertyContainer<?>>> parserByClass;
 	
@@ -58,6 +64,8 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	private TypedParser<UpdatedIssuesType> updatedIssuesParser;
 	private TypedParser<Issue> issueParser;
 	private TypedParser<Issues> issuesParser;
+	
+	private PartialIssueParser queryParser;
 	
 	private Configuration configuration;
 	
@@ -179,8 +187,24 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 
 	@Override
 	public PartialIssue[] query(Query query, IProgressMonitor monitor) throws RedmineApiStatusException {
-		// TODO Auto-generated method stub
-		return null;
+		monitor = Policy.monitorFor(monitor);
+		monitor.beginTask("Execute query", 1);
+
+		PostMethod method = new PostMethod(URL_QUERY);
+		
+		for (NameValuePair nvp : query.getParams()) {
+			method.addParameter(nvp);
+		}
+		
+		PartialIssues issues = executeMethod(method, queryParser, monitor);
+
+		if(monitor.isCanceled()) {
+			throw new OperationCanceledException();
+		} else {
+			monitor.worked(1);
+		}
+
+		return issues.issues;
 	}
 	
 	private void buildParser() {
@@ -200,6 +224,8 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 		updatedIssuesParser = new TypedParser<UpdatedIssuesType>(UpdatedIssuesType.class);
 		issueParser = new TypedParser<Issue>(Issue.class);
 		issuesParser = new TypedParser<Issues>(Issues.class);
+
+		queryParser = new PartialIssueParser();
 	}
 	
 }

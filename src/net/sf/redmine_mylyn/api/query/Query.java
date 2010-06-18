@@ -33,7 +33,7 @@ public class Query {
 		}
 	}
 	
-	List<NameValuePair> getParams() throws RedmineApiStatusException {
+	public List<NameValuePair> getParams() throws RedmineApiStatusException {
 		if(params==null) {
 			params = new ArrayList<NameValuePair>();
 		}
