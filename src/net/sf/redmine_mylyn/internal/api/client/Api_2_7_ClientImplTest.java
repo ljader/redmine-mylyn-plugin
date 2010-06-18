@@ -3,7 +3,7 @@ package net.sf.redmine_mylyn.internal.api.client;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -21,11 +21,14 @@ import java.util.regex.Pattern;
 
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.Issue;
+import net.sf.redmine_mylyn.api.model.PartialIssue;
+import net.sf.redmine_mylyn.api.query.Query;
 import net.sf.redmine_mylyn.internal.api.CustomFieldValidator;
 import net.sf.redmine_mylyn.internal.api.IssueCategoryValidator;
 import net.sf.redmine_mylyn.internal.api.IssuePriorityValidator;
 import net.sf.redmine_mylyn.internal.api.IssueStatusValidator;
 import net.sf.redmine_mylyn.internal.api.IssueValidator;
+import net.sf.redmine_mylyn.internal.api.PartialIssueValidator;
 import net.sf.redmine_mylyn.internal.api.ProjectValidator;
 import net.sf.redmine_mylyn.internal.api.QueryValidator;
 import net.sf.redmine_mylyn.internal.api.TimeEntryActivityValidator;
@@ -78,11 +81,12 @@ public class Api_2_7_ClientImplTest {
 				requestMap.put("issues/updatedsince?issues=1,6,7,8&unixtime=123456789", IssueValidator.RESOURCE_FILE_UPDATED);
 				requestMap.put("issue/1", IssueValidator.RESOURCE_FILE_ISSUE_1);
 				requestMap.put("issues/list?issues=1,7,8", IssueValidator.RESOURCE_FILE_LIST);
+				requestMap.put("issues.xml?set_filter=1", PartialIssueValidator.RESOURCE_FILE);
 				
 				
 				try {
 					ServerSocket server = new ServerSocket(1234);
-					Pattern p = Pattern.compile("^(GET|POST)\\s+/mylyn/(\\S+).*$", Pattern.CASE_INSENSITIVE);
+					Pattern p = Pattern.compile("^(?:GET|POST)\\s+(?:/mylyn)?/(\\S+).*$", Pattern.CASE_INSENSITIVE);
 					
 					while(!Thread.interrupted()) {
 						OutputStream respStream = null;
@@ -102,30 +106,27 @@ public class Api_2_7_ClientImplTest {
 							
 							Matcher m = p.matcher(request);
 							if(m.find()) {
-								if(m.group(1).toUpperCase().equals("GET")) {
-									String uri = m.group(2);
-									InputStream responseStream = null;
-									
-									if (requestMap.containsKey(uri)) {
-										responseStream = getClass().getResourceAsStream(requestMap.get(uri));
-									} else {
-										responseStream = getClass().getResourceAsStream("/xmldata/" + uri + ".xml");
-									}
-									
-									if (responseStream!=null) {
-										try {
-											flag = false;
-											respStream.write(RESPONSE_HEADER_OK.getBytes());
-											
-											int read = -1;
-											byte[] buffer = new byte[4096];
-											while((read=responseStream.read(buffer, 0, 4096))>-1) {
-												respStream.write(buffer, 0, read);
-											}
-										} finally {
-											responseStream.close();
-										}
+								String uri = m.group(1);
+								InputStream responseStream = null;
+								
+								if (requestMap.containsKey(uri)) {
+									responseStream = getClass().getResourceAsStream(requestMap.get(uri));
+								} else {
+									responseStream = getClass().getResourceAsStream("/xmldata/" + uri + ".xml");
+								}
+								
+								if (responseStream!=null) {
+									try {
+										flag = false;
+										respStream.write(RESPONSE_HEADER_OK.getBytes());
 										
+										int read = -1;
+										byte[] buffer = new byte[4096];
+										while((read=responseStream.read(buffer, 0, 4096))>-1) {
+											respStream.write(buffer, 0, read);
+										}
+									} finally {
+										responseStream.close();
 									}
 									
 								}
@@ -268,6 +269,24 @@ public class Api_2_7_ClientImplTest {
 		assertEquals(7, issues[1].getId());
 		assertEquals(8, issues[2].getId());
 	} 
+	
+	@Test
+	public void testQuery() throws Exception {
+		Query query = new Query();
+		PartialIssue[] issues =testee.query(query, monitor);
+		assertNotNull(issues);
+		assertEquals(PartialIssueValidator.COUNT, issues.length);
+	}
+	
+	@Test
+	public void testStoredQuery() throws Exception {
+		fail("not implemented");
+	}
+	
+	@Test
+	public void testEmptyQuery() throws Exception {
+		fail("not implemented");
+	}
 	
 	@Test
 	public void concurrencyRequests() throws Exception {
