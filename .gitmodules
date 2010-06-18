@@ -1,0 +1,6 @@
+[submodule "net.sf.redmine_mylyn.api"]
+	path = net.sf.redmine_mylyn.api
+	url = ssh://sven-k@redmin-mylyncon.git.sourceforge.net/gitroot/redmin-mylyncon/net.sf.redmine_mylyn.api
+[submodule "net.sf.redmine_mylyn.api-test"]
+	path = net.sf.redmine_mylyn.api-test
+	url = ssh://sven-k@redmin-mylyncon.git.sourceforge.net/gitroot/redmin-mylyncon/net.sf.redmine_mylyn.api-test
