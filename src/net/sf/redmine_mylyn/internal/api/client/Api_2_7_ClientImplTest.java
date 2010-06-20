@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.redmine_mylyn.api.client.RedmineServerVersion;
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.Issue;
 import net.sf.redmine_mylyn.api.model.PartialIssue;
@@ -31,6 +32,7 @@ import net.sf.redmine_mylyn.internal.api.IssueValidator;
 import net.sf.redmine_mylyn.internal.api.PartialIssueValidator;
 import net.sf.redmine_mylyn.internal.api.ProjectValidator;
 import net.sf.redmine_mylyn.internal.api.QueryValidator;
+import net.sf.redmine_mylyn.internal.api.ServerVersionValidator;
 import net.sf.redmine_mylyn.internal.api.TimeEntryActivityValidator;
 import net.sf.redmine_mylyn.internal.api.TrackerValidator;
 import net.sf.redmine_mylyn.internal.api.UserValidator;
@@ -78,6 +80,7 @@ public class Api_2_7_ClientImplTest {
 			@Override
 			public void run() {
 				Map <String, String> requestMap = new HashMap<String, String>();
+				requestMap.put("version", ServerVersionValidator.RESOURCE_FILE);
 				requestMap.put("issues/updatedsince?issues=1,6,7,8&unixtime=123456789", IssueValidator.RESOURCE_FILE_UPDATED);
 				requestMap.put("issue/1", IssueValidator.RESOURCE_FILE_ISSUE_1);
 				requestMap.put("issues/list?issues=1,7,8", IssueValidator.RESOURCE_FILE_LIST);
@@ -176,6 +179,12 @@ public class Api_2_7_ClientImplTest {
 	}
 
 	@Test
+	public void testDetectServerVersion() throws Exception {
+		RedmineServerVersion version = testee.detectServerVersion(monitor);
+		assertNotNull(version);
+	}
+	
+	@Test
 	public void testUpdateConfiguration() throws Exception {
 		Configuration configuration = testee.getConfiguration();
 		
@@ -211,7 +220,7 @@ public class Api_2_7_ClientImplTest {
 		
 		assertNull(configuration.getSettings());
 		
-		testee.updateConfiguration(null, true);
+		testee.updateConfiguration(null);
 
 		assertNotNull(configuration.getIssueStatuses());
 		assertEquals(IssueStatusValidator.COUNT, configuration.getIssueStatuses().getAll().size());
