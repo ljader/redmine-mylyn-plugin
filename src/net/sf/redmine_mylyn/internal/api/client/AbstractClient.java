@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
 
-import net.sf.redmine_mylyn.api.client.IApiClient;
+import net.sf.redmine_mylyn.api.client.IRedmineApiClient;
 import net.sf.redmine_mylyn.api.client.RedmineApiPlugin;
 import net.sf.redmine_mylyn.api.client.RedmineApiStatusException;
 import net.sf.redmine_mylyn.internal.api.parser.IModelParser;
@@ -31,7 +31,7 @@ import org.eclipse.mylyn.commons.net.AuthenticationType;
 import org.eclipse.mylyn.commons.net.Policy;
 import org.eclipse.mylyn.commons.net.WebUtil;
 
-public abstract class AbstractClient implements IApiClient {
+public abstract class AbstractClient implements IRedmineApiClient {
 
 	protected final static String HEADER_STATUS = "status";
 

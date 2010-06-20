@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import net.sf.redmine_mylyn.api.client.RedmineApiStatusException;
+import net.sf.redmine_mylyn.api.client.RedmineServerVersion;
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.Issue;
 import net.sf.redmine_mylyn.api.model.PartialIssue;
@@ -40,6 +41,7 @@ import org.eclipse.mylyn.commons.net.Policy;
 
 public class Api_2_7_ClientImpl extends AbstractClient {
 
+	private final static String URL_SERVER_VERSION = "/mylyn/version";
 	private final static String URL_ISSUE_STATUS = "/mylyn/issuestatus";
 	private final static String URL_ISSUE_CATEGORIES = "/mylyn/issuecategories";
 	private final static String URL_ISSUE_PRIORITIES = "/mylyn/issuepriorities";
@@ -57,6 +59,7 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	private final static String URL_ISSUE = "/mylyn/issue/%d";
 	
 	private final static String URL_QUERY = "/issues.xml?set_filter=1";
+
 	
 	private Map<String, IModelParser<? extends AbstractPropertyContainer<?>>> parserByClass;
 	
@@ -64,6 +67,7 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	private TypedParser<UpdatedIssuesType> updatedIssuesParser;
 	private TypedParser<Issue> issueParser;
 	private TypedParser<Issues> issuesParser;
+	private TypedParser<RedmineServerVersion> versionParser;
 	
 	private PartialIssueParser queryParser;
 	
@@ -84,8 +88,24 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	}
 
 	@Override
-	public void updateConfiguration(IProgressMonitor monitor, boolean force) throws RedmineApiStatusException {
-		//TODO force / one update every 24 hours
+	public RedmineServerVersion detectServerVersion(IProgressMonitor monitor) throws RedmineApiStatusException {
+		monitor = Policy.monitorFor(monitor);
+		monitor.beginTask("Detect version of Redmine", 1);
+
+		GetMethod method = new GetMethod(URL_SERVER_VERSION);
+		RedmineServerVersion version = executeMethod(method, versionParser, monitor);
+
+		if(monitor.isCanceled()) {
+			throw new OperationCanceledException();
+		} else {
+			monitor.worked(1);
+		}
+
+		return version;
+	}
+	
+	@Override
+	public void updateConfiguration(IProgressMonitor monitor) throws RedmineApiStatusException {
 		monitor = Policy.monitorFor(monitor);
 
 		Configuration conf = new Configuration();
@@ -224,6 +244,7 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 		updatedIssuesParser = new TypedParser<UpdatedIssuesType>(UpdatedIssuesType.class);
 		issueParser = new TypedParser<Issue>(Issue.class);
 		issuesParser = new TypedParser<Issues>(Issues.class);
+		versionParser = new TypedParser<RedmineServerVersion>(RedmineServerVersion.class);
 
 		queryParser = new PartialIssueParser();
 	}

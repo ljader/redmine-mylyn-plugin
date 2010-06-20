@@ -8,11 +8,13 @@ import net.sf.redmine_mylyn.api.query.Query;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
-public interface IApiClient {
+public interface IRedmineApiClient {
 
 	public Configuration getConfiguration();
+
+	public RedmineServerVersion detectServerVersion(IProgressMonitor monitor) throws RedmineApiStatusException;
 	
-	public void updateConfiguration(IProgressMonitor monitor, boolean force) throws RedmineApiStatusException;
+	public void updateConfiguration(IProgressMonitor monitor) throws RedmineApiStatusException;
 	
 	public int[] getUpdatedIssueIds(int[] issues, long updatedSince, IProgressMonitor monitor) throws RedmineApiStatusException;
 	
@@ -21,6 +23,7 @@ public interface IApiClient {
 	public Issue[] getIssues(IProgressMonitor monitor, int... issueIds) throws RedmineApiStatusException;
 	
 	public PartialIssue[] query(Query query, IProgressMonitor monitor) throws RedmineApiStatusException;
+	
 	
 //		public void search(String searchParam, String projectId, String storedQueryId, List<RedmineTicket> tickets, IProgressMonitor monitor) throws RedmineException;
 //		
@@ -31,8 +34,6 @@ public interface IApiClient {
 //		public InputStream getAttachmentContent(int attachmentId, IProgressMonitor monitor) throws RedmineException;
 //	
 //		public void uploadAttachment(int ticketId, String fileName, String comment, String description, AbstractTaskAttachmentSource source, IProgressMonitor monitor) throws RedmineException;
-//		
-//		public Version checkClientConnection(IProgressMonitor monitor) throws RedmineException;
 //		
 //		public void refreshRepositorySettings(TaskRepository repository, AbstractWebLocation location);
 

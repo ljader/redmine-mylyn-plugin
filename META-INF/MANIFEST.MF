@@ -10,6 +10,7 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="3.5.0";visibility:=reex
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: javax.xml.bind
 Export-Package: 
+ net.sf.redmine_mylyn.api.client,
  net.sf.redmine_mylyn.api.model;uses:="net.sf.redmine_mylyn.api.model.container",
  net.sf.redmine_mylyn.api.model.container,
  net.sf.redmine_mylyn.api.query,
