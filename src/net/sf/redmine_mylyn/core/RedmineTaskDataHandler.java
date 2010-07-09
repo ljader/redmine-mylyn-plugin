@@ -5,10 +5,12 @@ import java.util.Set;
 
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.CustomField;
+import net.sf.redmine_mylyn.api.model.CustomField.Format;
 import net.sf.redmine_mylyn.api.model.Issue;
+import net.sf.redmine_mylyn.api.model.IssuePriority;
+import net.sf.redmine_mylyn.api.model.IssueStatus;
 import net.sf.redmine_mylyn.api.model.Project;
 import net.sf.redmine_mylyn.api.model.Property;
-import net.sf.redmine_mylyn.api.model.CustomField.Format;
 import net.sf.redmine_mylyn.core.client.IClient;
 import net.sf.redmine_mylyn.internal.core.ProgressValues;
 
@@ -17,6 +19,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.mylyn.commons.core.StatusHandler;
 import org.eclipse.mylyn.commons.net.Policy;
 import org.eclipse.mylyn.tasks.core.ITask;
 import org.eclipse.mylyn.tasks.core.ITaskMapping;
@@ -78,14 +81,35 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 			issue.setTrackerId(conf.getTrackers().getById(project.getTrackerIds()).get(0).getId());
 		} catch (RuntimeException e) {
 			IStatus status = new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, "Initialization of task failed. The provided data are insufficient.");
+			StatusHandler.log(status);
 			throw new CoreException(status);
 		}
 		
 		try {
 			createAttributes(taskData, issue, conf);
 			//Operations
-			//CF Attribs
-			//Def Values
+
+			/* Default-Values */
+			TaskAttribute root = taskData.getRoot();
+			root.getAttribute(RedmineAttribute.PROJECT.getTaskKey()).setValue(""+issue.getProjectId());
+			root.getAttribute(RedmineAttribute.TRACKER.getTaskKey()).setValue(""+issue.getTrackerId());
+			
+			IssuePriority priority = conf.getIssuePriorities().getDefault();
+			if(priority!=null) {
+				root.getAttribute(RedmineAttribute.PRIORITY.getTaskKey()).setValue(""+priority.getId());
+			} else if(conf.getIssuePriorities().getAll().size()>0){
+				root.getAttribute(RedmineAttribute.PRIORITY.getTaskKey()).setValue(""+conf.getIssuePriorities().getAll().get(0));
+			}
+			
+			IssueStatus status = conf.getIssueStatuses().getDefault();
+			if(status!=null) {
+				root.getAttribute(RedmineAttribute.STATUS.getTaskKey()).setValue(""+status.getId());
+				root.getAttribute(RedmineAttribute.STATUS_CHG.getTaskKey()).setValue(""+status.getId());
+			} else if(conf.getIssueStatuses().getAll().size()>0){
+				root.getAttribute(RedmineAttribute.STATUS.getTaskKey()).setValue(""+conf.getIssueStatuses().getAll().get(0));
+				root.getAttribute(RedmineAttribute.STATUS_CHG.getTaskKey()).setValue(""+conf.getIssueStatuses().getAll().get(0));
+			}
+			
 		} catch (RedmineStatusException e) {
 			throw new CoreException(RedmineCorePlugin.toStatus(e, e.getMessage()));
 		}
@@ -152,6 +176,7 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 
 		if (project==null || cfg.getSettings()==null) {
 			IStatus status = new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, "Initialization of task failed. The provided data are insufficient.");
+			StatusHandler.log(status);
 			throw new RedmineStatusException(status);
 		}
 
