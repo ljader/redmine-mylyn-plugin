@@ -11,6 +11,8 @@ import org.osgi.framework.BundleContext;
 
 public class RedmineUiPlugin extends AbstractUIPlugin {
 
+	public static final String PLUGIN_ID = "net.sf.redmine_mylyn.ui";
+
 	private static BundleContext context;
 
 	static BundleContext getContext() {

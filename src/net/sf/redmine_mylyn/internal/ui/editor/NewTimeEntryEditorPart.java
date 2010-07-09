@@ -3,6 +3,7 @@ package net.sf.redmine_mylyn.internal.ui.editor;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.redmine_mylyn.core.IRedmineConstants;
 import net.sf.redmine_mylyn.core.RedmineAttribute;
 
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
@@ -37,6 +38,8 @@ public class NewTimeEntryEditorPart extends AbstractTaskEditorPart {
 	
 	@Override
 	public void createControl(Composite parent, FormToolkit toolkit) {
+		//TODO layout / AttributePartLayoutHelper
+		
 		initialize();
 		
 		section = createSection(parent, toolkit, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
@@ -97,17 +100,16 @@ public class NewTimeEntryEditorPart extends AbstractTaskEditorPart {
 			attributeEditor.getControl().setLayoutData(gd);
 		}
 
-		//TODO
-//		for (TaskAttribute childAttribute : root.getAttributes().values()) {
-//			if(childAttribute.getId().startsWith(IRedmineConstants.TASK_KEY_PREFIX_TIMEENTRY_CF)) {
-//				attributeList.add(childAttribute.getId());
-//				attributeEditor = createAttributeEditor(childAttribute);
-//				attributeEditor.createLabelControl(composite, toolkit);
-//				attributeEditor.createControl(composite, toolkit);
-//				attributeEditor.setDecorationEnabled(false);
-//				editorToolkit.adapt(attributeEditor);
-//			}
-//		}
+		for (TaskAttribute childAttribute : root.getAttributes().values()) {
+			if(childAttribute.getId().startsWith(IRedmineConstants.TASK_KEY_PREFIX_TIMEENTRY_CF)) {
+				attributeList.add(childAttribute.getId());
+				attributeEditor = createAttributeEditor(childAttribute);
+				attributeEditor.createLabelControl(composite, toolkit);
+				attributeEditor.createControl(composite, toolkit);
+				attributeEditor.setDecorationEnabled(false);
+				editorToolkit.adapt(attributeEditor);
+			}
+		}
 		
 		toolkit.paintBordersFor(composite);
 		section.setClient(composite);
