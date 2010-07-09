@@ -4,3 +4,12 @@
 [submodule "net.sf.redmine_mylyn.api-test"]
 	path = net.sf.redmine_mylyn.api-test
 	url = ssh://sven-k@redmin-mylyncon.git.sourceforge.net/gitroot/redmin-mylyncon/net.sf.redmine_mylyn.api-test
+[submodule "net.sf.redmine_mylyn.core"]
+	path = net.sf.redmine_mylyn.core
+	url = ssh://sven-k@redmin-mylyncon.git.sourceforge.net/gitroot/redmin-mylyncon/net.sf.redmine_mylyn.core
+[submodule "net.sf.redmine_mylyn.core-test"]
+	path = net.sf.redmine_mylyn.core-test
+	url = ssh://sven-k@redmin-mylyncon.git.sourceforge.net/gitroot/redmin-mylyncon/net.sf.redmine_mylyn.core-test
+[submodule "net.sf.redmine_mylyn.ui"]
+	path = net.sf.redmine_mylyn.ui
+	url = ssh://sven-k@redmin-mylyncon.git.sourceforge.net/gitroot/redmin-mylyncon/net.sf.redmine_mylyn.ui
