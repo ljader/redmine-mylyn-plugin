@@ -36,9 +36,9 @@ public class CustomFieldParserTest {
 		assertNotNull(ct);
 		assertEquals(CustomFieldValidator.COUNT, ct.getAll().size());
 		
-		CustomFieldValidator.validate1(ct.get(1));
-		CustomFieldValidator.validate2(ct.get(2));
-		CustomFieldValidator.validate7(ct.get(7));
+		CustomFieldValidator.validate1(ct.getById(1));
+		CustomFieldValidator.validate2(ct.getById(2));
+		CustomFieldValidator.validate7(ct.getById(7));
 		
 		int idx=0;
 		assertNotNull(ct.getIssueCustomFields());

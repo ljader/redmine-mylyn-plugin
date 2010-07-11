@@ -37,9 +37,9 @@
   </attachments>
   <issueRelations>
   </issueRelations>
-  <timeEntries viewAllowed="true" newAllowed="false">
+  <timeEntries viewAllowed="true" newAllowed="true">
     <sum>154.25</sum>
-    <timeEntry editAllowed="false" id="1">
+    <timeEntry editAllowed="true" id="1">
       <hours>4.25</hours>
       <activityId>9</activityId>
       <userId>2</userId>

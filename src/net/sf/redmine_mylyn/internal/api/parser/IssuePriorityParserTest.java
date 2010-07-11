@@ -36,7 +36,7 @@ public class IssuePriorityParserTest {
 		assertNotNull(ct);
 		assertEquals(IssuePriorityValidator.COUNT, ct.getAll().size());
 		
-		IssuePriorityValidator.validate4(ct.get(4));
+		IssuePriorityValidator.validate4(ct.getById(4));
 		IssuePriorityValidator.validateOrder(ct);
 		IssuePriorityValidator.validateDefault(ct.getDefault());
 	}

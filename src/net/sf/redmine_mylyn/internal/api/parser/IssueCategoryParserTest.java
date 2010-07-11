@@ -36,7 +36,7 @@ public class IssueCategoryParserTest {
 		assertNotNull(categories);
 		assertEquals(IssueCategoryValidator.COUNT, categories.getAll().size());
 		
-		IssueCategoryValidator.validate3(categories.get(3));
+		IssueCategoryValidator.validate3(categories.getById(3));
 	}
 
 }

@@ -36,7 +36,7 @@ public class UserParserTest {
 		assertNotNull(ct);
 		assertEquals(UserValidator.COUNT, ct.getAll().size());
 		
-		UserValidator.validate2(ct.get(2));
+		UserValidator.validate2(ct.getById(2));
 	}
 
 }

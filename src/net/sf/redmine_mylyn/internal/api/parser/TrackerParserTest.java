@@ -36,7 +36,7 @@ public class TrackerParserTest {
 		assertNotNull(ct);
 		assertEquals(TrackerValidator.COUNT, ct.getAll().size());
 		
-		TrackerValidator.validate2(ct.get(2));
+		TrackerValidator.validate2(ct.getById(2));
 		TrackerValidator.validateOrder(ct);
 	}
 

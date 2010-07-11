@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
-import java.util.List;
 
 import net.sf.redmine_mylyn.api.model.Project;
 
@@ -19,26 +18,28 @@ public class ProjectValidator {
 	public static void validate1(Project obj) {
 		assertNotNull(obj);
 		assertEquals(1, obj.getId());
+		assertTrue(obj.isNewIssueAllowed());
+		assertTrue(obj.isMoveIssueAllowed());
 		assertEquals("eCookbook", obj.getName());
 		assertEquals("ecookbook", obj.getIdentifier());
 		
-		List<Integer> idlist=null;
+		int[] idlist=null;
 		idlist = obj.getTrackerIds();
 		assertNotNull(idlist);
-		assertEquals(3, idlist.size());
-		assertEquals("[1, 2, 3]", Arrays.toString(idlist.toArray()));
+		assertEquals(3, idlist.length);
+		assertEquals("[1, 2, 3]", Arrays.toString(idlist));
 		
 		idlist=null;
 		idlist = obj.getVersionIds();
 		assertNotNull(idlist);
-		assertEquals(6, idlist.size());
-		assertEquals("[1, 2, 3, 4, 6, 7]", Arrays.toString(idlist.toArray()));
+		assertEquals(6, idlist.length);
+		assertEquals("[1, 2, 3, 4, 6, 7]", Arrays.toString(idlist));
 		
 		idlist=null;
 		idlist = obj.getIssueCategoryIds();
 		assertNotNull(idlist);
-		assertEquals(2, idlist.size());
-		assertEquals("[1, 2]", Arrays.toString(idlist.toArray()));
+		assertEquals(2, idlist.length);
+		assertEquals("[1, 2]", Arrays.toString(idlist));
 		
 		assertNotNull(obj.getMembers());
 		assertEquals(2, obj.getMembers().size());
@@ -49,9 +50,9 @@ public class ProjectValidator {
 		
 		assertNotNull(obj.getCustomFieldIdsByTrackerId());
 		assertEquals(3, obj.getCustomFieldIdsByTrackerId().size());
-		assertEquals("[1, 2, 6]", Arrays.toString(obj.getCustomFieldIdsByTrackerId().get(1).toArray()));
-		assertEquals("[6]", Arrays.toString(obj.getCustomFieldIdsByTrackerId().get(2).toArray()));
-		assertEquals("[2, 6]", Arrays.toString(obj.getCustomFieldIdsByTrackerId(3).toArray()));
+		assertEquals("[1, 2, 6]", Arrays.toString(obj.getCustomFieldIdsByTrackerId().get(1)));
+		assertEquals("[6]", Arrays.toString(obj.getCustomFieldIdsByTrackerId().get(2)));
+		assertEquals("[2, 6]", Arrays.toString(obj.getCustomFieldIdsByTrackerId(3)));
 	}
 
 }

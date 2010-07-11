@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projects api="2.7.0.trunk" xmlns="http://redmin-mylyncon.sf.net/api">
-<project id="1">
+<project id="1" newIssueAllowed="true" moveIssueAllowed="true">
   <name>eCookbook</name>
   <identifier>ecookbook</identifier>
   <trackers>1 2 3</trackers>
@@ -16,7 +16,7 @@
     <issueCustomFieldsByTracker trackerId="3">2 6</issueCustomFieldsByTracker>
   </issueCustomFields>
 </project>
-<project id="3">
+<project id="3" newIssueAllowed="true" moveIssueAllowed="false">
   <name>eCookbook Subproject 1</name>
   <identifier>subproject1</identifier>
   <trackers>2 3</trackers>

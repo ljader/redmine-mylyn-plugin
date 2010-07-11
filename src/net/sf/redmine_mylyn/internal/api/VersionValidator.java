@@ -10,7 +10,7 @@ public class VersionValidator {
 	public final static String RESOURCE_FILE = "/xmldata/versions.xml";
 	
 	public final static int COUNT = 7;
-	
+
 	public static void validate1(Version obj) {
 		assertNotNull(obj);
 		assertEquals(1, obj.getId());

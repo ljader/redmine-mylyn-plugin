@@ -36,7 +36,7 @@ public class TimeEntryActivityParserTest {
 		assertNotNull(ct);
 		assertEquals(TimeEntryActivityValidator.COUNT, ct.getAll().size());
 		
-		TimeEntryActivityValidator.validate11(ct.get(11));
+		TimeEntryActivityValidator.validate11(ct.getById(11));
 		TimeEntryActivityValidator.validateOrder(ct);
 		TimeEntryActivityValidator.validateDefault(ct.getDefault());
 	}

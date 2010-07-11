@@ -36,7 +36,7 @@ public class ProjectParserTest {
 		assertNotNull(ct);
 		assertEquals(ProjectValidator.COUNT, ct.getAll().size());
 		
-		ProjectValidator.validate1(ct.get(1));
+		ProjectValidator.validate1(ct.getById(1));
 	}
 
 }
