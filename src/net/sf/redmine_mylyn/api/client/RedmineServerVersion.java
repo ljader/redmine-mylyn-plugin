@@ -11,6 +11,7 @@ import javax.xml.bind.annotation.XmlValue;
 @XmlAccessorType(XmlAccessType.NONE)
 public class RedmineServerVersion {
 	
+	
 	@XmlElement(namespace="http://redmin-mylyncon.sf.net/api")
 	public SubVersion plugin;
 
@@ -18,6 +19,7 @@ public class RedmineServerVersion {
 	public SubVersion redmine;
 
 	public enum Release {
+		REDMINE_0_9_DEVEL(0, 9, 4),
 		REDMINE_1_0(1, 0),
 		PLUGIN_2_7(2, 7);
 
@@ -36,6 +38,18 @@ public class RedmineServerVersion {
 		}
 	}
 	
+	RedmineServerVersion() {
+	}
+	
+	public RedmineServerVersion(SubVersion redmine, SubVersion plugin) {
+		this.redmine = redmine;
+		this.plugin = plugin;
+	}
+
+	public RedmineServerVersion(Release redmine, Release plugin) {
+		this(new SubVersion(redmine), new SubVersion(plugin));
+	}
+
 	@XmlAccessorType(XmlAccessType.NONE)
 	public static class SubVersion implements Comparable<Release> {
 
@@ -47,6 +61,15 @@ public class RedmineServerVersion {
 		
 		private String versionString;
 
+		SubVersion() {
+		}
+		
+		public SubVersion(Release release) {
+			major = release.major;
+			minor = release.minor;
+			tiny = release.tiny;
+		}
+		
 		@XmlValue
 		public String getVersionString() {
 			return versionString;
@@ -115,6 +138,14 @@ public class RedmineServerVersion {
 			return String.format("%d.%d.%d", major, minor, tiny);
 		}
 
+	}
+	
+	@Override
+	public String toString() {
+		if(redmine != null && plugin != null) {
+			return redmine.toString() + "-" + plugin.toString();
+		}
+		return super.toString();
 	}
 
 }

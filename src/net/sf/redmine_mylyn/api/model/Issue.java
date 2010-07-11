@@ -22,8 +22,11 @@ public class Issue implements IModel {
 
 	private static final long serialVersionUID = 1L;
 
-	@XmlAttribute
+	@XmlAttribute(required=true)
 	private int id;
+	
+	@XmlAttribute(required=true)
+	private boolean editAllowed;
 	
 	private String subject;
 	
@@ -79,6 +82,14 @@ public class Issue implements IModel {
 	//IssueRelations
 
 	private TimeEntries timeEntries;
+
+	public boolean isEditAllowed() {
+		return editAllowed;
+	}
+
+	public void setEditAllowed(boolean editAllowed) {
+		this.editAllowed = editAllowed;
+	}
 
 	public String getSubject() {
 		return subject;

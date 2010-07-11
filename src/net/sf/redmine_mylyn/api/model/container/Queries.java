@@ -14,6 +14,8 @@ import net.sf.redmine_mylyn.api.model.Query;
 @XmlAccessorType(XmlAccessType.NONE)
 public class Queries extends AbstractPropertyContainer<Query> {
 
+	private static final long serialVersionUID = 1L;
+
 	protected List<Query> queries;
 	
 	@Override

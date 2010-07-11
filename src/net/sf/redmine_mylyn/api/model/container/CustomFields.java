@@ -18,6 +18,8 @@ import net.sf.redmine_mylyn.api.model.CustomField.Type;
 @XmlAccessorType(XmlAccessType.NONE)
 public class CustomFields extends AbstractPropertyContainer<CustomField> {
 
+	private static final long serialVersionUID = 1L;
+
 	protected List<CustomField> customFields;
 
 	protected Map<Type, List<CustomField>> customFieldsByType;

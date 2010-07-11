@@ -14,6 +14,8 @@ import net.sf.redmine_mylyn.api.model.IssueCategory;
 @XmlAccessorType(XmlAccessType.NONE)
 public class IssueCategories extends AbstractPropertyContainer<IssueCategory> {
 
+	private static final long serialVersionUID = 1L;
+
 	protected List<IssueCategory> issueCategories;
 	
 	@Override

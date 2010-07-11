@@ -14,6 +14,8 @@ import net.sf.redmine_mylyn.api.model.Tracker;
 @XmlAccessorType(XmlAccessType.NONE)
 public class Trackers extends AbstractSortedPropertyContainer<Tracker> {
 
+	private static final long serialVersionUID = 1L;
+
 	protected List<Tracker> trackers;
 	
 	@Override

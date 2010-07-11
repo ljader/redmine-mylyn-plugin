@@ -14,6 +14,8 @@ import net.sf.redmine_mylyn.api.model.TimeEntryActivity;
 @XmlAccessorType(XmlAccessType.NONE)
 public class TimeEntryActivities extends AbstractSortedPropertyContainer<TimeEntryActivity> {
 
+	private static final long serialVersionUID = 1L;
+
 	protected List<TimeEntryActivity> activities;
 	
 	protected TimeEntryActivity defaultActivity;

@@ -1,12 +1,11 @@
 package net.sf.redmine_mylyn.api.model;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlList;
@@ -21,19 +20,25 @@ public class Project extends Property {
 
 	private static final long serialVersionUID = 1L;
 
+	@XmlAttribute(required=true)
+	private boolean newIssueAllowed;
+
+	@XmlAttribute(required=true)
+	private boolean moveIssueAllowed;
+	
 	private String identifier;
 	
 	@XmlElement(name="trackers")
 	@XmlList
-	private List<Integer> trackerIds;
+	private int[] trackerIds;
 	
 	@XmlElement(name="versions")
 	@XmlList
-	private List<Integer> versionIds;
+	private int[] versionIds;
 	
 	@XmlElement(name="issueCategories")
 	@XmlList
-	private List<Integer> issueCategoryIds;
+	private int[] issueCategoryIds;
 	
 	@XmlElementWrapper(name="members")
 	@XmlElement(name="member")
@@ -41,7 +46,23 @@ public class Project extends Property {
 	
 	@XmlElement(name="issueCustomFields")
 	@XmlJavaTypeAdapter(CFbyTrackerAdapter.class)
-	public Map<Integer, List<Integer>> customFieldIdsByTrackerId;
+	public Map<Integer, int[]> customFieldIdsByTrackerId;
+
+	public boolean isNewIssueAllowed() {
+		return newIssueAllowed;
+	}
+
+	public void setNewIssueAllowed(boolean newIssueAllowed) {
+		this.newIssueAllowed = newIssueAllowed;
+	}
+
+	public boolean isMoveIssueAllowed() {
+		return moveIssueAllowed;
+	}
+
+	public void setMoveIssueAllowed(boolean moveIssueAllowed) {
+		this.moveIssueAllowed = moveIssueAllowed;
+	}
 
 	public String getIdentifier() {
 		return identifier;
@@ -51,32 +72,26 @@ public class Project extends Property {
 		this.identifier = identifier;
 	}
 
-	public List<Integer> getTrackerIds() {
-		if(trackerIds==null) {
-			trackerIds = new ArrayList<Integer>();
-		}
+	public int[] getTrackerIds() {
 		return trackerIds;
 	}
-
-	public void setTrackerIds(List<Integer> trackerIds) {
+	
+	public void setTrackerIds(int[] trackerIds) {
 		this.trackerIds = trackerIds;
 	}
 
-	public List<Integer> getVersionIds() {
-		if (versionIds==null) {
-			versionIds = new ArrayList<Integer>();
+	public int[] getVersionIds() {
+		if(versionIds==null) {
+			return new int[0];
 		}
 		return versionIds;
 	}
 
-	public void setVersionIds(List<Integer> versionIds) {
+	public void setVersionIds(int[] versionIds) {
 		this.versionIds = versionIds;
 	}
-
+	
 	public List<Member> getMembers() {
-		if(members==null) {
-			members = new ArrayList<Member>();
-		}
 		return members;
 	}
 
@@ -84,32 +99,34 @@ public class Project extends Property {
 		this.members = members;
 	}
 
-	public List<Integer> getIssueCategoryIds() {
-		if (issueCategoryIds==null) {
-			issueCategoryIds = new ArrayList<Integer>();
-		}
+	public int[] getIssueCategoryIds() {
 		return issueCategoryIds;
 	}
 
-	public void setIssueCategoryIds(List<Integer> issueCategoryIds) {
+	public void setIssueCategoryIds(int[] issueCategoryIds) {
 		this.issueCategoryIds = issueCategoryIds;
 	}
 
-	
-	public Map<Integer, List<Integer>> getCustomFieldIdsByTrackerId() {
-		if(customFieldIdsByTrackerId==null) {
-			customFieldIdsByTrackerId = new HashMap<Integer, List<Integer>>();
-		}
+	public Map<Integer, int[]> getCustomFieldIdsByTrackerId() {
 		return customFieldIdsByTrackerId;
 	}
 
-	public void setCustomFieldIdsByTrackerId(
-			Map<Integer, List<Integer>> customFieldIdsByTrackerId) {
-		this.customFieldIdsByTrackerId = customFieldIdsByTrackerId;
-	}
-
-	public List<Integer> getCustomFieldIdsByTrackerId(int trackerId) {
+	public int[] getCustomFieldIdsByTrackerId(int trackerId) {
 		return getCustomFieldIdsByTrackerId().get(trackerId);
 	}
 
+	public int[] getAssignableMemberIds() {
+		if(members==null) {
+			return new int[0];
+		}
+		
+		int[] ids = new int[members.size()];
+		for (int i = 0; i < members.size(); i++) {
+			if(members.get(i).isAssignable()) {
+				ids[i] = members.get(i).getUserId();
+			}
+		}
+		return ids;
+	}
+	
 }

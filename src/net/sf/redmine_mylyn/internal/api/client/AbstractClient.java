@@ -49,8 +49,9 @@ public abstract class AbstractClient implements IRedmineApiClient {
 		this.location = location;
 		
 		MultiThreadedHttpConnectionManager connectionManager = new MultiThreadedHttpConnectionManager();
-		this.httpClient = new HttpClient(connectionManager);
-		this.httpClient.getParams().setCookiePolicy(CookiePolicy.RFC_2109);
+		httpClient = new HttpClient(connectionManager);
+		httpClient.getParams().setCookiePolicy(CookiePolicy.RFC_2109);
+		httpClient.getParams().setAuthenticationPreemptive(true);
 	}
 
 	protected <T extends Object> T executeMethod(HttpMethodBase method, IModelParser<T> parser, IProgressMonitor monitor) throws RedmineApiStatusException {
@@ -178,6 +179,7 @@ public abstract class AbstractClient implements IRedmineApiClient {
 				AuthScope authScope = new AuthScope(host, hostConfiguration.getPort(), AuthScope.ANY_REALM);
 				httpClient.getState().setCredentials(authScope, httpCredentials);
 			}
+			
 			
 			//TODO csrf token
 			

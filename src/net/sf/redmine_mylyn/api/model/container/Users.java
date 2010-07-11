@@ -14,6 +14,8 @@ import net.sf.redmine_mylyn.api.model.User;
 @XmlAccessorType(XmlAccessType.NONE)
 public class Users extends AbstractPropertyContainer<User> {
 
+	private static final long serialVersionUID = 1L;
+
 	protected List<User> users;
 	
 	@Override

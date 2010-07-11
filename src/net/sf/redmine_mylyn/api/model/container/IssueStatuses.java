@@ -14,6 +14,8 @@ import net.sf.redmine_mylyn.api.model.IssueStatus;
 @XmlAccessorType(XmlAccessType.NONE)
 public class IssueStatuses extends AbstractSortedPropertyContainer<IssueStatus> {
 
+	private static final long serialVersionUID = 1L;
+
 	protected List<IssueStatus> issueStatus;
 	
 	protected IssueStatus defaultStatus;

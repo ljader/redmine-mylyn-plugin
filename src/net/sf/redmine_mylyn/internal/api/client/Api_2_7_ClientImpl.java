@@ -78,6 +78,13 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 		
 		buildParser();
 	}
+
+	public Api_2_7_ClientImpl(AbstractWebLocation location, Configuration initialConfiguration) {
+		super(location);
+		
+		this.configuration = initialConfiguration;
+		buildParser();
+	}
 	
 	@Override
 	public Configuration getConfiguration() {

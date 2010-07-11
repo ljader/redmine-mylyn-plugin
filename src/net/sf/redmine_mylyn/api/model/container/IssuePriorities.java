@@ -14,6 +14,8 @@ import net.sf.redmine_mylyn.api.model.IssuePriority;
 @XmlAccessorType(XmlAccessType.NONE)
 public class IssuePriorities extends AbstractSortedPropertyContainer<IssuePriority> {
 
+	private static final long serialVersionUID = 1L;
+
 	protected List<IssuePriority> issuePriorities;
 	
 	protected IssuePriority defaultPriority;
