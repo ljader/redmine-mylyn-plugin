@@ -47,8 +47,11 @@ public class Client implements IClient {
 	
 	@Override
 	public Issue getIssue(int id, IProgressMonitor monitor) throws RedmineStatusException {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			return apiClient.getIssue(id, monitor);
+		} catch (RedmineApiStatusException e) {
+			throw new RedmineStatusException(e);
+		}
 	}
 
 

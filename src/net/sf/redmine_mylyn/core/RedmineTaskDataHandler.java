@@ -11,16 +11,14 @@ import net.sf.redmine_mylyn.api.model.IssuePriority;
 import net.sf.redmine_mylyn.api.model.IssueStatus;
 import net.sf.redmine_mylyn.api.model.Project;
 import net.sf.redmine_mylyn.api.model.Property;
-import net.sf.redmine_mylyn.core.client.IClient;
+import net.sf.redmine_mylyn.internal.core.IssueMapper;
 import net.sf.redmine_mylyn.internal.core.ProgressValues;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.mylyn.commons.core.StatusHandler;
-import org.eclipse.mylyn.commons.net.Policy;
 import org.eclipse.mylyn.tasks.core.ITask;
 import org.eclipse.mylyn.tasks.core.ITaskMapping;
 import org.eclipse.mylyn.tasks.core.RepositoryResponse;
@@ -123,41 +121,14 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 		return null;
 	}
 
-	public TaskData getTaskData(TaskRepository repository, String taskId, IProgressMonitor monitor) throws CoreException {
-		monitor = Policy.monitorFor(monitor);
-		try {
-			int id = Integer.parseInt(taskId);
-			monitor.beginTask("Task Download", IProgressMonitor.UNKNOWN);
-			
-			
-			Issue issue;
-			IClient client;
-			
-			client = connector.getClientManager().getClient(repository);
-			issue = client.getIssue(id, monitor);
-			//TODO not found
-			
-			return createTaskDataFromTicket(client, repository, issue, monitor);
-			
-		
-		} catch (OperationCanceledException e) {
-			throw new CoreException(new Status(IStatus.CANCEL, RedmineCorePlugin.PLUGIN_ID, "Operation canceled"));
-		} catch(NumberFormatException e) {
-			throw new CoreException(RedmineCorePlugin.toStatus(e, "Invalid TaskId {0}", taskId));
-		} catch (RedmineStatusException e) {
-			throw new CoreException(e.getStatus());
-		} finally {
-			monitor.done();
-		}
-	}
-
-	public TaskData createTaskDataFromTicket(IClient client, TaskRepository repository, Issue issue, IProgressMonitor monitor) throws CoreException {
+	public TaskData createTaskDataFromTicket(TaskRepository repository, Issue issue, IProgressMonitor monitor) throws CoreException {
 
 		try {
 			TaskData taskData = new TaskData(getAttributeMapper(repository), RedmineCorePlugin.REPOSITORY_KIND, repository.getRepositoryUrl(), issue.getId() + ""); //$NON-NLS-1$
 			createAttributes(taskData, issue, connector.getRepositoryConfiguration(repository));
 //			createOperations(taskData, client.getClientData(), ticket);
-//			updateTaskData(repository, taskData, client, ticket);
+
+			IssueMapper.updateTaskData(repository, taskData, connector.getRepositoryConfiguration(repository), issue);
 			return taskData;
 		} catch (RedmineStatusException e) {
 			IStatus status = RedmineCorePlugin.toStatus(e, e.getMessage());
@@ -184,7 +155,12 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 		
 		createAttribute(data, RedmineAttribute.SUMMARY);
 		createAttribute(data, RedmineAttribute.DESCRIPTION);
-		createAttribute(data, RedmineAttribute.PROJECT, cfg.getProjects().getAll());
+		
+		if(existingTask) {
+			createAttribute(data, RedmineAttribute.PROJECT, cfg.getProjects().getMoveAllowed(project));
+		} else {
+			createAttribute(data, RedmineAttribute.PROJECT, cfg.getProjects().getNewAllowed());
+		}
 
 		createAttribute(data, RedmineAttribute.ESTIMATED);
 		createAttribute(data, RedmineAttribute.DATE_DUE);
