@@ -28,6 +28,7 @@ import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskAttributeMapper;
 import org.eclipse.mylyn.tasks.core.data.TaskData;
 import org.eclipse.mylyn.tasks.core.data.TaskDataCollector;
+import org.eclipse.mylyn.tasks.core.data.TaskOperation;
 
 
 public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
@@ -85,7 +86,7 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 		
 		try {
 			createAttributes(taskData, issue, conf);
-			//Operations
+			createOperations(taskData, issue, conf);
 
 			/* Default-Values */
 			TaskAttribute root = taskData.getRoot();
@@ -123,12 +124,13 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 
 	public TaskData createTaskDataFromTicket(TaskRepository repository, Issue issue, IProgressMonitor monitor) throws CoreException {
 
+		Configuration configuration = connector.getRepositoryConfiguration(repository);
 		try {
 			TaskData taskData = new TaskData(getAttributeMapper(repository), RedmineCorePlugin.REPOSITORY_KIND, repository.getRepositoryUrl(), issue.getId() + ""); //$NON-NLS-1$
-			createAttributes(taskData, issue, connector.getRepositoryConfiguration(repository));
-//			createOperations(taskData, client.getClientData(), ticket);
+			createAttributes(taskData, issue, configuration);
+			createOperations(taskData, issue, configuration);
 
-			IssueMapper.updateTaskData(repository, taskData, connector.getRepositoryConfiguration(repository), issue);
+			IssueMapper.updateTaskData(repository, taskData, configuration, issue);
 			return taskData;
 		} catch (RedmineStatusException e) {
 			IStatus status = RedmineCorePlugin.toStatus(e, e.getMessage());
@@ -285,41 +287,37 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 		}
 		return type;
 	}
-//
-//	private static void createOperations(TaskData taskData, RedmineClientData clientData, RedmineTicket ticket) {
-//		RedmineTicketStatus currentStatus = null;
-//		if(ticket!=null) {
-//			String statusVal = ticket.getValue(RedmineAttribute.STATUS.getTicketKey());
-//			if(statusVal!=null && statusVal.matches(IRedmineConstants.REGEX_INTEGER)) {
-//				currentStatus = clientData.getStatus(Integer.parseInt(statusVal));
-//			}
-//		}
-//		
-//		if(currentStatus!=null) {
-//			createOperation(taskData, RedmineOperation.none, ""+currentStatus.getValue(), currentStatus.getName()); //$NON-NLS-1$
-//		}
-//		
-//		createOperation(taskData, RedmineOperation.markas, null);
-//	}
-//
-//	private static TaskAttribute createOperation(TaskData taskData, RedmineOperation operation, String defaultValue, Object... labelArgs) {
-//		TaskAttribute operationAttrib = taskData.getRoot().getAttribute(TaskAttribute.OPERATION);
-//		if(operationAttrib==null) {
-//			operationAttrib = taskData.getRoot().createAttribute(TaskAttribute.OPERATION);
-//			TaskOperation.applyTo(operationAttrib, operation.toString(), null);
-//		}
-//
-//		TaskAttribute attribute = taskData.getRoot().createAttribute(TaskAttribute.PREFIX_OPERATION + operation.toString());
-//		TaskOperation.applyTo(attribute, operation.toString(), operation.getLabel(labelArgs));
-//		
-//		if(operation.isAssociated()) {
-//			attribute.getMetaData().putValue(TaskAttribute.META_ASSOCIATED_ATTRIBUTE_ID, operation.getInputId());
-//		} else if(operation.needsRestoreValue() && defaultValue!=null && defaultValue!=""){ //$NON-NLS-1$
-//			attribute.getMetaData().putValue(IRedmineConstants.TASK_ATTRIBUTE_OPERATION_RESTORE, defaultValue);
-//		}
-//
-//
-//		return attribute;
-//	}
+
+	private static void createOperations(TaskData taskData, Issue issue, Configuration configuration) {
+		IssueStatus currentStatus = null;
+		if(issue!=null) {
+			currentStatus = configuration.getIssueStatuses().getById(issue.getStatusId());
+		}
+		
+		if(currentStatus!=null) {
+			createOperation(taskData, RedmineOperation.none, ""+currentStatus.getId(), currentStatus.getName());
+		}
+		
+		createOperation(taskData, RedmineOperation.markas, null);
+	}
+
+	private static TaskAttribute createOperation(TaskData taskData, RedmineOperation operation, String defaultValue, Object... labelArgs) {
+		TaskAttribute operationAttrib = taskData.getRoot().getAttribute(TaskAttribute.OPERATION);
+		if(operationAttrib==null) {
+			operationAttrib = taskData.getRoot().createAttribute(TaskAttribute.OPERATION);
+			TaskOperation.applyTo(operationAttrib, operation.toString(), null);
+		}
+
+		TaskAttribute attribute = taskData.getRoot().createAttribute(TaskAttribute.PREFIX_OPERATION + operation.toString());
+		TaskOperation.applyTo(attribute, operation.toString(), operation.getLabel(labelArgs));
+		
+		if(operation.isAssociated()) {
+			attribute.getMetaData().putValue(TaskAttribute.META_ASSOCIATED_ATTRIBUTE_ID, operation.getInputId());
+		} else if(operation.needsRestoreValue() && defaultValue!=null && defaultValue!=""){
+			attribute.getMetaData().putValue(IRedmineConstants.TASK_ATTRIBUTE_OPERATION_RESTORE, defaultValue);
+		}
+
+		return attribute;
+	}
 
 }
