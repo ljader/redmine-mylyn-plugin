@@ -15,6 +15,7 @@ import net.sf.redmine_mylyn.api.model.Property;
 import net.sf.redmine_mylyn.core.IRedmineConstants;
 import net.sf.redmine_mylyn.core.RedmineAttribute;
 import net.sf.redmine_mylyn.core.RedmineCorePlugin;
+import net.sf.redmine_mylyn.core.RedmineOperation;
 import net.sf.redmine_mylyn.core.RedmineRepositoryConnector;
 import net.sf.redmine_mylyn.internal.ui.editor.EstimatedEditor;
 import net.sf.redmine_mylyn.internal.ui.editor.NewTimeEntryEditorPart;
@@ -28,6 +29,7 @@ import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.mylyn.commons.core.StatusHandler;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
+import org.eclipse.mylyn.tasks.core.data.TaskDataModel;
 import org.eclipse.mylyn.tasks.core.data.TaskDataModelEvent;
 import org.eclipse.mylyn.tasks.core.data.TaskDataModelListener;
 import org.eclipse.mylyn.tasks.ui.TasksUi;
@@ -37,7 +39,12 @@ import org.eclipse.mylyn.tasks.ui.editors.AbstractTaskEditorPart;
 import org.eclipse.mylyn.tasks.ui.editors.AttributeEditorFactory;
 import org.eclipse.mylyn.tasks.ui.editors.TaskEditor;
 import org.eclipse.mylyn.tasks.ui.editors.TaskEditorPartDescriptor;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 
@@ -49,6 +56,8 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 
 	private final TaskDataModelListener projectAttributeListener;
 	private final TaskDataModelListener trackerAttributeListener;
+
+	private final TaskDataModelListener modelListener;
 
 //	private RedmineTaskDataValidator validator;
 //	
@@ -88,6 +97,8 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 		projectAttributeListener = new ProjectTaskDataModelListener();
 		trackerAttributeListener = new TrackerTaskDataModelListener();
 		
+		modelListener = new AttributeTaskDataModelListener();
+		
 //		MODEL_LISTENER = new TaskDataModelListener() {
 //			@Override
 //			public void attributeChanged(TaskDataModelEvent event) {
@@ -98,34 +109,6 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 //					getTaskEditor().setMessage("", IMessageProvider.NONE); //$NON-NLS-1$
 //				}
 //				
-//				TaskAttribute changedAttribute = event.getTaskAttribute();
-//				if(changedAttribute.getId().equals(RedmineAttribute.STATUS_CHG.getTaskKey())) {
-//					TaskDataModel model = event.getModel();
-//					TaskAttribute markasOperation = model.getTaskData().getRoot().getAttribute(TaskAttribute.PREFIX_OPERATION + RedmineOperation.markas.toString());
-//					if(markasOperation!=null) {
-//						TaskAttribute operation = model.getTaskData().getRoot().getAttribute(TaskAttribute.OPERATION);
-//						model.getTaskData().getAttributeMapper().setValue(operation, RedmineOperation.markas.toString());
-//						model.attributeChanged(operation);
-//						
-//						if(statusChangeEditor!=null) {
-//							Control control = statusChangeEditor.getControl();
-//							if(control!=null && control instanceof CCombo) {
-//								Listener[] listeners = control.getListeners(SWT.Selection);
-//								if(listeners!=null && listeners.length==2) {
-//									Event e = new Event();
-//									e.widget = control;
-//									e.type = SWT.Selection;
-//									/*
-//									 * Excpected listeners:
-//									 * 0: AttributeEditor
-//									 * 1: ActionButton
-//									 */
-//									listeners[1].handleEvent(e);
-//								}
-//							}
-//						}
-//					}
-//				}
 //				
 //			}
 //		};
@@ -151,6 +134,8 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 
 			getModel().addModelListener(projectAttributeListener);
 			getModel().addModelListener(trackerAttributeListener);
+			
+			getModel().addModelListener(modelListener);
 		}
 
 		//TODO
@@ -162,6 +147,8 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 //		getModel().removeModelListener(MODEL_LISTENER);
 		getModel().removeModelListener(projectAttributeListener);
 		getModel().removeModelListener(trackerAttributeListener);
+		
+		getModel().removeModelListener(modelListener);
 		//TODO
 //		RedmineUiPlugin.getDefault().removeAttributeChangedListener(STATUS_LISTENER);
 		super.dispose();
@@ -390,6 +377,50 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 		}
 		return id;
 	} 
+
+	private class AttributeTaskDataModelListener extends TaskDataModelListener {
+
+		@Override
+		public void attributeChanged(TaskDataModelEvent event) {
+			TaskAttribute changedAttribute = event.getTaskAttribute();
+			
+			if(changedAttribute.getId().equals(RedmineAttribute.STATUS_CHG.getTaskKey())) {
+				statusChanged(changedAttribute, event.getModel());
+			}
+			
+		}
+		
+		void statusChanged(TaskAttribute statusAttribute, TaskDataModel model) {
+			TaskAttribute markasOperation = model.getTaskData().getRoot().getAttribute(TaskAttribute.PREFIX_OPERATION + RedmineOperation.markas.toString());
+			if(markasOperation!=null) {
+				TaskAttribute operation = model.getTaskData().getRoot().getAttribute(TaskAttribute.OPERATION);
+				model.getTaskData().getAttributeMapper().setValue(operation, RedmineOperation.markas.toString());
+				model.attributeChanged(operation);
+				
+				AbstractAttributeEditor statusChgEditor = attributeEditors.get(RedmineAttribute.STATUS_CHG);
+				if(statusChgEditor!=null) {
+					Control control = statusChgEditor.getControl();
+					if(control!=null && control instanceof CCombo) {
+						Listener[] listeners = control.getListeners(SWT.Selection);
+						if(listeners!=null && listeners.length==2) {
+							Event e = new Event();
+							e.widget = control;
+							e.type = SWT.Selection;
+							/*
+							 * Excpected listeners:
+							 * 0: AttributeEditor
+							 * 1: ActionButton
+							 */
+							listeners[1].handleEvent(e);
+						}
+					}
+					
+				}
+			}
+			
+		}
+		
+	}
 
 	private class ProjectTaskDataModelListener extends TaskDataModelListener {
 		
