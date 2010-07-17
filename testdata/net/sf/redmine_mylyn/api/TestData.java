@@ -186,7 +186,7 @@ public class TestData {
 		//TODO
 	}
 	
-	static CustomField buildCustomField(int id, String name, Type type, Format format, int min, int max, String regex, String defValue, boolean isRequired, boolean isFilter, boolean isForAll, String... options) throws Exception {
+	public static CustomField buildCustomField(int id, String name, Type type, Format format, int min, int max, String regex, String defValue, boolean isRequired, boolean isFilter, boolean isForAll, String... options) throws Exception {
 		CustomField cf = new CustomField();
 		setId(cf, id);
 		cf.setName(name);

@@ -15,10 +15,17 @@ import static net.sf.redmine_mylyn.api.query.QueryField.STATUS;
 import static net.sf.redmine_mylyn.api.query.QueryField.TRACKER;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+
+import net.sf.redmine_mylyn.api.TestData;
+import net.sf.redmine_mylyn.api.model.Configuration;
+import net.sf.redmine_mylyn.api.model.CustomField;
+import net.sf.redmine_mylyn.api.model.CustomField.Format;
+import net.sf.redmine_mylyn.api.model.CustomField.Type;
 
 import org.apache.commons.httpclient.NameValuePair;
 import org.junit.Before;
@@ -184,8 +191,8 @@ public class QueryFilterTest {
 	
 	@Test
 	public void testAppendParamsBooleanBased() throws Exception {
-		//TODO rewrite, use cf
-		testee = new QueryFilter(BOOLEAN_TYPE);
+		CustomField cf = TestData.buildCustomField(2, "boolValue", Type.IssueCustomField, Format.BOOL, 0, 0, null, null, false, true, true);
+		testee = new QueryFilter(cf, BOOLEAN_TYPE);
 		
 		testee.setOperator(IS);
 		testee.appendParams(params);
@@ -195,17 +202,17 @@ public class QueryFilterTest {
 		testee.appendParams(params);
 		assertEquals(0, params.size());
 		
-		testee = new QueryFilter(BOOLEAN_TYPE);
+		testee = new QueryFilter(cf, BOOLEAN_TYPE);
 		testee.setOperator(IS);
 		testee.addValue("1");
 		testee.appendParams(params);
 		
 		assertEquals(3, params.size());
 		assertEquals("fields[]", params.get(0).getName());
-		assertEquals("BOOLEAN_BASED", params.get(0).getValue());
-		assertEquals("operators[BOOLEAN_BASED]", params.get(1).getName());
+		assertEquals("cf_2", params.get(0).getValue());
+		assertEquals("operators[cf_2]", params.get(1).getName());
 		assertEquals("=", params.get(1).getValue());
-		assertEquals("values[BOOLEAN_BASED][]", params.get(2).getName());
+		assertEquals("values[cf_2][]", params.get(2).getName());
 		assertEquals("1", params.get(2).getValue());
 	}
 	
@@ -235,4 +242,58 @@ public class QueryFilterTest {
 		assertEquals("50", params.get(2).getValue());
 	}
 
+	@Test
+	public void testFromNameValuePair() throws Exception {
+		Configuration cfg = TestData.cfg;
+		Field queryF = QueryFilter.class.getDeclaredField("queryField"); //IQueryField
+		queryF.setAccessible(true);
+		Field definitionF = QueryFilter.class.getDeclaredField("definition"); //QueryField
+		definitionF.setAccessible(true);
+		assert(queryF!=null);
+		assert(definitionF!=null);
+		
+		QueryFilter filter;
+
+		assertNull(QueryFilter.fromNameValuePair(new NameValuePair("fields[]", "cf_5"), cfg));
+		
+		filter = QueryFilter.fromNameValuePair(new NameValuePair("fields[]", "cf_1"), cfg);
+		assertSame(cfg.getCustomFields().getById(1), queryF.get(filter));
+		assertSame(QueryField.LIST_TYPE, definitionF.get(filter));
+		
+		filter = QueryFilter.fromNameValuePair(new NameValuePair("fields[]", "cf_9"), cfg);
+		assertSame(cfg.getCustomFields().getById(9), queryF.get(filter));
+		assertSame(QueryField.DATE_TYPE, definitionF.get(filter));
+		
+		assertNull(QueryFilter.fromNameValuePair(new NameValuePair("fields[]", "fake"), cfg));
+
+		filter = QueryFilter.fromNameValuePair(new NameValuePair("fields[]", "created_on"), cfg);
+		assertSame(QueryField.DATE_CREATED, queryF.get(filter));
+		assertSame(QueryField.DATE_CREATED, definitionF.get(filter));
+	}
+
+	@Test
+	public void testFindOperatorFromNameValuePair() throws Exception {
+		assertNull(QueryFilter.findOperatorFromNameValuePair(new NameValuePair("operators[subject]", "fake")));
+		assertNull(QueryFilter.findOperatorFromNameValuePair(new NameValuePair("operators[subject][]", "~")));
+		assertNull(QueryFilter.findOperatorFromNameValuePair(new NameValuePair("foo[bar]", "~")));
+		assertSame(CompareOperator.CONTAINS, QueryFilter.findOperatorFromNameValuePair(new NameValuePair("operators[subject]", "~")));
+	}
+	
+	@Test
+	public void testFindValueFromNameValuePair() throws Exception {
+		assertNull(QueryFilter.findValueFromNameValuePair(new NameValuePair("foo[bar]", "short description")));
+		assertNull("short description", QueryFilter.findValueFromNameValuePair(new NameValuePair("values[subject]", "short description")));
+		assertSame("short description", QueryFilter.findValueFromNameValuePair(new NameValuePair("values[subject][]", "short description")));
+	}
+	
+	@Test
+	public void testFindNamefromNameValue() throws Exception {
+		assertNull(QueryFilter.findNamefromNameValuePair(new NameValuePair("something", "")));
+		assertNull(QueryFilter.findNamefromNameValuePair(new NameValuePair("operators[]", "")));
+		assertNull(QueryFilter.findNamefromNameValuePair(new NameValuePair("values[]", "")));
+		assertNull(QueryFilter.findNamefromNameValuePair(new NameValuePair("values[cf_1]", "")));
+		assertNull(QueryFilter.findNamefromNameValuePair(new NameValuePair("operators[cf_1][]", "")));
+		assertEquals("cf_1", QueryFilter.findNamefromNameValuePair(new NameValuePair("values[cf_1][]", "")));
+		assertEquals("cf_1", QueryFilter.findNamefromNameValuePair(new NameValuePair("operators[cf_1]", "")));
+	}
 }
