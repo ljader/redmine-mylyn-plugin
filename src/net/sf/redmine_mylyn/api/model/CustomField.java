@@ -9,9 +9,13 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlEnumValue;
 import javax.xml.bind.annotation.XmlType;
 
+import net.sf.redmine_mylyn.api.query.IQueryField;
+import net.sf.redmine_mylyn.api.query.QueryField;
+import net.sf.redmine_mylyn.api.query.QueryFilter;
+
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name="customField")
-public class CustomField extends Property {
+public class CustomField extends Property implements IQueryField {
 	
 	private static final long serialVersionUID = 1L;
 
@@ -135,5 +139,34 @@ public class CustomField extends Property {
 	public void setDefaultValue(String defaultValue) {
 		this.defaultValue = defaultValue;
 	}
+
+	@Override
+	public String getQueryValue() {
+		return QueryFilter.CUSTOM_FIELD_PREFIX + getId();
+	}
+
+	@Override
+	public String getLabel() {
+		return getName();
+	}
+
+	@Override
+	public boolean isCrossProjectUsable() {
+		return isForAll;
+	}
 	
+	public QueryField getQueryField() {
+		if(isFilter) {
+			switch (getFieldFormat()) {
+			case LIST: return QueryField.LIST_TYPE;
+			case BOOL: return QueryField.BOOLEAN_TYPE;
+			case DATE: return QueryField.DATE_TYPE;
+			case STRING:
+			case TEXT:
+			case INT:
+			case FLOAT: return QueryField.TEXT_TYPE;
+			}
+		}
+		return null;
+	}
 }

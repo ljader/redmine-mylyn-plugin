@@ -46,4 +46,13 @@ public enum CompareOperator {
 	public boolean isValueBased() {
 		return VALUE_BASED.contains(this);
 	}
+
+	static CompareOperator fromQueryValue(String value) {
+		for(CompareOperator operator : CompareOperator.values()) {
+			if (operator.getQueryValue().equals(value)) {
+				return operator;
+			}
+		}
+		return null;
+	}
 }
