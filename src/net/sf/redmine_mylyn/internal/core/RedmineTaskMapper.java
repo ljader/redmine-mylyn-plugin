@@ -4,6 +4,7 @@ import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.IssuePriority;
 import net.sf.redmine_mylyn.api.model.container.IssuePriorities;
 import net.sf.redmine_mylyn.core.RedmineAttribute;
+import net.sf.redmine_mylyn.core.RedmineUtil;
 
 import org.eclipse.mylyn.tasks.core.ITask.PriorityLevel;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
@@ -28,7 +29,7 @@ public class RedmineTaskMapper extends TaskMapper {
 			IssuePriorities priorities = configuration.getIssuePriorities();
 			
 			TaskAttribute attribute = getTaskData().getRoot().getAttribute(RedmineAttribute.PRIORITY.getTaskKey());
-			IssuePriority priority = priorities.getById(Util.parseIntegerId(attribute.getValue()));
+			IssuePriority priority = priorities.getById(RedmineUtil.parseIntegerId(attribute.getValue()));
 			
 			//some tickets references a non existing priority ?!
 			if (priority==null) {

@@ -13,6 +13,7 @@ import net.sf.redmine_mylyn.core.IRedmineConstants;
 import net.sf.redmine_mylyn.core.RedmineAttribute;
 import net.sf.redmine_mylyn.core.RedmineCorePlugin;
 import net.sf.redmine_mylyn.core.RedmineRepositoryConnector;
+import net.sf.redmine_mylyn.core.RedmineUtil;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
@@ -128,9 +129,9 @@ public class IssueMapper {
 		if(value==null) {
 			attribute.setValue("");
 		} else if(attribute.getMetaData().getType().equals(TaskAttribute.TYPE_BOOLEAN)) {
-			attribute.setValue(Util.parseBoolean(value).toString());
+			attribute.setValue(RedmineUtil.parseBoolean(value).toString());
 		} else if(attribute.getMetaData().getType().equals(TaskAttribute.TYPE_DATE) || attribute.getMetaData().getType().equals(TaskAttribute.TYPE_DATETIME)) {
-			setValue(attribute, Util.parseRedmineDate(value));
+			setValue(attribute, RedmineUtil.parseRedmineDate(value));
 		} else {
 			attribute.setValue(value);
 		}

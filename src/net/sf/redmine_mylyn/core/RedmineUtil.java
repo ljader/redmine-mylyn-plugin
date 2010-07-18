@@ -1,15 +1,14 @@
-package net.sf.redmine_mylyn.internal.core;
+package net.sf.redmine_mylyn.core;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import net.sf.redmine_mylyn.core.RedmineCorePlugin;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.mylyn.commons.core.StatusHandler;
 
-public class Util {
+public class RedmineUtil {
 	
 	public static int parseIntegerId(String intVal) {
 		if(intVal!=null && !intVal.isEmpty()) {

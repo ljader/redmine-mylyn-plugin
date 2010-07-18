@@ -7,7 +7,6 @@ import net.sf.redmine_mylyn.api.model.Issue;
 import net.sf.redmine_mylyn.api.model.IssueStatus;
 import net.sf.redmine_mylyn.core.client.IClient;
 import net.sf.redmine_mylyn.internal.core.RedmineTaskMapper;
-import net.sf.redmine_mylyn.internal.core.Util;
 import net.sf.redmine_mylyn.internal.core.client.ClientManager;
 
 import org.eclipse.core.runtime.Assert;
@@ -181,7 +180,7 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 		
 		//Set CompletionDate, if Closed-Status
 		TaskAttribute attribute = taskData.getRoot().getMappedAttribute(RedmineAttribute.STATUS.getTaskKey());
-		IssueStatus issueStatus = configuration.getIssueStatuses().getById(Util.parseIntegerId(attribute.getValue()));
+		IssueStatus issueStatus = configuration.getIssueStatuses().getById(RedmineUtil.parseIntegerId(attribute.getValue()));
 		if(issueStatus==null) {
 			IStatus status = new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, "Missing IssueStatus #"+attribute.getValue());
 			StatusHandler.log(status);

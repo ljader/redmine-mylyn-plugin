@@ -2,7 +2,6 @@ package net.sf.redmine_mylyn.core;
 
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.User;
-import net.sf.redmine_mylyn.internal.core.Util;
 
 import org.eclipse.mylyn.tasks.core.IRepositoryPerson;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
@@ -21,7 +20,7 @@ public class RedmineTaskAttributeMapper extends TaskAttributeMapper {
 	@Override
 	public void setRepositoryPerson(TaskAttribute taskAttribute, IRepositoryPerson person) {
 		if(person.getName()==null || person.getName().isEmpty()) {
-			User user = configuration.getUsers().getById(Util.parseIntegerId(person.getPersonId()));
+			User user = configuration.getUsers().getById(RedmineUtil.parseIntegerId(person.getPersonId()));
 			if(user!=null) {
 				person.setName(user.getName());
 			}
