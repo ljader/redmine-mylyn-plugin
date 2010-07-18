@@ -50,6 +50,10 @@ public class Query {
 		}
 	}
 	
+	public QueryFilter getQueryFilter(IQueryField queryField) {
+		return filterByQueryFieldValue.get(queryField.getQueryValue());
+	}
+	
 	public List<NameValuePair> getParams() throws RedmineApiStatusException {
 		if(params==null) {
 			params = new ArrayList<NameValuePair>();

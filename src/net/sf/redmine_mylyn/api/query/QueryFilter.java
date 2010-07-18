@@ -57,6 +57,14 @@ public class QueryFilter {
 		return queryField;
 	}
 	
+	public CompareOperator getOperator() {
+		return operator;
+	}
+	
+	public List<String> getValues() {
+		return values;
+	}
+	
 	void appendParams(List<NameValuePair> parts) throws RedmineApiStatusException {
 		if(queryField==null || definition==null || operator==null || !definition.containsOperator(operator)) {
 			return;
