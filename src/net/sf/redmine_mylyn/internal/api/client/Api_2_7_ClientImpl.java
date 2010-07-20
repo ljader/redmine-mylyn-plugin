@@ -2,6 +2,7 @@ package net.sf.redmine_mylyn.internal.api.client;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -33,7 +34,6 @@ import net.sf.redmine_mylyn.internal.api.parser.adapter.type.UpdatedIssuesType;
 
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
@@ -58,7 +58,7 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	private final static String URL_ISSUES_LIST = "/mylyn/issues/list?issues=%s";
 	private final static String URL_ISSUE = "/mylyn/issue/%d";
 	
-	private final static String URL_QUERY = "/issues.xml?set_filter=1";
+	private final static String URL_QUERY = "/issues.xml";
 
 	
 	private Map<String, IModelParser<? extends AbstractPropertyContainer<?>>> parserByClass;
@@ -217,11 +217,10 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 		monitor = Policy.monitorFor(monitor);
 		monitor.beginTask("Execute query", 1);
 
-		PostMethod method = new PostMethod(URL_QUERY);
+		GetMethod method = new GetMethod(URL_QUERY);
 		
-		for (NameValuePair nvp : query.getParams()) {
-			method.addParameter(nvp);
-		}
+		List<NameValuePair> params = query.getParams();
+		method.setQueryString(params.toArray(new NameValuePair[params.size()]));
 		
 		PartialIssues issues = executeMethod(method, queryParser, monitor);
 
@@ -233,7 +232,7 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 
 		return issues.issues;
 	}
-	
+
 	private void buildParser() {
 		parserByClass = new HashMap<String, IModelParser<? extends AbstractPropertyContainer<?>>>();
 		parserByClass.put(URL_ISSUE_STATUS, new AttributeParser<IssueStatuses>(IssueStatuses.class));

@@ -68,6 +68,19 @@ public class Issue implements IModel {
 	
 	private int parentId;
 
+	public Issue(){
+		
+	}
+	
+	public Issue(PartialIssue partial) {
+		id = partial.getId();
+		subject = partial.getSubject();
+		projectId = partial.getProjectId();
+		statusId = partial.getStatusId();
+		priorityId = partial.getPriorityId();
+		updatedOn = partial.getUpdatedOn();
+	}
+	
 	@XmlElement(name="availableStatus")
 	@XmlList
 	private int [] availableStatusId;

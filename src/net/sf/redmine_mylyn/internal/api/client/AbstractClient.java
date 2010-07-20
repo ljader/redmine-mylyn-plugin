@@ -55,6 +55,7 @@ public abstract class AbstractClient implements IRedmineApiClient {
 	}
 
 	protected <T extends Object> T executeMethod(HttpMethodBase method, IModelParser<T> parser, IProgressMonitor monitor) throws RedmineApiStatusException {
+//		System.out.println("EXECUTE: " + method.getPath());
 		return executeMethod(method, parser, monitor, HttpStatus.SC_OK);
 	}
 	

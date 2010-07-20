@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
 public class Query {
-
+	
 	private Map<String, QueryFilter> filterByQueryFieldValue = new LinkedHashMap<String, QueryFilter>();
 	
 	private List<NameValuePair> params;
@@ -60,6 +60,8 @@ public class Query {
 		}
 		
 		if(params.isEmpty()) {
+			params.add(new NameValuePair("set_filter", "1"));
+			
 			for (QueryFilter queryFilter : filterByQueryFieldValue.values()) {
 				queryFilter.appendParams(params);
 			}
@@ -76,6 +78,7 @@ public class Query {
 		//TODO filter + project param
 
 		try {
+			
 			for (NameValuePair nvp : getParams()) {
 				builder.append("&").append(nvp.getName());
 				builder.append("=").append(URLEncoder.encode(nvp.getValue(), encoding));
@@ -84,6 +87,9 @@ public class Query {
 			IStatus status = new Status(IStatus.ERROR, RedmineApiPlugin.PLUGIN_ID, e.getMessage(), e);
 			throw new RedmineApiStatusException(status);
 		}
+		
+		builder.deleteCharAt(0);
+		builder.insert(0, "?");
 		
 		return builder.toString();
 	}
@@ -99,7 +105,6 @@ public class Query {
 		List<NameValuePair> nvp = new ArrayList<NameValuePair>();
 		
 		url = url.substring(url.indexOf('&'));
-		//TODO Remove leading part (...?)
 
 		/* URL to NamedValuePairs */
 		for(String part : url.split("&")) {
