@@ -2,6 +2,9 @@ package net.sf.redmine_mylyn.internal.api;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
+import java.util.Date;
+
 import net.sf.redmine_mylyn.api.model.PartialIssue;
 
 public class PartialIssueValidator {
@@ -17,6 +20,8 @@ public class PartialIssueValidator {
 		assertEquals("Can't print recipes", obj.getSubject());
 		assertEquals(1, obj.getStatusId());
 		assertEquals(4, obj.getPriorityId());
+		assertEquals(1, obj.getProjectId());
+		assertEquals(new Date(1273356000000l), obj.getUpdatedOn());
 	}
 
 }

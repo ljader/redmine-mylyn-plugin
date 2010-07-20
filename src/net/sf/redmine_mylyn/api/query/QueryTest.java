@@ -6,7 +6,6 @@ import static net.sf.redmine_mylyn.api.query.QueryField.STATUS;
 import static net.sf.redmine_mylyn.api.query.QueryField.TRACKER;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -34,13 +33,15 @@ public class QueryTest {
 		testee.addFilter(TRACKER, IS_NOT, "1");
 		testee.addFilter(TRACKER, IS_NOT, "3");
 		List<NameValuePair> params = testee.getParams();
-		assertEquals(4, params.size());
+		assertEquals(5, params.size());
 		
 		testee.addFilter(STATUS, OPEN);
 		params = testee.getParams();
-		assertEquals(7, params.size());
+		assertEquals(8, params.size());
 
 		int idx=0;
+		assertEquals("set_filter", params.get(idx).getName());
+		assertEquals("1", params.get(idx++).getValue());
 		
 		assertEquals("fields[]", params.get(idx).getName());
 		assertEquals("tracker_id", params.get(idx++).getValue());
@@ -72,7 +73,6 @@ public class QueryTest {
 		valid.add(new NameValuePair("values[tracker_id][]", "1"));
 		valid.add(new NameValuePair("operators[tracker_id]", "!"));
 		valid.add(new NameValuePair("fields[]", "tracker_id"));
-		valid.add(new NameValuePair("values[status_id][]", ""));
 		valid.add(new NameValuePair("values[tracker_id][]", "3"));
 		valid.add(new NameValuePair("fields[]", "status_id"));
 		valid.add(new NameValuePair("operators[status_id]", "o"));
@@ -87,10 +87,14 @@ public class QueryTest {
 		Query query = Query.fromNameValuePairs(invalid, TestData.cfg);
 		assertNotNull(query);
 		
+		ArrayList<NameValuePair> expected = new ArrayList<NameValuePair>(valid);
+		expected.add(0, new NameValuePair("set_filter", "1"));
+		expected.add(new NameValuePair("values[status_id][]", ""));
+		
 		List<NameValuePair> result = query.getParams();
-		Collections.sort(valid, comparator);
+		Collections.sort(expected, comparator);
 		Collections.sort(result, comparator);
-		assertEquals(valid, result);
+		assertEquals(expected, result);
 	}
 	
 	@Test
@@ -100,7 +104,7 @@ public class QueryTest {
 		testee.addFilter(STATUS, OPEN);
 		
 		String enc = "UTF-8";
-		StringBuilder expected = new StringBuilder();
+		StringBuilder expected = new StringBuilder("?set_filter=1");
 		expected.append("&fields[]=").append(URLEncoder.encode("tracker_id", enc));
 		expected.append("&operators[tracker_id]=").append(URLEncoder.encode("!", enc));
 		expected.append("&values[tracker_id][]=").append(URLEncoder.encode("1", enc));
@@ -110,14 +114,12 @@ public class QueryTest {
 		expected.append("&values[status_id][]=").append(URLEncoder.encode("", enc));
 		
 		assertEquals(expected.toString(), testee.toUrl(enc));
-		
-		fail("Incomplete");
 	}
 
 	@Test
 	public void testIntegratedFromUrl() throws Exception {
 		String enc = "UTF-8";
-		StringBuilder url = new StringBuilder();
+		StringBuilder url = new StringBuilder("?set_filter=1");
 		url.append("&fields[]=").append(URLEncoder.encode("tracker_id", enc));
 		url.append("&operators[tracker_id]=").append(URLEncoder.encode("!", enc));
 		url.append("&values[tracker_id][]=").append(URLEncoder.encode("1", enc));
@@ -130,6 +132,7 @@ public class QueryTest {
 		assertNotNull(query);
 
 		ArrayList<NameValuePair> expected = new ArrayList<NameValuePair>();
+		expected.add(new NameValuePair("set_filter", "1"));
 		expected.add(new NameValuePair("fields[]", "tracker_id"));
 		expected.add(new NameValuePair("operators[tracker_id]", "!"));
 		expected.add(new NameValuePair("values[tracker_id][]", "1"));
@@ -139,8 +142,6 @@ public class QueryTest {
 		expected.add(new NameValuePair("values[status_id][]", ""));
 		
 		assertEquals(expected, query.getParams());
-		
-		fail("Incomplete");
 }
 	
 }
