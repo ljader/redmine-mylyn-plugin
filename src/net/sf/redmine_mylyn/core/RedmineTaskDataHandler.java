@@ -41,14 +41,15 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 
 	@Override
 	public boolean canGetMultiTaskData(TaskRepository taskRepository) {
-		//TODO
-		return false;
+		return true;
 	}
 
 	@Override
 	public void getMultiTaskData(TaskRepository repository, Set<String> taskIds, TaskDataCollector collector, IProgressMonitor monitor) throws CoreException {
-		// TODO Auto-generated method stub
-		super.getMultiTaskData(repository, taskIds, collector, monitor);
+		TaskData[] taskData = connector.getTaskData(repository, taskIds, monitor);
+		for (TaskData data : taskData) {
+			collector.accept(data);
+		}
 	}
 	
 	@Override
@@ -122,7 +123,7 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 		return null;
 	}
 
-	public TaskData createTaskDataFromTicket(TaskRepository repository, Issue issue, IProgressMonitor monitor) throws CoreException {
+	public TaskData createTaskDataFromIssue(TaskRepository repository, Issue issue, IProgressMonitor monitor) throws CoreException {
 
 		Configuration configuration = connector.getRepositoryConfiguration(repository);
 		try {

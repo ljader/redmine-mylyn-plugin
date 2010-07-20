@@ -1,10 +1,15 @@
 package net.sf.redmine_mylyn.core;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Set;
 
+import net.sf.redmine_mylyn.api.client.RedmineApiStatusException;
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.Issue;
 import net.sf.redmine_mylyn.api.model.IssueStatus;
+import net.sf.redmine_mylyn.api.model.PartialIssue;
+import net.sf.redmine_mylyn.api.query.Query;
 import net.sf.redmine_mylyn.core.client.IClient;
 import net.sf.redmine_mylyn.internal.core.RedmineTaskMapper;
 import net.sf.redmine_mylyn.internal.core.client.ClientManager;
@@ -29,6 +34,9 @@ import org.eclipse.mylyn.tasks.core.data.TaskData;
 import org.eclipse.mylyn.tasks.core.data.TaskDataCollector;
 import org.eclipse.mylyn.tasks.core.data.TaskMapper;
 import org.eclipse.mylyn.tasks.core.sync.ISynchronizationSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MarkerFactory;
 
 
 public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
@@ -38,6 +46,8 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 	private RedmineTaskDataHandler taskDataHandler;
 	
 	private ClientManager clientManager;
+	
+	private final static Logger LOGGER = LoggerFactory.getLogger(RedmineRepositoryConnector.class);
 	
 	public RedmineRepositoryConnector() {
 		taskDataHandler = new RedmineTaskDataHandler(this);
@@ -101,6 +111,8 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 
 	@Override
 	public TaskData getTaskData(TaskRepository repository, String taskId, IProgressMonitor monitor) throws CoreException {
+		LOGGER.debug("get task #{}", taskId);
+		
 		monitor = Policy.monitorFor(monitor);
 		monitor.beginTask("Task Download", IProgressMonitor.UNKNOWN);
 		
@@ -116,7 +128,7 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 				IStatus status = new Status(IStatus.INFO, RedmineCorePlugin.PLUGIN_ID, "Can't find Issue #"+taskId);
 				throw new CoreException(status);
 			}
-			taskData = taskDataHandler.createTaskDataFromTicket(repository, issue, monitor);
+			taskData = taskDataHandler.createTaskDataFromIssue(repository, issue, monitor);
 		} catch (OperationCanceledException e) {
 			throw new CoreException(new Status(IStatus.CANCEL, RedmineCorePlugin.PLUGIN_ID, "Operation canceled"));
 		} catch(NumberFormatException e) {
@@ -130,6 +142,34 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 		return taskData;
 	}
 
+	public TaskData[] getTaskData(TaskRepository repository, Set<String> taskIds, IProgressMonitor monitor) throws CoreException {
+		LOGGER.debug("get tasks :{}", Arrays.toString(taskIds.toArray()));		
+
+		monitor = Policy.monitorFor(monitor);
+		monitor.beginTask("Task Download", IProgressMonitor.UNKNOWN);
+
+		TaskData[] taskData = new TaskData[taskIds.size()];
+		
+		try {
+			IClient client = getClientManager().getClient(repository);
+			Issue[] issues = client.getIssues(taskIds, monitor);
+			
+			if(issues!=null) {
+				for (int i=issues.length-1; i>=0; i--) {
+					taskData[i] = taskDataHandler.createTaskDataFromIssue(repository, issues[i], monitor);
+				}
+			}
+		} catch (OperationCanceledException e) {
+			throw new CoreException(new Status(IStatus.CANCEL, RedmineCorePlugin.PLUGIN_ID, "Operation canceled"));
+		} catch (RedmineStatusException e) {
+			throw new CoreException(e.getStatus());
+		} finally {
+			monitor.done();
+		}
+		
+		return taskData;
+	}
+	
 	@Override
 	public String getTaskIdFromTaskUrl(String arg0) {
 		// TODO Auto-generated method stub
@@ -152,9 +192,104 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 	}
 	
 	@Override
-	public IStatus performQuery(TaskRepository arg0, IRepositoryQuery arg1, TaskDataCollector arg2, ISynchronizationSession arg3, IProgressMonitor arg4) {
-		// TODO Auto-generated method stub
-		return null;
+	public IStatus performQuery(TaskRepository repository, IRepositoryQuery repositoryQuery, TaskDataCollector collector, ISynchronizationSession session, IProgressMonitor monitor) {
+		
+		try {
+			Query query = Query.fromUrl(repositoryQuery.getUrl(), repository.getCharacterEncoding(), getRepositoryConfiguration(repository));
+
+			IClient client = getClientManager().getClient(repository);
+			PartialIssue[] partialIssues = client.query(query, monitor);
+			
+			for(PartialIssue partialIssue : partialIssues) {
+				Date updated = partialIssue.getUpdatedOn();
+				
+				// UpdatedOn should never be null
+				if(updated==null) {
+					IStatus status = new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, "Datum für updatedon fehlt");
+					collector.failed(""+partialIssue.getId(), status);
+					continue;
+				}
+
+				Issue issue = new Issue(partialIssue);
+				TaskData taskData = taskDataHandler.createTaskDataFromIssue(repository, issue, monitor);
+
+				//TODO mark only new or changed taks partial
+				taskData.setPartial(true);
+				collector.accept(taskData);
+			}
+			
+		} catch (RedmineStatusException e) {
+			IStatus status = e.getStatus();
+			StatusHandler.log(status);
+			return status;
+		} catch (RedmineApiStatusException e) {
+			IStatus status = e.getStatus();
+			StatusHandler.log(status);
+			return status;
+		} catch (CoreException e) {
+			e.getStatus();
+		}
+		
+		return Status.OK_STATUS;
+	}
+	
+	@Override
+	public void preSynchronization(ISynchronizationSession session, IProgressMonitor monitor) throws CoreException {
+		if (session.getTasks().isEmpty()) {
+			return;
+		}
+
+		monitor = Policy.monitorFor(monitor);
+		monitor.beginTask("Checking for changed tasks", 1);
+		
+		TaskRepository repository = session.getTaskRepository();
+		if(repository.getSynchronizationTimeStamp()==null || repository.getSynchronizationTimeStamp().isEmpty()) {
+			LOGGER.debug("old Syncronization-Timestamp {}" , "n.a.");
+
+			for (ITask task : session.getTasks()) {
+				session.markStale(task);
+			}
+			return;
+		}
+		LOGGER.debug("old Syncronization-Timestamp {}" , RedmineUtil.parseDate(repository.getSynchronizationTimeStamp()).toString());
+
+		
+		try {
+			Date updatedSince = RedmineUtil.parseDate(repository.getSynchronizationTimeStamp());
+			Set<ITask> tasks = session.getTasks();
+
+			IClient client = getClientManager().getClient(repository);
+			int[] changedIds = client.getUpdatedIssueIds(tasks, updatedSince, monitor);
+
+			if(changedIds!=null && changedIds.length>0) {
+				Arrays.sort(changedIds);
+				for(ITask task : tasks) {
+					if(Arrays.binarySearch(changedIds, RedmineUtil.parseIntegerId(task.getTaskId()))>=0) {
+						LOGGER.debug("mark stale task +{}" , task.getTaskId());
+						session.markStale(task);
+					}
+				}
+				LOGGER.debug("mark {} task of {} as stale" , changedIds.length, tasks.size());
+			}
+		} catch (RedmineStatusException e) {
+			throw new CoreException(e.getStatus());
+		}
+	}
+
+	@Override
+	public void postSynchronization(ISynchronizationSession event, IProgressMonitor monitor) throws CoreException {
+		monitor = Policy.monitorFor(monitor);
+		try {
+			monitor.beginTask("", 1);
+			if (event.isFullSynchronization() && event.getStatus() == null) {
+				event.getTaskRepository().setSynchronizationTimeStamp(""+getSynchronizationTimestamp(event));
+				LOGGER.debug("new Syncronization-Timestamp {}" , RedmineUtil.parseDate(event.getTaskRepository().getSynchronizationTimeStamp()).toString());
+			} else {
+				
+			}
+		} finally {
+			monitor.done();
+		}
 	}
 
 	@Override
@@ -169,7 +304,8 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 
 	@Override
 	public void updateTaskFromTaskData(TaskRepository taskRepository, ITask task, TaskData taskData) {
-		
+		LOGGER.debug("updating TaskData ITask #{}" , task.getTaskId());
+
 		TaskMapper mapper = getTaskMapping(taskData);
 		mapper.applyTo(task);
 
@@ -212,5 +348,21 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 	public TaskMapper getTaskMapping(TaskData taskData) {
 		TaskRepository repository = taskData.getAttributeMapper().getTaskRepository();
 		return new RedmineTaskMapper(taskData, getRepositoryConfiguration(repository));
+	}
+
+	private long getSynchronizationTimestamp(ISynchronizationSession event) {
+		Date mostRecent = new Date(0);
+		String mostRecentTimeStamp = event.getTaskRepository().getSynchronizationTimeStamp();
+		if (mostRecentTimeStamp != null) {
+			mostRecent = RedmineUtil.parseDate(mostRecentTimeStamp);
+		}
+		
+		for (ITask task : event.getChangedTasks()) {
+			Date taskModifiedDate = task.getModificationDate();
+			if (taskModifiedDate != null && taskModifiedDate.after(mostRecent)) {
+				mostRecent = taskModifiedDate;
+			}
+		}
+		return mostRecent.getTime();
 	}
 }

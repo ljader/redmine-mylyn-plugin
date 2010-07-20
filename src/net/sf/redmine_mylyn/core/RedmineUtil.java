@@ -25,6 +25,18 @@ public class RedmineUtil {
 	public static Boolean parseBoolean(String value) {
 		return value!=null && value.trim().equals("1") ? Boolean.TRUE : Boolean.parseBoolean(value);
 	}
+	
+	public static Date parseDate(String value) {
+		if(value!=null && !value.isEmpty()) {
+			try {
+				//try timestamp
+				return new Date(Long.parseLong(value));
+			} catch(NumberFormatException e) {
+				;//nothing to do
+			}
+		}
+		return new Date(0);
+	}
 
 	public static Date parseRedmineDate(String value) {
 		if(value!=null && !value.isEmpty()) {

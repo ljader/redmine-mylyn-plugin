@@ -1,11 +1,17 @@
 package net.sf.redmine_mylyn.core.client;
 
+import java.util.Date;
+import java.util.Set;
+
 import net.sf.redmine_mylyn.api.client.RedmineServerVersion;
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.Issue;
+import net.sf.redmine_mylyn.api.model.PartialIssue;
+import net.sf.redmine_mylyn.api.query.Query;
 import net.sf.redmine_mylyn.core.RedmineStatusException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.mylyn.tasks.core.ITask;
 
 public interface IClient {
 
@@ -17,9 +23,11 @@ public interface IClient {
 	
 	public Issue getIssue(int id, IProgressMonitor monitor) throws RedmineStatusException;
 	
-//	public Set<Integer> getChangedTicketId(Set<Integer> ids, Date changedSince, IProgressMonitor monitor) throws RedmineStatusException
-//	
-//	public void query(String searchParam, String projectId, String storedQueryId, List<RedmineTicket> tickets, IProgressMonitor monitor) throws RedmineException;
+	public Issue[] getIssues(Set<String> ids, IProgressMonitor monitor) throws RedmineStatusException;
+	
+	public int[] getUpdatedIssueIds(Set<ITask> tasks, Date updatedSince, IProgressMonitor monitor) throws RedmineStatusException;
+
+	public PartialIssue[] query(Query query, IProgressMonitor monitor) throws RedmineStatusException;
 	
 //	public void updateAttributes(boolean force, IProgressMonitor monitor) throws RedmineException;
 //	

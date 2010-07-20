@@ -48,65 +48,75 @@ public class IssueMapper {
 		}
 
 		/* Custom Attributes */
-		for (CustomValue customValue : issue.getCustomValues().getAll()) {
-			taskAttribute = taskData.getRoot().getAttribute(IRedmineConstants.TASK_KEY_PREFIX_ISSUE_CF + customValue.getCustomFieldId());
-			if(taskAttribute!=null) {
-				setValue(taskAttribute, customValue.getValue());
+		if(issue.getCustomValues()!=null) {
+			for (CustomValue customValue : issue.getCustomValues().getAll()) {
+				taskAttribute = taskData.getRoot().getAttribute(IRedmineConstants.TASK_KEY_PREFIX_ISSUE_CF + customValue.getCustomFieldId());
+				if(taskAttribute!=null) {
+					setValue(taskAttribute, customValue.getValue());
+				}
 			}
 		}
 		
 		/* Journals */
-		int jrnlCount=1;
-		for (Journal journal : issue.getJournals().getAll()) {
-			TaskCommentMapper mapper = new TaskCommentMapper();
-			mapper.setAuthor(repository.createPerson(""+journal.getUserId()));
-			mapper.setCreationDate(journal.getCreatedOn());
-			mapper.setText(journal.getNotes());
-			String issueUrl = RedmineRepositoryConnector.getTaskUrl(repository.getUrl(), issue.getId());
-			mapper.setUrl(issueUrl + String.format(IRedmineConstants.REDMINE_URL_PART_COMMENT, journal.getId()));
-			mapper.setNumber(jrnlCount++);
-			mapper.setCommentId(String.valueOf(journal.getId()));
-			
-			taskAttribute = taskData.getRoot().createAttribute(TaskAttribute.PREFIX_COMMENT + mapper.getCommentId());
-			mapper.applyTo(taskAttribute);
+		if(issue.getJournals()!=null) {
+			int jrnlCount=1;
+			for (Journal journal : issue.getJournals().getAll()) {
+				TaskCommentMapper mapper = new TaskCommentMapper();
+				mapper.setAuthor(repository.createPerson(""+journal.getUserId()));
+				mapper.setCreationDate(journal.getCreatedOn());
+				mapper.setText(journal.getNotes());
+				String issueUrl = RedmineRepositoryConnector.getTaskUrl(repository.getUrl(), issue.getId());
+				mapper.setUrl(issueUrl + String.format(IRedmineConstants.REDMINE_URL_PART_COMMENT, journal.getId()));
+				mapper.setNumber(jrnlCount++);
+				mapper.setCommentId(String.valueOf(journal.getId()));
+				
+				taskAttribute = taskData.getRoot().createAttribute(TaskAttribute.PREFIX_COMMENT + mapper.getCommentId());
+				mapper.applyTo(taskAttribute);
+			}
 		}
 
 		/* Attachments */
-		for (Attachment	attachment : issue.getAttachments().getAll()) {
-			TaskAttachmentMapper mapper = new TaskAttachmentMapper();
-			mapper.setAttachmentId("" + attachment.getId()); //$NON-NLS-1$
-			mapper.setAuthor(repository.createPerson(""+attachment.getAuthorId()));
-			mapper.setDescription(attachment.getDescription());
-			mapper.setCreationDate(attachment.getCreatedOn());
-			mapper.setContentType(attachment.getContentType());
-			mapper.setFileName(attachment.getFilename());
-			mapper.setLength((long)attachment.getFilesize());
-			mapper.setUrl(String.format(IRedmineConstants.REDMINE_URL_ATTACHMENT_DOWNLOAD, repository.getUrl(), attachment.getId()));
-			
-			taskAttribute = taskData.getRoot().createAttribute(TaskAttribute.PREFIX_ATTACHMENT + mapper.getAttachmentId());
-			mapper.applyTo(taskAttribute);
+		if(issue.getAttachments()!=null) {
+			for (Attachment	attachment : issue.getAttachments().getAll()) {
+				TaskAttachmentMapper mapper = new TaskAttachmentMapper();
+				mapper.setAttachmentId("" + attachment.getId()); //$NON-NLS-1$
+				mapper.setAuthor(repository.createPerson(""+attachment.getAuthorId()));
+				mapper.setDescription(attachment.getDescription());
+				mapper.setCreationDate(attachment.getCreatedOn());
+				mapper.setContentType(attachment.getContentType());
+				mapper.setFileName(attachment.getFilename());
+				mapper.setLength((long)attachment.getFilesize());
+				mapper.setUrl(String.format(IRedmineConstants.REDMINE_URL_ATTACHMENT_DOWNLOAD, repository.getUrl(), attachment.getId()));
+				
+				taskAttribute = taskData.getRoot().createAttribute(TaskAttribute.PREFIX_ATTACHMENT + mapper.getAttachmentId());
+				mapper.applyTo(taskAttribute);
+			}
 		}
 		
 		//TODO
 		if(true /*ticket.getRight(RedmineAcl.TIMEENTRY_VIEW*/) {
 			//TODO kind/label
 			taskAttribute = taskData.getRoot().createAttribute(IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY_TOTAL);
-			taskAttribute.setValue(""+issue.getTimeEntries().getSum());
 			
-			
-			for (TimeEntry timeEntry : issue.getTimeEntries().getAll()) {
-				TaskTimeEntryMapper mapper = new TaskTimeEntryMapper(cfg);
-				mapper.setTimeEntryId(timeEntry.getId());
-				mapper.setUser(repository.createPerson(""+timeEntry.getUserId()));
-				mapper.setActivityId(timeEntry.getActivityId());
-				mapper.setHours(timeEntry.getHours());
-				mapper.setSpentOn(timeEntry.getSpentOn());
-				mapper.setComments(timeEntry.getComments());
-				mapper.setCustomValues(timeEntry.getCustomValues().getAll());
-
-				taskAttribute = taskData.getRoot().createAttribute(IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY_PREFIX + mapper.getTimeEntryId());
-				mapper.applyTo(taskAttribute);
+			if(issue.getTimeEntries()!=null) {
+				taskAttribute.setValue(""+issue.getTimeEntries().getSum());
+				
+				
+				for (TimeEntry timeEntry : issue.getTimeEntries().getAll()) {
+					TaskTimeEntryMapper mapper = new TaskTimeEntryMapper(cfg);
+					mapper.setTimeEntryId(timeEntry.getId());
+					mapper.setUser(repository.createPerson(""+timeEntry.getUserId()));
+					mapper.setActivityId(timeEntry.getActivityId());
+					mapper.setHours(timeEntry.getHours());
+					mapper.setSpentOn(timeEntry.getSpentOn());
+					mapper.setComments(timeEntry.getComments());
+					mapper.setCustomValues(timeEntry.getCustomValues().getAll());
+					
+					taskAttribute = taskData.getRoot().createAttribute(IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY_PREFIX + mapper.getTimeEntryId());
+					mapper.applyTo(taskAttribute);
+				}
 			}
+			
 		}
 	}
 
