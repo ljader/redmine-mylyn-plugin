@@ -29,7 +29,6 @@ import net.sf.redmine_mylyn.api.client.RedmineApiInvalidDataException;
 import net.sf.redmine_mylyn.api.client.RedmineServerVersion;
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.Issue;
-import net.sf.redmine_mylyn.api.model.PartialIssue;
 import net.sf.redmine_mylyn.api.query.Query;
 import net.sf.redmine_mylyn.internal.api.CustomFieldValidator;
 import net.sf.redmine_mylyn.internal.api.IssueCategoryValidator;
@@ -226,7 +225,7 @@ public class Api_2_7_ClientImplTest {
 	@Test
 	public void testQuery() throws Exception {
 		Query query = new Query();
-		PartialIssue[] issues =testee.query(query, monitor);
+		Issue[] issues =testee.query(query, monitor);
 		assertNotNull(issues);
 		assertEquals(PartialIssueValidator.COUNT, issues.length);
 	}
@@ -246,10 +245,9 @@ public class Api_2_7_ClientImplTest {
 		server.responseHeader = RESPONSE_HEADER_CREATED;
 		server.responseResourcePath = RESOURCE_FILE_SUBMIT_NEW;
 		
-		Issue issue = TestData.issue2;
-		int id = testee.createIssue(issue, errorCollector, monitor);
-		
-		assertEquals(14, id);
+		Issue issue = testee.createIssue(TestData.issue2, errorCollector, monitor);
+		assertNotNull(issue);
+		assertEquals(14, issue.getId());
 		assertEquals(0, errorCollector.lst.size());
 	}
 

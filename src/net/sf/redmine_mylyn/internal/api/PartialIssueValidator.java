@@ -5,7 +5,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.Date;
 
-import net.sf.redmine_mylyn.api.model.PartialIssue;
+import net.sf.redmine_mylyn.api.model.Issue;
 
 public class PartialIssueValidator {
 
@@ -14,7 +14,7 @@ public class PartialIssueValidator {
 	
 	public final static int COUNT = 6;
 	
-	public static void validate1(PartialIssue obj) throws Exception {
+	public static void validate1(Issue obj) throws Exception {
 		assertNotNull(obj);
 		assertEquals(1, obj.getId());
 		assertEquals("Can't print recipes", obj.getSubject());
