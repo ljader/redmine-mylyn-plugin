@@ -2,10 +2,12 @@ package net.sf.redmine_mylyn.internal.core;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import net.sf.redmine_mylyn.api.TestData;
 import net.sf.redmine_mylyn.api.model.Attachment;
@@ -153,6 +155,37 @@ public class IssueMapperTest {
 		
 		fail("Not yet implemented");
 	}
+
+	@Test
+	public void readTaskData() throws Exception {
+
+		TaskData taskData = buildEmptyTaskData(TestData.issue2);
+		fillTaskData(taskData, TestData.issue2);
+		
+		Issue issue = IssueMapper.readTaskData(repository, taskData, null, cfg);
+		assertNotNull(issue);
+		
+		assertEquals("Add ingredients categories", issue.getSubject());
+		assertEquals("Ingredients of the recipe should be classified by categories", issue.getDescription());
+		//TODO Comment
+		assertEquals(1, issue.getProjectId());
+		assertEquals(2, issue.getTrackerId());
+		assertEquals(2, issue.getStatusId());
+		//TODO change status and validate again
+		assertEquals(5, issue.getPriorityId());
+		assertEquals(0, issue.getCategoryId());
+		assertEquals(2, issue.getAuthorId());
+		assertEquals(3, issue.getAssignedToId());
+		assertEquals(2, issue.getFixedVersionId());
+		assertEquals(new Date(1153335861000l), issue.getCreatedOn());
+		assertEquals(new Date(1153336190000l), issue.getUpdatedOn());
+		assertEquals(df.parse("2010-05-08"), issue.getStartDate());
+		assertNull(issue.getDueDate());
+		assertEquals(3.5f, issue.getEstimatedHours(), 0.0);
+		assertEquals(10, issue.getDoneRatio());
+
+		fail("Not yet implemented");
+	}
 	
 	TaskData buildEmptyTaskData(Issue issue) throws Exception {
 		TaskData taskData = new TaskData(new RedmineTaskAttributeMapper(repository, cfg), RedmineCorePlugin.REPOSITORY_KIND, repository.getUrl(), "" + issue.getId());
@@ -162,6 +195,60 @@ public class IssueMapperTest {
 		m.invoke(taskDataHandler, taskData, issue, cfg);
 		
 		return taskData;
+	}
+	
+	void fillTaskData(TaskData taskData, Issue issue) {
+		TaskAttribute root = taskData.getRoot();
+
+		setAttributeValue(root, RedmineAttribute.SUMMARY, issue.getSubject());
+		setAttributeValue(root, RedmineAttribute.DESCRIPTION, issue.getDescription());
+		setAttributeValue(root, RedmineAttribute.PROJECT, issue.getProjectId());
+		setAttributeValue(root, RedmineAttribute.TRACKER, issue.getTrackerId());
+		setAttributeValue(root, RedmineAttribute.STATUS, issue.getStatusId());
+		setAttributeValue(root, RedmineAttribute.STATUS_CHG, issue.getStatusId());
+		setAttributeValue(root, RedmineAttribute.PRIORITY, issue.getPriorityId());
+		setAttributeValue(root, RedmineAttribute.CATEGORY, issue.getCategoryId());
+		setAttributeValue(root, RedmineAttribute.REPORTER, issue.getAuthorId());
+		setAttributeValue(root, RedmineAttribute.ASSIGNED_TO, issue.getAssignedToId());
+		setAttributeValue(root, RedmineAttribute.VERSION, issue.getFixedVersionId());
+		setAttributeValue(root, RedmineAttribute.DATE_SUBMITTED, issue.getCreatedOn());
+		setAttributeValue(root, RedmineAttribute.DATE_UPDATED, issue.getUpdatedOn());
+		setAttributeValue(root, RedmineAttribute.DATE_START, issue.getStartDate());
+		setAttributeValue(root, RedmineAttribute.DATE_DUE, issue.getDueDate());
+		setAttributeValue(root, RedmineAttribute.ESTIMATED, issue.getEstimatedHours());
+		setAttributeValue(root, RedmineAttribute.PROGRESS, issue.getDoneRatio());
+//		setAttributeValue(root, RedmineAttribute.COMMENT, "");
+		
+		//new time entry
+		//operation
+	}
+	
+	void setAttributeValue(TaskAttribute root, RedmineAttribute redmineAttribute, String value) {
+		TaskAttribute attribute = root.getAttribute(redmineAttribute.getTaskKey());
+		if(attribute!=null && value!=null) {
+			attribute.setValue(value);
+		}
+	}
+
+	void setAttributeValue(TaskAttribute root, RedmineAttribute redmineAttribute, Date value) {
+		TaskAttribute attribute = root.getAttribute(redmineAttribute.getTaskKey());
+		if(attribute!=null && value!=null) {
+			attribute.setValue(""+value.getTime());
+		}
+	}
+
+	void setAttributeValue(TaskAttribute root, RedmineAttribute redmineAttribute, int value) {
+		TaskAttribute attribute = root.getAttribute(redmineAttribute.getTaskKey());
+		if(attribute!=null) {
+			attribute.setValue(""+value);
+		}
+	}
+
+	void setAttributeValue(TaskAttribute root, RedmineAttribute redmineAttribute, float value) {
+		TaskAttribute attribute = root.getAttribute(redmineAttribute.getTaskKey());
+		if(attribute!=null) {
+			attribute.setValue(""+value);
+		}
 	}
 
 }
