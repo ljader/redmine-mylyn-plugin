@@ -6,8 +6,8 @@ import java.net.URL;
 import java.util.Arrays;
 
 import net.sf.redmine_mylyn.api.client.IRedmineApiClient;
-import net.sf.redmine_mylyn.api.client.RedmineApiErrorException;
-import net.sf.redmine_mylyn.api.client.RedmineApiHttpStatusException;
+import net.sf.redmine_mylyn.api.exception.RedmineApiErrorException;
+import net.sf.redmine_mylyn.api.exception.RedmineApiHttpStatusException;
 import net.sf.redmine_mylyn.internal.api.parser.IModelParser;
 
 import org.apache.commons.httpclient.Credentials;

@@ -1,12 +1,14 @@
 package net.sf.redmine_mylyn.internal.api.parser;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXSource;
 
-import net.sf.redmine_mylyn.api.client.RedmineApiErrorException;
+import net.sf.redmine_mylyn.api.exception.RedmineApiErrorException;
 import net.sf.redmine_mylyn.internal.api.parser.adapter.type.PartialIssueType;
 import net.sf.redmine_mylyn.internal.api.parser.adapter.type.SubmitError;
 
@@ -31,11 +33,18 @@ public class SubmitedIssueParser implements IModelParser<Object> {
 
 		parserFactory = SAXParserFactory.newInstance();
 		parserFactory.setNamespaceAware(false);
-}
+	}
 	
 	@Override
 	public Object parseResponse(InputStream input, int sc) throws RedmineApiErrorException {
 		try {
+			//TODO remove
+//			BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+//			String l;
+//			while((l=reader.readLine())!=null) {
+//				System.out.println(l);
+//			}
+			
 			JaxbParser<?> parser = successParser;
 			if (sc!=HttpStatus.SC_CREATED) {
 				parser = errorParser;

@@ -9,13 +9,15 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import net.sf.redmine_mylyn.api.client.IRedmineApiErrorCollector;
-import net.sf.redmine_mylyn.api.client.RedmineApiErrorException;
-import net.sf.redmine_mylyn.api.client.RedmineApiInvalidDataException;
 import net.sf.redmine_mylyn.api.client.RedmineServerVersion;
+import net.sf.redmine_mylyn.api.exception.RedmineApiErrorException;
+import net.sf.redmine_mylyn.api.exception.RedmineApiInvalidDataException;
 import net.sf.redmine_mylyn.api.model.Configuration;
+import net.sf.redmine_mylyn.api.model.CustomValue;
 import net.sf.redmine_mylyn.api.model.Issue;
 import net.sf.redmine_mylyn.api.model.container.AbstractPropertyContainer;
 import net.sf.redmine_mylyn.api.model.container.CustomFields;
+import net.sf.redmine_mylyn.api.model.container.CustomValues;
 import net.sf.redmine_mylyn.api.model.container.IssueCategories;
 import net.sf.redmine_mylyn.api.model.container.IssuePriorities;
 import net.sf.redmine_mylyn.api.model.container.IssueStatuses;
@@ -40,6 +42,7 @@ import net.sf.redmine_mylyn.internal.api.parser.adapter.type.UpdatedIssuesType;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.NameValuePair;
+import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
@@ -81,19 +84,21 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	private PartialIssueParser queryParser;
 	private SubmitedIssueParser submitIssueParser;
 	
+	private final IssueXmlWriter issueWriter;
+	
 	private Configuration configuration;
 	
 	public Api_2_7_ClientImpl(AbstractWebLocation location) {
 		super(location);
 		
 		buildParser();
+		issueWriter = new IssueXmlWriter();
 	}
 
 	public Api_2_7_ClientImpl(AbstractWebLocation location, Configuration initialConfiguration) {
-		super(location);
+		this(location);
 		
 		this.configuration = initialConfiguration;
-		buildParser();
 	}
 	
 	@Override
@@ -250,19 +255,11 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 		
 		PostMethod method = new PostMethod("/issues.xml");
 		
-		StringBuilder builder = new StringBuilder();
-		builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-		builder.append("<issue>");
-
-		for(Entry<String, String> entry : issue2SubmitValues(issue).entrySet()) {
-			builder.append("<").append(entry.getKey()).append(">");
-			builder.append(entry.getValue());
-			builder.append("</").append(entry.getKey()).append(">");
-		}
-		builder.append("</issue>");
+		
 		
 		try {
-			method.setRequestEntity(new StringRequestEntity(builder.toString(), "text/xml", "UTF-8"));
+			String requestBody = issueWriter.writeIssue(issue);
+			method.setRequestEntity(new StringRequestEntity(requestBody, "text/xml", "UTF-8"));
 		} catch (UnsupportedEncodingException e) {
 			throw new RedmineApiErrorException("Execution of method failed - Invalid encoding {}", e, "UTF-8");
 		}
@@ -285,24 +282,6 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 			
 			throw new RedmineApiInvalidDataException();
 		}
-	}
-
-	static Map<String, String> issue2SubmitValues(Issue issue) {
-		Map<String, String> values = new HashMap<String, String>();
-		
-		Field[] fields = Issue.class.getDeclaredFields();
-		for (Field field : fields) {
-
-			
-			if(field.isAnnotationPresent(IssuePropertyMapping.class)) {
-				IssuePropertyMapping annotation = (IssuePropertyMapping)field.getAnnotation(IssuePropertyMapping.class);
-				String key = annotation.value().getSubmitKey();
-				String value = annotation.value().getSubmitValue(field, issue);
-				values.put(key, value);
-			}
-		}
-		
-		return values;
 	}
 	
 	private void buildParser() {

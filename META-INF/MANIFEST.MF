@@ -11,6 +11,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: javax.xml.bind
 Export-Package: 
  net.sf.redmine_mylyn.api.client,
+ net.sf.redmine_mylyn.api.exception,
  net.sf.redmine_mylyn.api.model;uses:="net.sf.redmine_mylyn.api.model.container",
  net.sf.redmine_mylyn.api.model.container,
  net.sf.redmine_mylyn.api.query,

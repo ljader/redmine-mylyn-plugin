@@ -1,6 +1,8 @@
 package net.sf.redmine_mylyn.api.client;
 
 
+import net.sf.redmine_mylyn.api.exception.RedmineApiErrorException;
+import net.sf.redmine_mylyn.api.exception.RedmineApiInvalidDataException;
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.Issue;
 import net.sf.redmine_mylyn.api.query.Query;

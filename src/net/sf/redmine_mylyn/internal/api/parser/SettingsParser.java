@@ -2,7 +2,7 @@ package net.sf.redmine_mylyn.internal.api.parser;
 
 import java.io.InputStream;
 
-import net.sf.redmine_mylyn.api.client.RedmineApiErrorException;
+import net.sf.redmine_mylyn.api.exception.RedmineApiErrorException;
 import net.sf.redmine_mylyn.api.model.Settings;
 
 public class SettingsParser implements IModelParser<Settings> {
