@@ -14,7 +14,6 @@ import net.sf.redmine_mylyn.api.client.RedmineApiInvalidDataException;
 import net.sf.redmine_mylyn.api.client.RedmineServerVersion;
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.Issue;
-import net.sf.redmine_mylyn.api.model.PartialIssue;
 import net.sf.redmine_mylyn.api.model.container.AbstractPropertyContainer;
 import net.sf.redmine_mylyn.api.model.container.CustomFields;
 import net.sf.redmine_mylyn.api.model.container.IssueCategories;
@@ -34,6 +33,7 @@ import net.sf.redmine_mylyn.internal.api.parser.SettingsParser;
 import net.sf.redmine_mylyn.internal.api.parser.SubmitedIssueParser;
 import net.sf.redmine_mylyn.internal.api.parser.TypedParser;
 import net.sf.redmine_mylyn.internal.api.parser.adapter.type.Issues;
+import net.sf.redmine_mylyn.internal.api.parser.adapter.type.PartialIssueType;
 import net.sf.redmine_mylyn.internal.api.parser.adapter.type.PartialIssues;
 import net.sf.redmine_mylyn.internal.api.parser.adapter.type.SubmitError;
 import net.sf.redmine_mylyn.internal.api.parser.adapter.type.UpdatedIssuesType;
@@ -223,7 +223,7 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	}
 
 	@Override
-	public PartialIssue[] query(Query query, IProgressMonitor monitor) throws RedmineApiErrorException {
+	public Issue[] query(Query query, IProgressMonitor monitor) throws RedmineApiErrorException {
 		monitor = Policy.monitorFor(monitor);
 		monitor.beginTask("Execute query", 1);
 
@@ -244,7 +244,7 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	}
 
 	@Override
-	public int createIssue(Issue issue, IRedmineApiErrorCollector errorCollector, IProgressMonitor monitor) throws RedmineApiInvalidDataException, RedmineApiErrorException {
+	public Issue createIssue(Issue issue, IRedmineApiErrorCollector errorCollector, IProgressMonitor monitor) throws RedmineApiInvalidDataException, RedmineApiErrorException {
 		monitor = Policy.monitorFor(monitor);
 		monitor.beginTask("Upload Task", 1);
 		
@@ -275,8 +275,8 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 			monitor.worked(1);
 		}
 
-		if(response instanceof PartialIssue) {
-			return ((PartialIssue)response).getId();
+		if(response instanceof PartialIssueType) {
+			return ((PartialIssueType)response).toIssue();
 		} else {
 			SubmitError error = (SubmitError)response;
 			for (String errMsg : error.errors) {

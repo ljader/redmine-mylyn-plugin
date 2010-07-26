@@ -88,15 +88,6 @@ public class Issue implements IModel {
 		
 	}
 	
-	public Issue(PartialIssue partial) {
-		id = partial.getId();
-		subject = partial.getSubject();
-		projectId = partial.getProjectId();
-		statusId = partial.getStatusId();
-		priorityId = partial.getPriorityId();
-		updatedOn = partial.getUpdatedOn();
-	}
-	
 	@XmlElement(name="availableStatus")
 	@XmlList
 	private int [] availableStatusId;
@@ -316,5 +307,4 @@ public class Issue implements IModel {
 		return id;
 	}
 
-	
 }

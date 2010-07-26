@@ -1,5 +1,6 @@
-package net.sf.redmine_mylyn.api.model;
+package net.sf.redmine_mylyn.internal.api.parser.adapter.type;
 
+import java.lang.reflect.Field;
 import java.util.Date;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -9,15 +10,19 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import net.sf.redmine_mylyn.api.model.IModel;
+import net.sf.redmine_mylyn.api.model.Issue;
 import net.sf.redmine_mylyn.internal.api.parser.PartialIssueParser;
-import net.sf.redmine_mylyn.internal.api.parser.adapter.EmbededPropertyAdapter;
 import net.sf.redmine_mylyn.internal.api.parser.adapter.DateAdapter;
+import net.sf.redmine_mylyn.internal.api.parser.adapter.EmbededPropertyAdapter;
 
 @XmlRootElement(name="issue")
 @XmlType(name="issue", namespace=PartialIssueParser.FAKE_NS)
 @XmlAccessorType(XmlAccessType.FIELD)
-public class PartialIssue implements IModel {
+public class PartialIssueType implements IModel {
 
+	private static Field idField = getIdField();
+	
 	private static final long serialVersionUID = 1L;
 
 	private int id;
@@ -59,5 +64,33 @@ public class PartialIssue implements IModel {
 	
 	public Date getUpdatedOn() {
 		return updatedOn;
+	}
+	
+	public Issue toIssue() {
+		try {
+			Issue issue = new Issue();
+			idField.setInt(issue, id);
+			issue.setSubject(subject);
+			issue.setProjectId(project);
+			issue.setStatusId(status);
+			issue.setPriorityId(priority);
+			issue.setUpdatedOn(updatedOn);
+			return issue;
+		} catch (Exception e) {
+			//should never happens
+		}
+		return null;
+	}
+	
+	private static Field getIdField() {
+		try {
+			Field field = Issue.class.getDeclaredField("id");
+			field.setAccessible(true);
+			return field;
+		} catch (Exception e) {
+			//should never happens
+		}
+		
+		return null;
 	}
 }

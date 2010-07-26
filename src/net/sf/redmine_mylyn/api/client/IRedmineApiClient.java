@@ -3,7 +3,6 @@ package net.sf.redmine_mylyn.api.client;
 
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.Issue;
-import net.sf.redmine_mylyn.api.model.PartialIssue;
 import net.sf.redmine_mylyn.api.query.Query;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -22,9 +21,9 @@ public interface IRedmineApiClient {
 	
 	public Issue[] getIssues(IProgressMonitor monitor, int... issueIds) throws RedmineApiErrorException;
 	
-	public PartialIssue[] query(Query query, IProgressMonitor monitor) throws RedmineApiErrorException;
+	public Issue[] query(Query query, IProgressMonitor monitor) throws RedmineApiErrorException;
 	
-	public int createIssue(Issue issue, IRedmineApiErrorCollector errorCollector, IProgressMonitor monitor) throws RedmineApiInvalidDataException, RedmineApiErrorException;
+	public Issue createIssue(Issue issue, IRedmineApiErrorCollector errorCollector, IProgressMonitor monitor) throws RedmineApiInvalidDataException, RedmineApiErrorException;
 //		public void search(String searchParam, String projectId, String storedQueryId, List<RedmineTicket> tickets, IProgressMonitor monitor) throws RedmineException;
 //		
 //		public int createTicket(String project, Map<String, String> postValues, IProgressMonitor monitor) throws RedmineException;

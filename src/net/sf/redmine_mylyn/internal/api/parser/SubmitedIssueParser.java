@@ -7,7 +7,7 @@ import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXSource;
 
 import net.sf.redmine_mylyn.api.client.RedmineApiErrorException;
-import net.sf.redmine_mylyn.api.model.PartialIssue;
+import net.sf.redmine_mylyn.internal.api.parser.adapter.type.PartialIssueType;
 import net.sf.redmine_mylyn.internal.api.parser.adapter.type.SubmitError;
 
 import org.apache.commons.httpclient.HttpStatus;
@@ -20,14 +20,14 @@ public class SubmitedIssueParser implements IModelParser<Object> {
 
 	public final static String FAKE_NS = "http://redmin-mylyncon.sf.net/api"; 
 	
-	protected JaxbParser<PartialIssue> successParser;
+	protected JaxbParser<PartialIssueType> successParser;
 	protected JaxbParser<SubmitError> errorParser;
 	
 	protected SAXParserFactory parserFactory;
 	
 	public SubmitedIssueParser() {
 		errorParser = new JaxbParser<SubmitError>(SubmitError.class);
-		successParser = new JaxbParser<PartialIssue>(PartialIssue.class);
+		successParser = new JaxbParser<PartialIssueType>(PartialIssueType.class);
 
 		parserFactory = SAXParserFactory.newInstance();
 		parserFactory.setNamespaceAware(false);
