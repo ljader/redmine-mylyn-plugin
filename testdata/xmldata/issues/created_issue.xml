@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issue>
+  <id>14</id>
+  <project name="eCookbook" id="1"/>
+  <tracker name="Feature request" id="2"/>
+  <status name="Assigned" id="2"/>
+  <priority name="Normal" id="5"/>
+  <author name="John Smith" id="2"/>
+  <assigned_to name="Dave Lopper" id="3"/>
+  <subject>Add ingredients categories</subject>
+  <description>Ingredients of the recipe should be classified by categories</description>
+  <start_date>2010-05-08</start_date>
+  <due_date/>
+  <done_ratio>0</done_ratio>
+  <estimated_hours/>
+  <custom_fields>
+    <custom_field name="Float field" id="6">2.05</custom_field>
+  </custom_fields>
+  <created_on>Wed Jul 19 21:04:21 +0200 2006</created_on>
+  <updated_on>Wed Jul 19 21:09:50 +0200 2006</updated_on>
+</issue>

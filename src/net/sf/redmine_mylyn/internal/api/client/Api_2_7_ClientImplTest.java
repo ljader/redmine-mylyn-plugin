@@ -3,7 +3,8 @@ package net.sf.redmine_mylyn.internal.api.client;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -13,12 +14,18 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.redmine_mylyn.api.TestData;
+import net.sf.redmine_mylyn.api.client.IRedmineApiErrorCollector;
+import net.sf.redmine_mylyn.api.client.RedmineApiInvalidDataException;
 import net.sf.redmine_mylyn.api.client.RedmineServerVersion;
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.Issue;
@@ -59,104 +66,34 @@ public class Api_2_7_ClientImplTest {
 
 	private final static String RESPONSE_HEADER_NOT_FOUND = "HTTP/1.0 404 NOT FOUND\n\n";
 
-	static IProgressMonitor monitor;
+	private final static String RESPONSE_HEADER_CREATED = "HTTP/1.0 201 CREATED\n\n";
 
-	static AbstractWebLocation location;
+	private final static String RESPONSE_HEADER_FAILED = "HTTP/1.0 422 Unprocessable Entity\n\n";
+
+	private final static String RESOURCE_FILE_SUBMIT_ERRORS = "/xmldata/issues/submit_errors.xml"; 
 	
-	static Thread server; 
+	private final static String RESOURCE_FILE_SUBMIT_NEW = "/xmldata/issues/created_issue.xml"; 
 
+	private IProgressMonitor monitor;
+
+	private static AbstractWebLocation location;
+	
+	private static TestServer server; 
+
+	private static ErrorCollector errorCollector;
 	//	private TaskRepository repository;
 
 	
-	Api_2_7_ClientImpl testee;
+	private Api_2_7_ClientImpl testee;
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		monitor = new NullProgressMonitor();
 		location = new WebLocation("http://localhost:1234", "jsmith", "jsmith");
 
-		server = new Thread(new Runnable() {
-			
-			@Override
-			public void run() {
-				Map <String, String> requestMap = new HashMap<String, String>();
-				requestMap.put("version", ServerVersionValidator.RESOURCE_FILE);
-				requestMap.put("issues/updatedsince?issues=1,6,7,8&unixtime=123456789", IssueValidator.RESOURCE_FILE_UPDATED);
-				requestMap.put("issue/1", IssueValidator.RESOURCE_FILE_ISSUE_1);
-				requestMap.put("issues/list?issues=1,7,8", IssueValidator.RESOURCE_FILE_LIST);
-				requestMap.put("issues.xml?set_filter=1", PartialIssueValidator.RESOURCE_FILE);
-				
-				
-				try {
-					ServerSocket server = new ServerSocket(1234);
-					Pattern p = Pattern.compile("^(?:GET|POST)\\s+(?:/mylyn)?/(\\S+).*$", Pattern.CASE_INSENSITIVE);
-					
-					while(!Thread.interrupted()) {
-						OutputStream respStream = null;
-						BufferedReader reqReader = null;
-						Socket socket = server.accept();
-						
-						try {
-							respStream = socket.getOutputStream();
-							reqReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-							
-							String request = reqReader.readLine();
-							while(reqReader.ready()) {
-								reqReader.readLine();
-							}
-
-							boolean flag = true;
-							
-							Matcher m = p.matcher(request);
-							if(m.find()) {
-								String uri = m.group(1);
-								InputStream responseStream = null;
-								
-								if (requestMap.containsKey(uri)) {
-									responseStream = getClass().getResourceAsStream(requestMap.get(uri));
-								} else {
-									responseStream = getClass().getResourceAsStream("/xmldata/" + uri + ".xml");
-								}
-								
-								if (responseStream!=null) {
-									try {
-										flag = false;
-										respStream.write(RESPONSE_HEADER_OK.getBytes());
-										
-										int read = -1;
-										byte[] buffer = new byte[4096];
-										while((read=responseStream.read(buffer, 0, 4096))>-1) {
-											respStream.write(buffer, 0, read);
-										}
-									} finally {
-										responseStream.close();
-									}
-									
-								}
-								
-								if (flag) {
-									respStream.write(RESPONSE_HEADER_NOT_FOUND.getBytes());
-								}
-							}
-
-						} finally {
-							if(respStream!=null) {
-								respStream.close();
-							}
-							if(reqReader!=null) {
-								reqReader.close();
-							}
-							socket.close();
-						}
-						
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				
-			}
-		});
+		errorCollector = new ErrorCollector();
+		server = new TestServer();
 		server.start();
+		
 	}
 
 	@AfterClass
@@ -166,7 +103,14 @@ public class Api_2_7_ClientImplTest {
 
 	@Before
 	public void setUp() throws Exception {
+		monitor = new NullProgressMonitor();
 		testee = new Api_2_7_ClientImpl(location);
+		errorCollector.lst.clear();
+
+		
+		server.responseHeader = RESPONSE_HEADER_OK;
+		server.responseResourcePath = null;
+
 	}
 
 	@After
@@ -296,6 +240,34 @@ public class Api_2_7_ClientImplTest {
 	public void testEmptyQuery() throws Exception {
 		fail("not implemented");
 	}
+
+	@Test
+	public void testCreateIssue() throws Exception {
+		server.responseHeader = RESPONSE_HEADER_CREATED;
+		server.responseResourcePath = RESOURCE_FILE_SUBMIT_NEW;
+		
+		Issue issue = TestData.issue2;
+		int id = testee.createIssue(issue, errorCollector, monitor);
+		
+		assertEquals(14, id);
+		assertEquals(0, errorCollector.lst.size());
+	}
+
+	@Test(expected=RedmineApiInvalidDataException.class)
+	public void testCreateIssue_failed() throws Exception {
+		server.responseHeader = RESPONSE_HEADER_FAILED;
+		server.responseResourcePath = RESOURCE_FILE_SUBMIT_ERRORS;
+		
+		try {
+			Issue issue = TestData.issue2;
+			testee.createIssue(issue, errorCollector, monitor);
+			
+		} finally {
+			assertEquals(2, errorCollector.lst.size());
+			assertEquals("Zielversion ist kein gültiger Wert", errorCollector.lst.get(0));
+			assertEquals("FooBar", errorCollector.lst.get(1));
+		}
+	}
 	
 	@Test
 	public void concurrencyRequests() throws Exception {
@@ -342,5 +314,156 @@ public class Api_2_7_ClientImplTest {
 			assertArrayEquals(excpected, firstBuffer);
 			assertArrayEquals(excpected, secondBuffer);
 		}
+	}
+
+	@Test
+	public void testIssue2ValuePairs() {
+		Map<String, String> values = Api_2_7_ClientImpl.issue2SubmitValues(TestData.issue2);
+		
+		assertNotNull(values);
+		//TODO count
+		
+		List<String> keys = new ArrayList<String>(values.keySet());
+		Collections.sort(keys);
+//		
+		int idx=0;
+		assertEquals("issue[assigned_to_id]", keys.get(idx));
+		assertEquals("3", values.get(keys.get(idx++)));
+
+		assertEquals("issue[category_id]", keys.get(idx));
+		assertEquals("", values.get(keys.get(idx++)));
+
+		assertEquals("issue[description]", keys.get(idx));
+		assertEquals("Ingredients of the recipe should be classified by categories", values.get(keys.get(idx++)));
+
+		assertEquals("issue[done_ratio]", keys.get(idx));
+		assertEquals("10", values.get(keys.get(idx++)));
+
+		assertEquals("issue[due_date]", keys.get(idx));
+		assertEquals("", values.get(keys.get(idx++)));
+
+		assertEquals("issue[estimated_hours]", keys.get(idx));
+		assertEquals("3.5", values.get(keys.get(idx++)));
+
+		assertEquals("issue[fixed_version_id]", keys.get(idx));
+		assertEquals("2", values.get(keys.get(idx++)));
+
+		assertEquals("issue[priority_id]", keys.get(idx));
+		assertEquals("5", values.get(keys.get(idx++)));
+		
+		assertEquals("issue[project_id]", keys.get(idx)); //TODO prüfen
+		assertEquals("1", values.get(keys.get(idx++)));
+
+		assertEquals("issue[start_date]", keys.get(idx));
+		assertEquals("2010-05-08", values.get(keys.get(idx++)));
+
+		assertEquals("issue[status_id]", keys.get(idx));
+		assertEquals("2", values.get(keys.get(idx++)));
+		
+		assertEquals("issue[subject]", keys.get(idx));
+		assertEquals("Add ingredients categories", values.get(keys.get(idx++)));
+
+		assertEquals("issue[tracker_id]", keys.get(idx));
+		assertEquals("2", values.get(keys.get(idx++)));
+		
+		//TODO Comment
+		//TODO cf
+		
+		
+		fail("incomplete");
+	}
+
+	private static class ErrorCollector implements IRedmineApiErrorCollector {
+		public ArrayList<String> lst = new ArrayList<String>();
+		
+		@Override
+		public void accept(String errorMessage) {
+			lst.add(errorMessage);
+		}
+	}
+
+	private static class TestServer extends Thread {
+		final Map <String, String> requestMap;
+		final Pattern p = Pattern.compile("^(?:GET|POST)\\s+(?:/mylyn)?/(\\S+).*$", Pattern.CASE_INSENSITIVE);
+		
+		public String responseHeader;
+		public String responseResourcePath;
+		
+		public TestServer() {
+			requestMap = new HashMap<String, String>();
+			requestMap.put("version", ServerVersionValidator.RESOURCE_FILE);
+			requestMap.put("issues/updatedsince?issues=1,6,7,8&unixtime=123456789", IssueValidator.RESOURCE_FILE_UPDATED);
+			requestMap.put("issue/1", IssueValidator.RESOURCE_FILE_ISSUE_1);
+			requestMap.put("issues/list?issues=1,7,8", IssueValidator.RESOURCE_FILE_LIST);
+			requestMap.put("issues.xml?set_filter=1", PartialIssueValidator.RESOURCE_FILE);
+		}
+
+		@Override
+		public void run() {
+			try {
+				
+				ServerSocket server = new ServerSocket(1234);
+				
+				while(!Thread.interrupted()) {
+					OutputStream respStream = null;
+					BufferedReader reqReader = null;
+					Socket socket = server.accept();
+					
+					try {
+						respStream = socket.getOutputStream();
+						reqReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+						
+						String request = reqReader.readLine();
+						reqReader.skip(socket.getInputStream().available());
+
+						//find ResponseBody
+						String responseResourcePath = this.responseResourcePath;
+						if (responseResourcePath==null) {
+							
+							Matcher m = p.matcher(request);
+							if(m.find()) {
+								String uri = m.group(1);
+								responseResourcePath = requestMap.containsKey(uri) ? requestMap.get(uri) : "/xmldata/" + uri + ".xml";
+							}
+						}
+
+						//Repsonse Header
+						respStream.write(responseHeader.getBytes());
+
+						//Repsonse Body
+						InputStream responseStream = getClass().getResourceAsStream(responseResourcePath);
+						if(responseStream!=null) {
+							try {
+								int read = -1;
+								byte[] buffer = new byte[4096];
+								while((read=responseStream.read(buffer, 0, 4096))>-1) {
+									respStream.write(buffer, 0, read);
+								}
+							} finally {
+								responseStream.close();
+							}
+						}
+						
+
+					} finally {
+						if(respStream!=null) {
+							respStream.close();
+						}
+						if(reqReader!=null) {
+							reqReader.close();
+						}
+						socket.close();
+					}
+					
+				}
+				
+				server.close();
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+		}
+		
 	}
 }
