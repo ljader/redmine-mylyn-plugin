@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import net.sf.redmine_mylyn.api.client.RedmineApiStatusException;
+import net.sf.redmine_mylyn.api.exception.RedmineApiErrorException;
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.CustomField;
 import net.sf.redmine_mylyn.api.model.Project;
@@ -406,9 +406,11 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 		
 		try {
 			query = Query.fromUrl(repositoryQuery.getUrl(), getTaskRepository().getCharacterEncoding(), configuration);
-		} catch (RedmineApiStatusException e) {
-			StatusHandler.log(e.getStatus());
-			setErrorMessage("Restore of query failed");
+		} catch (RedmineApiErrorException e) {
+			//TODO PluginId
+			IStatus status = RedmineCorePlugin.toStatus(e, "Restore of Query failed");
+			StatusHandler.log(status);
+			setErrorMessage(status.getMessage());
 		}
 
 //		//NOTE : Don't call updateProjectAttributes() - projectViewer's SeletionListener call this method !!!
@@ -506,7 +508,7 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 		Query query = QueryBuilder.buildQuery(searchOperators, queryText, queryStructuredViewer);
 		try {
 			repositoryQuery.setUrl(query.toUrl(getTaskRepository().getCharacterEncoding()));
-		} catch (RedmineApiStatusException e) {
+		} catch (RedmineApiErrorException e) {
 			//TODO PluginId
 			IStatus status = RedmineCorePlugin.toStatus(e, "Creation of Query failed");
 			StatusHandler.log(status);
