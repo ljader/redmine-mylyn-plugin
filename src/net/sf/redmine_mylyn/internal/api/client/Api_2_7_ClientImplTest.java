@@ -16,17 +16,15 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.redmine_mylyn.api.TestData;
 import net.sf.redmine_mylyn.api.client.IRedmineApiErrorCollector;
-import net.sf.redmine_mylyn.api.client.RedmineApiInvalidDataException;
 import net.sf.redmine_mylyn.api.client.RedmineServerVersion;
+import net.sf.redmine_mylyn.api.exception.RedmineApiInvalidDataException;
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.Issue;
 import net.sf.redmine_mylyn.api.query.Query;
@@ -63,7 +61,7 @@ public class Api_2_7_ClientImplTest {
 
 	private final static String RESPONSE_HEADER_OK = "HTTP/1.0 200 OK\n\n";
 
-	private final static String RESPONSE_HEADER_NOT_FOUND = "HTTP/1.0 404 NOT FOUND\n\n";
+//	private final static String RESPONSE_HEADER_NOT_FOUND = "HTTP/1.0 404 NOT FOUND\n\n";
 
 	private final static String RESPONSE_HEADER_CREATED = "HTTP/1.0 201 CREATED\n\n";
 
@@ -312,63 +310,6 @@ public class Api_2_7_ClientImplTest {
 			assertArrayEquals(excpected, firstBuffer);
 			assertArrayEquals(excpected, secondBuffer);
 		}
-	}
-
-	@Test
-	public void testIssue2ValuePairs() {
-		Map<String, String> values = Api_2_7_ClientImpl.issue2SubmitValues(TestData.issue2);
-		
-		assertNotNull(values);
-		//TODO count
-		
-		List<String> keys = new ArrayList<String>(values.keySet());
-		Collections.sort(keys);
-//		
-		int idx=0;
-		assertEquals("issue[assigned_to_id]", keys.get(idx));
-		assertEquals("3", values.get(keys.get(idx++)));
-
-		assertEquals("issue[category_id]", keys.get(idx));
-		assertEquals("", values.get(keys.get(idx++)));
-
-		assertEquals("issue[description]", keys.get(idx));
-		assertEquals("Ingredients of the recipe should be classified by categories", values.get(keys.get(idx++)));
-
-		assertEquals("issue[done_ratio]", keys.get(idx));
-		assertEquals("10", values.get(keys.get(idx++)));
-
-		assertEquals("issue[due_date]", keys.get(idx));
-		assertEquals("", values.get(keys.get(idx++)));
-
-		assertEquals("issue[estimated_hours]", keys.get(idx));
-		assertEquals("3.5", values.get(keys.get(idx++)));
-
-		assertEquals("issue[fixed_version_id]", keys.get(idx));
-		assertEquals("2", values.get(keys.get(idx++)));
-
-		assertEquals("issue[priority_id]", keys.get(idx));
-		assertEquals("5", values.get(keys.get(idx++)));
-		
-		assertEquals("issue[project_id]", keys.get(idx)); //TODO prüfen
-		assertEquals("1", values.get(keys.get(idx++)));
-
-		assertEquals("issue[start_date]", keys.get(idx));
-		assertEquals("2010-05-08", values.get(keys.get(idx++)));
-
-		assertEquals("issue[status_id]", keys.get(idx));
-		assertEquals("2", values.get(keys.get(idx++)));
-		
-		assertEquals("issue[subject]", keys.get(idx));
-		assertEquals("Add ingredients categories", values.get(keys.get(idx++)));
-
-		assertEquals("issue[tracker_id]", keys.get(idx));
-		assertEquals("2", values.get(keys.get(idx++)));
-		
-		//TODO Comment
-		//TODO cf
-		
-		
-		fail("incomplete");
 	}
 
 	private static class ErrorCollector implements IRedmineApiErrorCollector {
