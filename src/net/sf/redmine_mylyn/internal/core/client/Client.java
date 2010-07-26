@@ -4,11 +4,10 @@ import java.util.Date;
 import java.util.Set;
 
 import net.sf.redmine_mylyn.api.client.IRedmineApiClient;
-import net.sf.redmine_mylyn.api.client.RedmineApiStatusException;
 import net.sf.redmine_mylyn.api.client.RedmineServerVersion;
+import net.sf.redmine_mylyn.api.exception.RedmineApiErrorException;
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.Issue;
-import net.sf.redmine_mylyn.api.model.PartialIssue;
 import net.sf.redmine_mylyn.api.query.Query;
 import net.sf.redmine_mylyn.core.RedmineStatusException;
 import net.sf.redmine_mylyn.core.RedmineUtil;
@@ -34,7 +33,7 @@ public class Client implements IClient {
 	public void updateConfiguration(IProgressMonitor monitor) throws RedmineStatusException {
 		try {
 			apiClient.updateConfiguration(monitor);
-		} catch (RedmineApiStatusException e) {
+		} catch (RedmineApiErrorException e) {
 			throw new RedmineStatusException(e);
 		}
 	}
@@ -45,7 +44,7 @@ public class Client implements IClient {
 		RedmineServerVersion version;
 		try {
 			version = apiClient.detectServerVersion(monitor);
-		} catch (RedmineApiStatusException e) {
+		} catch (RedmineApiErrorException e) {
 			throw new RedmineStatusException(e);
 		}
 		
@@ -56,7 +55,7 @@ public class Client implements IClient {
 	public Issue getIssue(int id, IProgressMonitor monitor) throws RedmineStatusException {
 		try {
 			return apiClient.getIssue(id, monitor);
-		} catch (RedmineApiStatusException e) {
+		} catch (RedmineApiErrorException e) {
 			throw new RedmineStatusException(e);
 		}
 	}
@@ -74,7 +73,7 @@ public class Client implements IClient {
 		
 		try {
 			return apiClient.getIssues(monitor, ids);
-		} catch (RedmineApiStatusException e) {
+		} catch (RedmineApiErrorException e) {
 			throw new RedmineStatusException(e);
 		}
 	}
@@ -89,16 +88,16 @@ public class Client implements IClient {
 		
 		try {
 			return apiClient.getUpdatedIssueIds(ids, updatedSince.getTime(), monitor);
-		} catch (RedmineApiStatusException e) {
+		} catch (RedmineApiErrorException e) {
 			throw new RedmineStatusException(e);
 		}
 	}
 	
 	@Override
-	public PartialIssue[] query(Query query, IProgressMonitor monitor) throws RedmineStatusException {
+	public Issue[] query(Query query, IProgressMonitor monitor) throws RedmineStatusException {
 		try {
 			return apiClient.query(query, monitor);
-		} catch (RedmineApiStatusException e) {
+		} catch (RedmineApiErrorException e) {
 			throw new RedmineStatusException(e);
 		}
 	}

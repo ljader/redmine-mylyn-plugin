@@ -118,11 +118,11 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 	}
 
 	@Override
-	public RepositoryResponse postTaskData(TaskRepository arg0, TaskData arg1, Set<TaskAttribute> arg2, IProgressMonitor arg3) throws CoreException {
+	public RepositoryResponse postTaskData(TaskRepository repository, TaskData taskData, Set<TaskAttribute> oldAttributes, IProgressMonitor monitor) throws CoreException {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
+	
 	public TaskData createTaskDataFromIssue(TaskRepository repository, Issue issue, IProgressMonitor monitor) throws CoreException {
 
 		Configuration configuration = connector.getRepositoryConfiguration(repository);

@@ -1,6 +1,6 @@
 package net.sf.redmine_mylyn.core;
 
-import net.sf.redmine_mylyn.api.client.RedmineApiStatusException;
+import net.sf.redmine_mylyn.api.exception.RedmineApiErrorException;
 
 import org.eclipse.core.runtime.IStatus;
 
@@ -15,9 +15,14 @@ public class RedmineStatusException extends Exception {
 		this.status = status;
 	}
 
-	public RedmineStatusException(RedmineApiStatusException apiException) {
-		super(apiException.getStatus().getException());
-		this.status = apiException.getStatus();
+	public RedmineStatusException(RedmineApiErrorException apiException) {
+		super(apiException);
+		this.status = RedmineCorePlugin.toStatus(apiException, apiException.getMessage());
+	}
+
+	public RedmineStatusException(RedmineApiErrorException apiException, String message) {
+		super(apiException);
+		this.status = RedmineCorePlugin.toStatus(apiException, message);
 	}
 	
 	public IStatus getStatus() {

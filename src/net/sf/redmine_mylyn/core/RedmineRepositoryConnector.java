@@ -4,11 +4,10 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Set;
 
-import net.sf.redmine_mylyn.api.client.RedmineApiStatusException;
+import net.sf.redmine_mylyn.api.exception.RedmineApiErrorException;
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.Issue;
 import net.sf.redmine_mylyn.api.model.IssueStatus;
-import net.sf.redmine_mylyn.api.model.PartialIssue;
 import net.sf.redmine_mylyn.api.query.Query;
 import net.sf.redmine_mylyn.core.client.IClient;
 import net.sf.redmine_mylyn.internal.core.RedmineTaskMapper;
@@ -35,8 +34,6 @@ import org.eclipse.mylyn.tasks.core.data.TaskDataCollector;
 import org.eclipse.mylyn.tasks.core.data.TaskMapper;
 import org.eclipse.mylyn.tasks.core.sync.ISynchronizationSession;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.MarkerFactory;
 
 
 public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
@@ -47,7 +44,8 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 	
 	private ClientManager clientManager;
 	
-	private final static Logger LOGGER = LoggerFactory.getLogger(RedmineRepositoryConnector.class);
+//	private final static Logger LOGGER = LoggerFactory.getLogger(RedmineRepositoryConnector.class);
+	private final static Logger LOGGER = null;
 	
 	public RedmineRepositoryConnector() {
 		taskDataHandler = new RedmineTaskDataHandler(this);
@@ -198,9 +196,9 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 			Query query = Query.fromUrl(repositoryQuery.getUrl(), repository.getCharacterEncoding(), getRepositoryConfiguration(repository));
 
 			IClient client = getClientManager().getClient(repository);
-			PartialIssue[] partialIssues = client.query(query, monitor);
+			Issue[] partialIssues = client.query(query, monitor);
 			
-			for(PartialIssue partialIssue : partialIssues) {
+			for(Issue partialIssue : partialIssues) {
 				Date updated = partialIssue.getUpdatedOn();
 				
 				// UpdatedOn should never be null
@@ -210,8 +208,7 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 					continue;
 				}
 
-				Issue issue = new Issue(partialIssue);
-				TaskData taskData = taskDataHandler.createTaskDataFromIssue(repository, issue, monitor);
+				TaskData taskData = taskDataHandler.createTaskDataFromIssue(repository, partialIssue, monitor);
 
 				//TODO mark only new or changed taks partial
 				taskData.setPartial(true);
@@ -222,8 +219,8 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 			IStatus status = e.getStatus();
 			StatusHandler.log(status);
 			return status;
-		} catch (RedmineApiStatusException e) {
-			IStatus status = e.getStatus();
+		} catch (RedmineApiErrorException e) {
+			IStatus status = RedmineCorePlugin.toStatus(e, "Syncronization failed");
 			StatusHandler.log(status);
 			return status;
 		} catch (CoreException e) {
