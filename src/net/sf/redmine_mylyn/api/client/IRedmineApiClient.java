@@ -12,19 +12,19 @@ public interface IRedmineApiClient {
 
 	public Configuration getConfiguration();
 
-	public RedmineServerVersion detectServerVersion(IProgressMonitor monitor) throws RedmineApiStatusException;
+	public RedmineServerVersion detectServerVersion(IProgressMonitor monitor) throws RedmineApiErrorException;
 	
-	public void updateConfiguration(IProgressMonitor monitor) throws RedmineApiStatusException;
+	public void updateConfiguration(IProgressMonitor monitor) throws RedmineApiErrorException;
 	
-	public int[] getUpdatedIssueIds(int[] issues, long updatedSince, IProgressMonitor monitor) throws RedmineApiStatusException;
+	public int[] getUpdatedIssueIds(int[] issues, long updatedSince, IProgressMonitor monitor) throws RedmineApiErrorException;
 	
-	public Issue getIssue(int id, IProgressMonitor monitor) throws RedmineApiStatusException;
+	public Issue getIssue(int id, IProgressMonitor monitor) throws RedmineApiErrorException;
 	
-	public Issue[] getIssues(IProgressMonitor monitor, int... issueIds) throws RedmineApiStatusException;
+	public Issue[] getIssues(IProgressMonitor monitor, int... issueIds) throws RedmineApiErrorException;
 	
-	public PartialIssue[] query(Query query, IProgressMonitor monitor) throws RedmineApiStatusException;
+	public PartialIssue[] query(Query query, IProgressMonitor monitor) throws RedmineApiErrorException;
 	
-	
+	public int createIssue(Issue issue, IRedmineApiErrorCollector errorCollector, IProgressMonitor monitor) throws RedmineApiInvalidDataException, RedmineApiErrorException;
 //		public void search(String searchParam, String projectId, String storedQueryId, List<RedmineTicket> tickets, IProgressMonitor monitor) throws RedmineException;
 //		
 //		public int createTicket(String project, Map<String, String> postValues, IProgressMonitor monitor) throws RedmineException;

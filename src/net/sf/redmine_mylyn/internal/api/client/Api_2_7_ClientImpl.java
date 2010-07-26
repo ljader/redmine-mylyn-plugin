@@ -1,12 +1,16 @@
 package net.sf.redmine_mylyn.internal.api.client;
 
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import net.sf.redmine_mylyn.api.client.RedmineApiStatusException;
+import net.sf.redmine_mylyn.api.client.IRedmineApiErrorCollector;
+import net.sf.redmine_mylyn.api.client.RedmineApiErrorException;
+import net.sf.redmine_mylyn.api.client.RedmineApiInvalidDataException;
 import net.sf.redmine_mylyn.api.client.RedmineServerVersion;
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.Issue;
@@ -27,13 +31,18 @@ import net.sf.redmine_mylyn.internal.api.parser.AttributeParser;
 import net.sf.redmine_mylyn.internal.api.parser.IModelParser;
 import net.sf.redmine_mylyn.internal.api.parser.PartialIssueParser;
 import net.sf.redmine_mylyn.internal.api.parser.SettingsParser;
+import net.sf.redmine_mylyn.internal.api.parser.SubmitedIssueParser;
 import net.sf.redmine_mylyn.internal.api.parser.TypedParser;
 import net.sf.redmine_mylyn.internal.api.parser.adapter.type.Issues;
 import net.sf.redmine_mylyn.internal.api.parser.adapter.type.PartialIssues;
+import net.sf.redmine_mylyn.internal.api.parser.adapter.type.SubmitError;
 import net.sf.redmine_mylyn.internal.api.parser.adapter.type.UpdatedIssuesType;
 
+import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
@@ -70,6 +79,7 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	private TypedParser<RedmineServerVersion> versionParser;
 	
 	private PartialIssueParser queryParser;
+	private SubmitedIssueParser submitIssueParser;
 	
 	private Configuration configuration;
 	
@@ -95,7 +105,7 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	}
 
 	@Override
-	public RedmineServerVersion detectServerVersion(IProgressMonitor monitor) throws RedmineApiStatusException {
+	public RedmineServerVersion detectServerVersion(IProgressMonitor monitor) throws RedmineApiErrorException {
 		monitor = Policy.monitorFor(monitor);
 		monitor.beginTask("Detect version of Redmine", 1);
 
@@ -112,7 +122,7 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	}
 	
 	@Override
-	public void updateConfiguration(IProgressMonitor monitor) throws RedmineApiStatusException {
+	public void updateConfiguration(IProgressMonitor monitor) throws RedmineApiErrorException {
 		monitor = Policy.monitorFor(monitor);
 
 		Configuration conf = new Configuration();
@@ -144,7 +154,7 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	}
 	
 	@Override
-	public int[] getUpdatedIssueIds(int[] issues, long updatedSince, IProgressMonitor monitor) throws RedmineApiStatusException {
+	public int[] getUpdatedIssueIds(int[] issues, long updatedSince, IProgressMonitor monitor) throws RedmineApiErrorException {
 		if (issues==null || issues.length==0) {
 			return null;
 		}
@@ -167,7 +177,7 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	}
 	
 	@Override
-	public Issue getIssue(int id, IProgressMonitor monitor) throws RedmineApiStatusException {
+	public Issue getIssue(int id, IProgressMonitor monitor) throws RedmineApiErrorException {
 		if(id < 1) {
 			return null;
 		}
@@ -190,7 +200,7 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	}
 	
 	@Override
-	public Issue[] getIssues(IProgressMonitor monitor, int... issueIds) throws RedmineApiStatusException {
+	public Issue[] getIssues(IProgressMonitor monitor, int... issueIds) throws RedmineApiErrorException {
 		if (issueIds==null || issueIds.length==0) {
 			return null;
 		}
@@ -213,7 +223,7 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	}
 
 	@Override
-	public PartialIssue[] query(Query query, IProgressMonitor monitor) throws RedmineApiStatusException {
+	public PartialIssue[] query(Query query, IProgressMonitor monitor) throws RedmineApiErrorException {
 		monitor = Policy.monitorFor(monitor);
 		monitor.beginTask("Execute query", 1);
 
@@ -233,6 +243,68 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 		return issues.issues;
 	}
 
+	@Override
+	public int createIssue(Issue issue, IRedmineApiErrorCollector errorCollector, IProgressMonitor monitor) throws RedmineApiInvalidDataException, RedmineApiErrorException {
+		monitor = Policy.monitorFor(monitor);
+		monitor.beginTask("Upload Task", 1);
+		
+		PostMethod method = new PostMethod("/issues.xml");
+		
+		StringBuilder builder = new StringBuilder();
+		builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+		builder.append("<issue>");
+
+		for(Entry<String, String> entry : issue2SubmitValues(issue).entrySet()) {
+			builder.append("<").append(entry.getKey()).append(">");
+			builder.append(entry.getValue());
+			builder.append("</").append(entry.getKey()).append(">");
+		}
+		builder.append("</issue>");
+		
+		try {
+			method.setRequestEntity(new StringRequestEntity(builder.toString(), "text/xml", "UTF-8"));
+		} catch (UnsupportedEncodingException e) {
+			throw new RedmineApiErrorException("Execution of method failed - Invalid encoding {}", e, "UTF-8");
+		}
+		
+		Object response = executeMethod(method, submitIssueParser, monitor, HttpStatus.SC_CREATED, HttpStatus.SC_UNPROCESSABLE_ENTITY);
+		
+		if(monitor.isCanceled()) {
+			throw new OperationCanceledException();
+		} else {
+			monitor.worked(1);
+		}
+
+		if(response instanceof PartialIssue) {
+			return ((PartialIssue)response).getId();
+		} else {
+			SubmitError error = (SubmitError)response;
+			for (String errMsg : error.errors) {
+				errorCollector.accept(errMsg);
+			}
+			
+			throw new RedmineApiInvalidDataException();
+		}
+	}
+
+	static Map<String, String> issue2SubmitValues(Issue issue) {
+		Map<String, String> values = new HashMap<String, String>();
+		
+		Field[] fields = Issue.class.getDeclaredFields();
+		for (Field field : fields) {
+
+			
+			if(field.isAnnotationPresent(IssuePropertyMapping.class)) {
+				IssuePropertyMapping annotation = (IssuePropertyMapping)field.getAnnotation(IssuePropertyMapping.class);
+				String key = annotation.value().getSubmitKey();
+				String value = annotation.value().getSubmitValue(field, issue);
+				values.put(key, value);
+			}
+		}
+		
+		return values;
+	}
+	
 	private void buildParser() {
 		parserByClass = new HashMap<String, IModelParser<? extends AbstractPropertyContainer<?>>>();
 		parserByClass.put(URL_ISSUE_STATUS, new AttributeParser<IssueStatuses>(IssueStatuses.class));
@@ -253,6 +325,7 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 		versionParser = new TypedParser<RedmineServerVersion>(RedmineServerVersion.class);
 
 		queryParser = new PartialIssueParser();
+		submitIssueParser = new SubmitedIssueParser();
 	}
 	
 }

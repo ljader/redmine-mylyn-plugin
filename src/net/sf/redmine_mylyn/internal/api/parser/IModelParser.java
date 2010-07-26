@@ -2,10 +2,10 @@ package net.sf.redmine_mylyn.internal.api.parser;
 
 import java.io.InputStream;
 
-import net.sf.redmine_mylyn.api.client.RedmineApiStatusException;
+import net.sf.redmine_mylyn.api.client.RedmineApiErrorException;
 
 public interface IModelParser<T> {
 
-	T parseResponse(InputStream input, int sc) throws RedmineApiStatusException;
+	T parseResponse(InputStream input, int sc) throws RedmineApiErrorException;
 	
 }

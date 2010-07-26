@@ -7,31 +7,40 @@ import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXSource;
 
 import net.sf.redmine_mylyn.api.client.RedmineApiErrorException;
-import net.sf.redmine_mylyn.internal.api.parser.adapter.type.PartialIssues;
+import net.sf.redmine_mylyn.api.model.PartialIssue;
+import net.sf.redmine_mylyn.internal.api.parser.adapter.type.SubmitError;
 
+import org.apache.commons.httpclient.HttpStatus;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.XMLFilterImpl;
 
-public class PartialIssueParser implements IModelParser<PartialIssues> {
+public class SubmitedIssueParser implements IModelParser<Object> {
 
 	public final static String FAKE_NS = "http://redmin-mylyncon.sf.net/api"; 
 	
-	protected JaxbParser<PartialIssues> parser;
+	protected JaxbParser<PartialIssue> successParser;
+	protected JaxbParser<SubmitError> errorParser;
 	
 	protected SAXParserFactory parserFactory;
 	
-	public PartialIssueParser() {
-		parser = new JaxbParser<PartialIssues>(PartialIssues.class);
+	public SubmitedIssueParser() {
+		errorParser = new JaxbParser<SubmitError>(SubmitError.class);
+		successParser = new JaxbParser<PartialIssue>(PartialIssue.class);
 
 		parserFactory = SAXParserFactory.newInstance();
 		parserFactory.setNamespaceAware(false);
 }
 	
 	@Override
-	public PartialIssues parseResponse(InputStream input, int sc) throws RedmineApiErrorException {
+	public Object parseResponse(InputStream input, int sc) throws RedmineApiErrorException {
 		try {
+			JaxbParser<?> parser = successParser;
+			if (sc!=HttpStatus.SC_CREATED) {
+				parser = errorParser;
+			}
+		
 			XMLFilterImpl filter = new MissingNamespaceFilter();
 			SAXSource source = new SAXSource(filter, new InputSource(input));
 			

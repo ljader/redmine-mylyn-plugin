@@ -5,14 +5,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.redmine_mylyn.api.client.RedmineApiPlugin;
-import net.sf.redmine_mylyn.api.client.RedmineApiStatusException;
+import net.sf.redmine_mylyn.api.client.RedmineApiErrorException;
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.CustomField;
 
 import org.apache.commons.httpclient.NameValuePair;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 
 public class QueryFilter {
 
@@ -65,7 +62,7 @@ public class QueryFilter {
 		return values;
 	}
 	
-	void appendParams(List<NameValuePair> parts) throws RedmineApiStatusException {
+	void appendParams(List<NameValuePair> parts) throws RedmineApiErrorException {
 		if(queryField==null || definition==null || operator==null || !definition.containsOperator(operator)) {
 			return;
 		}
@@ -95,8 +92,7 @@ public class QueryFilter {
 				}
 			}
 		} catch (NumberFormatException e) {
-			IStatus status = new Status(IStatus.ERROR, RedmineApiPlugin.PLUGIN_ID, "Invalid value of Query-Field", e);
-			throw new RedmineApiStatusException(status);
+			throw new RedmineApiErrorException("Invalid Integer-Value `{}` for Query-Field `{}`", e, ""+values.get(0), queryField.getQueryValue());
 		}
 		
 		appendFieldAndOperator(parts);

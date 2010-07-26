@@ -14,6 +14,8 @@ import net.sf.redmine_mylyn.api.model.container.Attachments;
 import net.sf.redmine_mylyn.api.model.container.CustomValues;
 import net.sf.redmine_mylyn.api.model.container.Journals;
 import net.sf.redmine_mylyn.api.model.container.TimeEntries;
+import net.sf.redmine_mylyn.internal.api.client.IssuePropertyMapping;
+import net.sf.redmine_mylyn.internal.api.client.RedmineApiIssueProperty;
 
 @XmlRootElement
 @XmlType
@@ -28,20 +30,27 @@ public class Issue implements IModel {
 	@XmlAttribute(required=true)
 	private boolean editAllowed;
 	
+	@IssuePropertyMapping(RedmineApiIssueProperty.SUBJECT)
 	private String subject;
 	
+	
+	@IssuePropertyMapping(RedmineApiIssueProperty.DESCRIPTION)
 	private String description;
 
 	private Date createdOn;
 	
 	private Date updatedOn;
 	
+	@IssuePropertyMapping(RedmineApiIssueProperty.TRACKER)
 	private int trackerId;
 	
+	@IssuePropertyMapping(RedmineApiIssueProperty.PROJECT)
 	private int projectId;
 
+	@IssuePropertyMapping(RedmineApiIssueProperty.STATUS)
 	private int statusId;
 
+	@IssuePropertyMapping(RedmineApiIssueProperty.PRIORITY)
 	private int priorityId;
 	
 	private boolean watched;
@@ -50,20 +59,27 @@ public class Issue implements IModel {
 	@XmlList
 	private int[] watcherIds;
 	
+	@IssuePropertyMapping(RedmineApiIssueProperty.START_DATE)
 	private Date startDate;
 	
+	@IssuePropertyMapping(RedmineApiIssueProperty.DUE_DATE)
 	private Date dueDate;
 
+	@IssuePropertyMapping(RedmineApiIssueProperty.DONE_RATIO)
 	private int doneRatio;
 	
+	@IssuePropertyMapping(RedmineApiIssueProperty.ESTIMATED_HOURS)
 	private float estimatedHours;
 
 	private int authorId;
 	
+	@IssuePropertyMapping(RedmineApiIssueProperty.CATEGORY)
 	private int categoryId;
 
+	@IssuePropertyMapping(RedmineApiIssueProperty.ASSIGNED_TO)
 	private int assignedToId;
 
+	@IssuePropertyMapping(RedmineApiIssueProperty.FIXED_VERSION)
 	private int fixedVersionId;
 	
 	private int parentId;

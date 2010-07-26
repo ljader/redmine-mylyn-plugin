@@ -4,8 +4,7 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
-import net.sf.redmine_mylyn.api.client.RedmineApiPlugin;
-import net.sf.redmine_mylyn.api.client.RedmineApiStatusException;
+import net.sf.redmine_mylyn.api.client.RedmineApiErrorException;
 import net.sf.redmine_mylyn.api.model.container.AbstractPropertyContainer;
 import net.sf.redmine_mylyn.api.model.container.CustomFields;
 import net.sf.redmine_mylyn.api.model.container.IssueCategories;
@@ -17,9 +16,6 @@ import net.sf.redmine_mylyn.api.model.container.TimeEntryActivities;
 import net.sf.redmine_mylyn.api.model.container.Trackers;
 import net.sf.redmine_mylyn.api.model.container.Users;
 import net.sf.redmine_mylyn.api.model.container.Versions;
-
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 
 public class Configuration implements Serializable{
 
@@ -56,7 +52,7 @@ public class Configuration implements Serializable{
 		this.settings = settings;
 	}
 
-	public void setPropertyContainer(AbstractPropertyContainer<? extends Property> container) throws RedmineApiStatusException {
+	public void setPropertyContainer(AbstractPropertyContainer<? extends Property> container) throws RedmineApiErrorException {
 		try {
 			for (Field field : getClass().getDeclaredFields()) {
 				if (field.getType().equals(container.getClass())) {
@@ -64,12 +60,11 @@ public class Configuration implements Serializable{
 				}
 			}
 		} catch (Exception e) {
-			IStatus status = new Status(IStatus.ERROR, RedmineApiPlugin.PLUGIN_ID, "Updating Attributes failed", e);
-			throw new RedmineApiStatusException(status);
+			throw new RedmineApiErrorException("Updating Attributes failed", e);
 		}
 	}
 	
-	public void copy(Configuration conf) throws RedmineApiStatusException {
+	public void copy(Configuration conf) throws RedmineApiErrorException {
 		try {
 			for (Field field : getClass().getDeclaredFields()) {
 				if ((field.getModifiers()&Modifier.STATIC)!=Modifier.STATIC) {
@@ -77,8 +72,7 @@ public class Configuration implements Serializable{
 				}
 			}
 		} catch (Exception e) {
-			IStatus status = new Status(IStatus.ERROR, RedmineApiPlugin.PLUGIN_ID, "Updating Attributes failed", e);
-			throw new RedmineApiStatusException(status);
+			throw new RedmineApiErrorException("Updating Attributes failed", e);
 		}
 	}
 

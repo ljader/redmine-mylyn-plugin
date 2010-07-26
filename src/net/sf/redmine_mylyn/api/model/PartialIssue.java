@@ -5,6 +5,7 @@ import java.util.Date;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
@@ -12,6 +13,7 @@ import net.sf.redmine_mylyn.internal.api.parser.PartialIssueParser;
 import net.sf.redmine_mylyn.internal.api.parser.adapter.EmbededPropertyAdapter;
 import net.sf.redmine_mylyn.internal.api.parser.adapter.DateAdapter;
 
+@XmlRootElement(name="issue")
 @XmlType(name="issue", namespace=PartialIssueParser.FAKE_NS)
 @XmlAccessorType(XmlAccessType.FIELD)
 public class PartialIssue implements IModel {

@@ -10,13 +10,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import net.sf.redmine_mylyn.api.client.RedmineApiPlugin;
-import net.sf.redmine_mylyn.api.client.RedmineApiStatusException;
+import net.sf.redmine_mylyn.api.client.RedmineApiErrorException;
 import net.sf.redmine_mylyn.api.model.Configuration;
 
 import org.apache.commons.httpclient.NameValuePair;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 
 public class Query {
 	
@@ -54,7 +51,7 @@ public class Query {
 		return filterByQueryFieldValue.get(queryField.getQueryValue());
 	}
 	
-	public List<NameValuePair> getParams() throws RedmineApiStatusException {
+	public List<NameValuePair> getParams() throws RedmineApiErrorException {
 		if(params==null) {
 			params = new ArrayList<NameValuePair>();
 		}
@@ -70,7 +67,7 @@ public class Query {
 		return params;
 	}
 
-	public String toUrl(String encoding) throws RedmineApiStatusException{
+	public String toUrl(String encoding) throws RedmineApiErrorException {
 		if(encoding==null) {
 			encoding="UTF-8";
 		}
@@ -84,8 +81,7 @@ public class Query {
 				builder.append("=").append(URLEncoder.encode(nvp.getValue(), encoding));
 			}
 		} catch (UnsupportedEncodingException e) {
-			IStatus status = new Status(IStatus.ERROR, RedmineApiPlugin.PLUGIN_ID, e.getMessage(), e);
-			throw new RedmineApiStatusException(status);
+			throw new RedmineApiErrorException("Invalid encoding {}", e, encoding);
 		}
 		
 		builder.deleteCharAt(0);
@@ -94,7 +90,7 @@ public class Query {
 		return builder.toString();
 	}
 	
-	public static Query fromUrl(String url, String encoding, Configuration configuration) throws RedmineApiStatusException {
+	public static Query fromUrl(String url, String encoding, Configuration configuration) throws RedmineApiErrorException {
 		if(encoding==null) {
 			encoding="UTF-8";
 		}
@@ -116,8 +112,7 @@ public class Query {
 			try {
 				namedValue[1] = URLDecoder.decode(namedValue[1], encoding);
 			} catch (UnsupportedEncodingException e) {
-				IStatus status = new Status(IStatus.ERROR, RedmineApiPlugin.PLUGIN_ID, e.getMessage(), e);
-				throw new RedmineApiStatusException(status);
+				throw new RedmineApiErrorException("Invalid encoding {}", e, encoding);
 			}
 			
 			nvp.add(new NameValuePair(namedValue[0], namedValue[1]));

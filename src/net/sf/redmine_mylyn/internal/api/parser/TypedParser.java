@@ -2,7 +2,7 @@ package net.sf.redmine_mylyn.internal.api.parser;
 
 import java.io.InputStream;
 
-import net.sf.redmine_mylyn.api.client.RedmineApiStatusException;
+import net.sf.redmine_mylyn.api.client.RedmineApiErrorException;
 
 public class TypedParser<T> implements IModelParser<T> {
 
@@ -13,7 +13,7 @@ public class TypedParser<T> implements IModelParser<T> {
 	}
 	
 	@Override
-	public T parseResponse(InputStream input, int sc) throws RedmineApiStatusException {
+	public T parseResponse(InputStream input, int sc) throws RedmineApiErrorException {
 		return parser.parseInputStream(input);
 	}
 

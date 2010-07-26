@@ -6,8 +6,8 @@ import java.net.URL;
 import java.util.Arrays;
 
 import net.sf.redmine_mylyn.api.client.IRedmineApiClient;
-import net.sf.redmine_mylyn.api.client.RedmineApiPlugin;
-import net.sf.redmine_mylyn.api.client.RedmineApiStatusException;
+import net.sf.redmine_mylyn.api.client.RedmineApiErrorException;
+import net.sf.redmine_mylyn.api.client.RedmineApiHttpStatusException;
 import net.sf.redmine_mylyn.internal.api.parser.IModelParser;
 
 import org.apache.commons.httpclient.Credentials;
@@ -23,8 +23,6 @@ import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
 import org.eclipse.mylyn.commons.net.AuthenticationCredentials;
 import org.eclipse.mylyn.commons.net.AuthenticationType;
@@ -54,12 +52,12 @@ public abstract class AbstractClient implements IRedmineApiClient {
 		httpClient.getParams().setAuthenticationPreemptive(true);
 	}
 
-	protected <T extends Object> T executeMethod(HttpMethodBase method, IModelParser<T> parser, IProgressMonitor monitor) throws RedmineApiStatusException {
+	protected <T extends Object> T executeMethod(HttpMethodBase method, IModelParser<T> parser, IProgressMonitor monitor) throws RedmineApiErrorException {
 //		System.out.println("EXECUTE: " + method.getPath());
 		return executeMethod(method, parser, monitor, HttpStatus.SC_OK);
 	}
 	
-	protected <T extends Object> T executeMethod(HttpMethodBase method, IModelParser<T> parser, IProgressMonitor monitor, int... expectedSC) throws RedmineApiStatusException {
+	protected <T extends Object> T executeMethod(HttpMethodBase method, IModelParser<T> parser, IProgressMonitor monitor, int... expectedSC) throws RedmineApiErrorException {
 		monitor = Policy.monitorFor(monitor);
 		method.setFollowRedirects(false);
 		HostConfiguration hostConfiguration = WebUtil.createHostConfiguration(httpClient, location, monitor);
@@ -76,8 +74,8 @@ public abstract class AbstractClient implements IRedmineApiClient {
 					msg += " : " + statusHeader.getValue().replace(""+HttpStatus.SC_INTERNAL_SERVER_ERROR, "").trim();
 				}
 				
-				IStatus status = new Status(IStatus.ERROR,  RedmineApiPlugin.PLUGIN_ID, "Execution of method failed");
-				throw new RedmineApiStatusException(status);
+				
+				throw new RedmineApiHttpStatusException(sc, msg);
 			}
 
 			if (parser!=null && expectedSC != null) {
@@ -99,8 +97,7 @@ public abstract class AbstractClient implements IRedmineApiClient {
 				}
 			}
 		} catch (IOException e) {
-			IStatus status = new Status(IStatus.ERROR, RedmineApiPlugin.PLUGIN_ID, "Execution of method failed", e);
-			throw new RedmineApiStatusException(status);
+			throw new RedmineApiErrorException("Execution of method failed", e);
 		} finally {
 			method.releaseConnection();
 		}
@@ -156,7 +153,7 @@ public abstract class AbstractClient implements IRedmineApiClient {
 //		return statusCode;
 //	}
 //	
-	synchronized protected int performExecuteMethod(HttpMethod method, HostConfiguration hostConfiguration, IProgressMonitor monitor) throws RedmineApiStatusException {
+	synchronized protected int performExecuteMethod(HttpMethod method, HostConfiguration hostConfiguration, IProgressMonitor monitor) throws RedmineApiErrorException {
 		try {
 			//complete URL
 			String baseUrl = new URL(location.getUrl()).getPath();
@@ -187,11 +184,9 @@ public abstract class AbstractClient implements IRedmineApiClient {
 			return WebUtil.execute(httpClient, hostConfiguration, method, monitor);
 			
 		} catch (RuntimeException e) {
-			IStatus status = new Status(IStatus.ERROR, RedmineApiPlugin.PLUGIN_ID, "Execution of method failed (RTE)", e);
-			throw new RedmineApiStatusException(status);
+			throw new RedmineApiErrorException("Execution of method failed - unexpected RuntimeException", e);
 		} catch (IOException e) {
-			IStatus status = new Status(IStatus.ERROR, RedmineApiPlugin.PLUGIN_ID, "Execution of method failed", e);
-			throw new RedmineApiStatusException(status);
+			throw new RedmineApiErrorException("Execution of method failed", e);
 		}
 	}
 	

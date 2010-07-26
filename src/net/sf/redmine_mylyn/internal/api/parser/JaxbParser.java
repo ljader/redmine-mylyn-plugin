@@ -10,11 +10,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.sax.SAXSource;
 
-import net.sf.redmine_mylyn.api.client.RedmineApiPlugin;
-import net.sf.redmine_mylyn.api.client.RedmineApiStatusException;
-
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
+import net.sf.redmine_mylyn.api.client.RedmineApiErrorException;
 
 public class JaxbParser<T extends Object> {
 
@@ -34,7 +30,7 @@ public class JaxbParser<T extends Object> {
 		classes[requiredClasses.length] = modelClass;
 	}
 	
-	public T parseInputStream(InputStream stream) throws RedmineApiStatusException {
+	public T parseInputStream(InputStream stream) throws RedmineApiErrorException {
 		try {
 			Unmarshaller unmarshaller = getUnmarshaller();
 			XMLInputFactory inputFactory = XMLInputFactory.newInstance();
@@ -46,11 +42,10 @@ public class JaxbParser<T extends Object> {
 			return clazz.cast(obj);
 
 		} catch (Exception e) {
-			IStatus status = new Status(IStatus.ERROR, RedmineApiPlugin.PLUGIN_ID, "Execution of method failed", e);
-			throw new RedmineApiStatusException(status);
+			throw new RedmineApiErrorException("Parsing of InputStream failed", e);
 		}
 	}
-	public T parseInputStream(SAXSource source) throws RedmineApiStatusException {
+	public T parseInputStream(SAXSource source) throws RedmineApiErrorException {
 		try {
 			Unmarshaller unmarshaller = getUnmarshaller();
 			Object obj = unmarshaller.unmarshal(source);
@@ -58,8 +53,7 @@ public class JaxbParser<T extends Object> {
 			return clazz.cast(obj);
 			
 		} catch (Exception e) {
-			IStatus status = new Status(IStatus.ERROR, RedmineApiPlugin.PLUGIN_ID, "Execution of method failed", e);
-			throw new RedmineApiStatusException(status);
+			throw new RedmineApiErrorException("Parsing of InputStream failed", e);
 		}
 	}
 	
