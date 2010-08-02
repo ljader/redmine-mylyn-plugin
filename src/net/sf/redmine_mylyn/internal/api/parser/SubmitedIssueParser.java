@@ -38,13 +38,6 @@ public class SubmitedIssueParser implements IModelParser<Object> {
 	@Override
 	public Object parseResponse(InputStream input, int sc) throws RedmineApiErrorException {
 		try {
-			//TODO remove
-//			BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-//			String l;
-//			while((l=reader.readLine())!=null) {
-//				System.out.println(l);
-//			}
-			
 			JaxbParser<?> parser = successParser;
 			if (sc!=HttpStatus.SC_CREATED) {
 				parser = errorParser;

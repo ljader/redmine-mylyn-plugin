@@ -1,7 +1,6 @@
 package net.sf.redmine_mylyn.internal.api.client;
 
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -13,11 +12,10 @@ import net.sf.redmine_mylyn.api.client.RedmineServerVersion;
 import net.sf.redmine_mylyn.api.exception.RedmineApiErrorException;
 import net.sf.redmine_mylyn.api.exception.RedmineApiInvalidDataException;
 import net.sf.redmine_mylyn.api.model.Configuration;
-import net.sf.redmine_mylyn.api.model.CustomValue;
 import net.sf.redmine_mylyn.api.model.Issue;
+import net.sf.redmine_mylyn.api.model.TimeEntry;
 import net.sf.redmine_mylyn.api.model.container.AbstractPropertyContainer;
 import net.sf.redmine_mylyn.api.model.container.CustomFields;
-import net.sf.redmine_mylyn.api.model.container.CustomValues;
 import net.sf.redmine_mylyn.api.model.container.IssueCategories;
 import net.sf.redmine_mylyn.api.model.container.IssuePriorities;
 import net.sf.redmine_mylyn.api.model.container.IssueStatuses;
@@ -42,10 +40,9 @@ import net.sf.redmine_mylyn.internal.api.parser.adapter.type.UpdatedIssuesType;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.NameValuePair;
-import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.commons.httpclient.methods.PutMethod;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
@@ -72,6 +69,7 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	
 	private final static String URL_QUERY = "/issues.xml";
 
+	private final static String URL_UPDATE_ISSUE = "/issues/%d.xml";
 	
 	private Map<String, IModelParser<? extends AbstractPropertyContainer<?>>> parserByClass;
 	
@@ -84,15 +82,12 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	private PartialIssueParser queryParser;
 	private SubmitedIssueParser submitIssueParser;
 	
-	private final IssueXmlWriter issueWriter;
-	
 	private Configuration configuration;
 	
 	public Api_2_7_ClientImpl(AbstractWebLocation location) {
 		super(location);
 		
 		buildParser();
-		issueWriter = new IssueXmlWriter();
 	}
 
 	public Api_2_7_ClientImpl(AbstractWebLocation location, Configuration initialConfiguration) {
@@ -254,12 +249,8 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 		monitor.beginTask("Upload Task", 1);
 		
 		PostMethod method = new PostMethod("/issues.xml");
-		
-		
-		
 		try {
-			String requestBody = issueWriter.writeIssue(issue);
-			method.setRequestEntity(new StringRequestEntity(requestBody, "text/xml", "UTF-8"));
+			method.setRequestEntity(new IssueRequestEntity(issue));
 		} catch (UnsupportedEncodingException e) {
 			throw new RedmineApiErrorException("Execution of method failed - Invalid encoding {}", e, "UTF-8");
 		}
@@ -275,6 +266,37 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 		if(response instanceof PartialIssueType) {
 			return ((PartialIssueType)response).toIssue();
 		} else {
+			SubmitError error = (SubmitError)response;
+			for (String errMsg : error.errors) {
+				errorCollector.accept(errMsg);
+			}
+			
+			throw new RedmineApiInvalidDataException();
+		}
+	}
+	
+	@Override
+	public void updateIssue(Issue issue, String comment, TimeEntry timeEntry, IRedmineApiErrorCollector errorCollector, IProgressMonitor monitor) throws RedmineApiInvalidDataException, RedmineApiErrorException {
+		monitor = Policy.monitorFor(monitor);
+		monitor.beginTask("Upload Task", 1);
+
+		Object response = null;
+		
+		try {
+			PutMethod method = new PutMethod(String.format(URL_UPDATE_ISSUE, issue.getId()));
+			method.setRequestEntity(new IssueRequestEntity(issue, comment, timeEntry));
+			response = executeMethod(method, submitIssueParser, monitor, HttpStatus.SC_CREATED, HttpStatus.SC_UNPROCESSABLE_ENTITY);
+		} catch (UnsupportedEncodingException e) {
+			throw new RedmineApiErrorException("Execution of method failed - Invalid encoding {}", e, "UTF-8");
+		} finally {
+			if(monitor.isCanceled()) {
+				throw new OperationCanceledException();
+			} else {
+				monitor.worked(1);
+			}
+		}
+
+		if(response instanceof SubmitError) {
 			SubmitError error = (SubmitError)response;
 			for (String errMsg : error.errors) {
 				errorCollector.accept(errMsg);
