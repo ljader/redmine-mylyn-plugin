@@ -249,15 +249,36 @@ public class Api_2_7_ClientImplTest {
 		assertEquals(0, errorCollector.lst.size());
 	}
 
+	@Test
+	public void testUpdateIssue() throws Exception {
+		server.responseHeader = RESPONSE_HEADER_OK;
+		server.responseResourcePath = RESOURCE_FILE_SUBMIT_NEW;
+		
+		testee.updateIssue(TestData.issue2, "noContent", TestData.issue2.getTimeEntries().getAll().get(0), errorCollector, monitor);
+		assertEquals(0, errorCollector.lst.size());
+	}
+	
 	@Test(expected=RedmineApiInvalidDataException.class)
 	public void testCreateIssue_failed() throws Exception {
 		server.responseHeader = RESPONSE_HEADER_FAILED;
 		server.responseResourcePath = RESOURCE_FILE_SUBMIT_ERRORS;
 		
 		try {
-			Issue issue = TestData.issue2;
-			testee.createIssue(issue, errorCollector, monitor);
-			
+			testee.createIssue(TestData.issue2, errorCollector, monitor);
+		} finally {
+			assertEquals(2, errorCollector.lst.size());
+			assertEquals("Zielversion ist kein gültiger Wert", errorCollector.lst.get(0));
+			assertEquals("FooBar", errorCollector.lst.get(1));
+		}
+	}
+
+	@Test(expected=RedmineApiInvalidDataException.class)
+	public void testUpdateIssue_failed() throws Exception {
+		server.responseHeader = RESPONSE_HEADER_FAILED;
+		server.responseResourcePath = RESOURCE_FILE_SUBMIT_ERRORS;
+		
+		try {
+			testee.updateIssue(TestData.issue2, "noContent", TestData.issue2.getTimeEntries().getAll().get(0), errorCollector, monitor);
 		} finally {
 			assertEquals(2, errorCollector.lst.size());
 			assertEquals("Zielversion ist kein gültiger Wert", errorCollector.lst.get(0));
