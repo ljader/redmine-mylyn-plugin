@@ -4,10 +4,6 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-
 import net.sf.redmine_mylyn.api.exception.RedmineApiErrorException;
 import net.sf.redmine_mylyn.api.model.CustomValue;
 import net.sf.redmine_mylyn.api.model.Issue;
@@ -16,7 +12,6 @@ import net.sf.redmine_mylyn.api.model.container.CustomValues;
 
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.json.JSONWriter;
 
 public class IssueRequestEntity extends StringRequestEntity {
