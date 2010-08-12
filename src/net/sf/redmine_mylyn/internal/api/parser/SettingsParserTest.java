@@ -1,5 +1,6 @@
 package net.sf.redmine_mylyn.internal.api.parser;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertFalse;
 
@@ -36,6 +37,7 @@ public class SettingsParserTest {
 		
 		assertNotNull(settings);
 		assertFalse(settings.isUseIssueDoneRatio());
+		assertEquals(100, settings.getMaxPerPage());
 	}
 	
 }

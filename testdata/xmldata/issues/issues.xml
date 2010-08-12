@@ -1,131 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues type="array" >
-  <issue>
-    <id>13</id>
-    <project name="eCookbook Subproject 1" id="3"/>
-    <tracker name="Bug" id="1"/>
-    <status name="New" id="1"/>
-    <priority name="Low" id="4"/>
-    <author name="John Smith" id="2"/>
-    <subject>Subproject issue two</subject>
-    <description>This is a second issue on a cookbook subproject</description>
-    <start_date/>
-    <due_date/>
-    <done_ratio>0</done_ratio>
-    <estimated_hours/>
-    <custom_fields>
-      <custom_field name="Database" id="1"/>
-      <custom_field name="Searchable field" id="2">Default string</custom_field>
-      <custom_field name="Float field" id="6"/>
-    </custom_fields>
-    <created_on>Wed May 05 00:00:00 +0200 2010</created_on>
-    <updated_on>Sat May 08 00:00:00 +0200 2010</updated_on>
-  </issue>
-  <issue>
-    <id>7</id>
-    <project name="eCookbook" id="1"/>
-    <tracker name="Bug" id="1"/>
-    <status name="New" id="1"/>
-    <priority name="Normal" id="5"/>
-    <author name="John Smith" id="2"/>
-    <subject>Issue due today</subject>
-    <description>This is an issue that is due today</description>
-    <start_date>2010-04-30</start_date>
-    <due_date>2010-05-10</due_date>
-    <done_ratio>0</done_ratio>
-    <estimated_hours/>
-    <custom_fields>
-      <custom_field name="Database" id="1"/>
-      <custom_field name="Searchable field" id="2">Default string</custom_field>
-      <custom_field name="Float field" id="6"/>
-    </custom_fields>
-    <created_on>Fri Apr 30 00:00:00 +0200 2010</created_on>
-    <updated_on>Fri Apr 30 00:00:00 +0200 2010</updated_on>
-  </issue>
-  <issue>
-    <id>5</id>
-    <project name="eCookbook Subproject 1" id="3"/>
-    <tracker name="Bug" id="1"/>
-    <status name="New" id="1"/>
-    <priority name="Low" id="4"/>
-    <author name="John Smith" id="2"/>
-    <subject>Subproject issue</subject>
-    <description>This is an issue on a cookbook subproject</description>
-    <start_date/>
-    <due_date/>
-    <done_ratio>0</done_ratio>
-    <estimated_hours/>
-    <custom_fields>
-      <custom_field name="Database" id="1"/>
-      <custom_field name="Searchable field" id="2">Default string</custom_field>
-      <custom_field name="Float field" id="6">-7.6</custom_field>
-    </custom_fields>
-    <created_on>Wed May 05 00:00:00 +0200 2010</created_on>
-    <updated_on>Sat May 08 00:00:00 +0200 2010</updated_on>
-  </issue>
-  <issue>
-    <id>3</id>
-    <project name="eCookbook" id="1"/>
-    <tracker name="Bug" id="1"/>
-    <status name="New" id="1"/>
-    <priority name="Low" id="4"/>
-    <author name="John Smith" id="2"/>
-    <assigned_to name="Dave Lopper" id="3"/>
-    <subject>Error 281 when updating a recipe</subject>
-    <description>Error 281 is encountered when saving a recipe</description>
-    <start_date>2010-05-11</start_date>
-    <due_date>2010-03-31</due_date>
-    <done_ratio>0</done_ratio>
-    <estimated_hours/>
-    <custom_fields>
-      <custom_field name="Database" id="1">MySQL</custom_field>
-      <custom_field name="Searchable field" id="2">125</custom_field>
-      <custom_field name="Float field" id="6">11.65</custom_field>
-    </custom_fields>
-    <created_on>Wed Jul 19 21:07:27 +0200 2006</created_on>
-    <updated_on>Wed Jul 19 21:07:27 +0200 2006</updated_on>
-  </issue>
-  <issue>
-    <id>2</id>
-    <project name="eCookbook" id="1"/>
-    <tracker name="Feature request" id="2"/>
-    <status name="Assigned" id="2"/>
-    <priority name="Normal" id="5"/>
-    <author name="John Smith" id="2"/>
-    <assigned_to name="Dave Lopper" id="3"/>
-    <fixed_version name="1.0" id="2"/>
-    <subject>Add ingredients categories</subject>
-    <description>Ingredients of the recipe should be classified by categories</description>
-    <start_date>2010-05-08</start_date>
-    <due_date/>
-    <done_ratio>0</done_ratio>
-    <estimated_hours/>
-    <custom_fields>
-      <custom_field name="Float field" id="6">2.05</custom_field>
-    </custom_fields>
-    <created_on>Wed Jul 19 21:04:21 +0200 2006</created_on>
-    <updated_on>Wed Jul 19 21:09:50 +0200 2006</updated_on>
-  </issue>
-  <issue>
-    <id>1</id>
-    <project name="eCookbook" id="1"/>
-    <tracker name="Bug" id="1"/>
-    <status name="New" id="1"/>
-    <priority name="Low" id="4"/>
-    <author name="John Smith" id="2"/>
-    <category name="Printing" id="1"/>
-    <subject>Can't print recipes</subject>
-    <description>Unable to print recipes</description>
-    <start_date>2010-05-09</start_date>
-    <due_date>2010-05-20</due_date>
-    <done_ratio>0</done_ratio>
-    <estimated_hours/>
-    <custom_fields>
-      <custom_field name="Database" id="1"/>
-      <custom_field name="Searchable field" id="2">125</custom_field>
-      <custom_field name="Float field" id="6">2.1</custom_field>
-    </custom_fields>
-    <created_on>Fri May 07 00:00:00 +0200 2010</created_on>
-    <updated_on>Sun May 09 00:00:00 +0200 2010</updated_on>
-  </issue>
+<issues api="2.7.0.trunk" xmlns="http://redmin-mylyncon.sf.net/api">
+<issue editAllowed="false" id="3">
+  <subject>Subproject issue two</subject>
+  <updatedOn unixtime="1273269600">2010-05-08T00:00:00+02:00</updatedOn>
+  <projectId>3</projectId>
+  <statusId>1</statusId>
+  <priorityId>4</priorityId>
+</issue>
+<issue editAllowed="false" id="7">
+  <subject>Issue due today</subject>
+  <updatedOn unixtime="1272319200">2010-04-30T00:00:00+02:00</updatedOn>
+  <projectId>1</projectId>
+  <statusId>1</statusId>
+  <priorityId>5</priorityId>
+</issue>
+<issue editAllowed="false" id="5">
+  <subject>Subproject issue</subject>
+  <updatedOn unixtime="1273269600">2010-05-08T00:00:00+02:00</updatedOn>
+  <projectId>3</projectId>
+  <statusId>1</statusId>
+  <priorityId>4</priorityId>
+</issue>
+<issue editAllowed="false" id="3">
+  <subject>Error 281 when updating a recipe</subject>
+  <updatedOn unixtime="1137096447">2006-07-19T21:07:27+02:00</updatedOn>
+  <projectId>1</projectId>
+  <statusId>1</statusId>
+  <priorityId>4</priorityId>
+</issue>
+<issue editAllowed="false" id="2">
+  <subject>Add ingredients categories</subject>
+  <updatedOn unixtime="1137096590">2006-07-19T21:09:50+02:00</updatedOn>
+  <projectId>1</projectId>
+  <statusId>2</statusId>
+  <priorityId>5</priorityId>
+</issue>
+<issue editAllowed="false" id="1">
+  <subject>Can't print recipes</subject>
+  <updatedOn unixtime="1273356000">2010-05-09T00:00:00+02:00</updatedOn>
+  <projectId>1</projectId>
+  <statusId>1</statusId>
+  <priorityId>4</priorityId>
+</issue>
 </issues>

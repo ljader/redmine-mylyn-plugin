@@ -1,9 +1,11 @@
 package net.sf.redmine_mylyn.api.query;
 
 import static net.sf.redmine_mylyn.api.query.CompareOperator.IS_NOT;
+import static net.sf.redmine_mylyn.api.query.CompareOperator.IS;
 import static net.sf.redmine_mylyn.api.query.CompareOperator.OPEN;
 import static net.sf.redmine_mylyn.api.query.QueryField.STATUS;
 import static net.sf.redmine_mylyn.api.query.QueryField.TRACKER;
+import static net.sf.redmine_mylyn.api.query.QueryField.PROJECT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -33,16 +35,13 @@ public class QueryTest {
 		testee.addFilter(TRACKER, IS_NOT, "1");
 		testee.addFilter(TRACKER, IS_NOT, "3");
 		List<NameValuePair> params = testee.getParams();
-		assertEquals(5, params.size());
+		assertEquals(4, params.size());
 		
 		testee.addFilter(STATUS, OPEN);
 		params = testee.getParams();
-		assertEquals(8, params.size());
+		assertEquals(7, params.size());
 
 		int idx=0;
-		assertEquals("set_filter", params.get(idx).getName());
-		assertEquals("1", params.get(idx++).getValue());
-		
 		assertEquals("fields[]", params.get(idx).getName());
 		assertEquals("tracker_id", params.get(idx++).getValue());
 		assertEquals("operators[tracker_id]", params.get(idx).getName());
@@ -88,7 +87,6 @@ public class QueryTest {
 		assertNotNull(query);
 		
 		ArrayList<NameValuePair> expected = new ArrayList<NameValuePair>(valid);
-		expected.add(0, new NameValuePair("set_filter", "1"));
 		expected.add(new NameValuePair("values[status_id][]", ""));
 		
 		List<NameValuePair> result = query.getParams();
@@ -99,12 +97,14 @@ public class QueryTest {
 	
 	@Test
 	public void testIntegratedToUrl() throws Exception {
+		testee.addFilter(PROJECT, IS, "2");
 		testee.addFilter(TRACKER, IS_NOT, "1");
 		testee.addFilter(TRACKER, IS_NOT, "3");
 		testee.addFilter(STATUS, OPEN);
 		
 		String enc = "UTF-8";
-		StringBuilder expected = new StringBuilder("?set_filter=1");
+		StringBuilder expected = new StringBuilder();
+		expected.append("?project_id=2");
 		expected.append("&fields[]=").append(URLEncoder.encode("tracker_id", enc));
 		expected.append("&operators[tracker_id]=").append(URLEncoder.encode("!", enc));
 		expected.append("&values[tracker_id][]=").append(URLEncoder.encode("1", enc));
@@ -119,7 +119,8 @@ public class QueryTest {
 	@Test
 	public void testIntegratedFromUrl() throws Exception {
 		String enc = "UTF-8";
-		StringBuilder url = new StringBuilder("?set_filter=1");
+		StringBuilder url = new StringBuilder();
+		url.append("?project_id=2");
 		url.append("&fields[]=").append(URLEncoder.encode("tracker_id", enc));
 		url.append("&operators[tracker_id]=").append(URLEncoder.encode("!", enc));
 		url.append("&values[tracker_id][]=").append(URLEncoder.encode("1", enc));
@@ -132,7 +133,7 @@ public class QueryTest {
 		assertNotNull(query);
 
 		ArrayList<NameValuePair> expected = new ArrayList<NameValuePair>();
-		expected.add(new NameValuePair("set_filter", "1"));
+		expected.add(new NameValuePair("project_id", "2"));
 		expected.add(new NameValuePair("fields[]", "tracker_id"));
 		expected.add(new NameValuePair("operators[tracker_id]", "!"));
 		expected.add(new NameValuePair("values[tracker_id][]", "1"));

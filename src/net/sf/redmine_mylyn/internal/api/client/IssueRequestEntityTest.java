@@ -39,7 +39,7 @@ public class IssueRequestEntityTest {
 		issueValues.put("category_id", "");
 		issueValues.put("assigned_to_id", ""+TestData.issue2.getAssignedToId());
 		issueValues.put("fixed_version_id", ""+TestData.issue2.getFixedVersionId());
-		//TODO parent		
+		issueValues.put("parent_id", "1");
 		
 		issueCustomValues = new LinkedHashMap<String, String>();
 		issueCustomValues.put("2", TestData.issue2.getCustomValues().get(5).getValue());
@@ -70,7 +70,7 @@ public class IssueRequestEntityTest {
 		append(builder, issueValues);
 		builder.append(",\"custom_field_values\":{");
 		append(builder, issueCustomValues);
-		builder.append("}}");
+		builder.append("}}}");
 		
 		String result = (String)writeIssueMethod.invoke(null, TestData.issue2, null, null);
 		assertEquals(builder.toString(), result);

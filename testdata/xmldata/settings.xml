@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <settings api="2.7.0.trunk" xmlns="http://redmin-mylyncon.sf.net/api">
   <useIssueDoneRatio>false</useIssueDoneRatio>
+  <maxPerPage>100</maxPerPage>
 </settings>

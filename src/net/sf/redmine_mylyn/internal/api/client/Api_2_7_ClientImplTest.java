@@ -355,7 +355,7 @@ public class Api_2_7_ClientImplTest {
 			requestMap.put("issues/updatedsince?issues=1,6,7,8&unixtime=123456789", IssueValidator.RESOURCE_FILE_UPDATED);
 			requestMap.put("issue/1", IssueValidator.RESOURCE_FILE_ISSUE_1);
 			requestMap.put("issues/list?issues=1,7,8", IssueValidator.RESOURCE_FILE_LIST);
-			requestMap.put("issues.xml?set_filter=1", PartialIssueValidator.RESOURCE_FILE);
+			requestMap.put("issues", PartialIssueValidator.RESOURCE_FILE);
 		}
 
 		@Override

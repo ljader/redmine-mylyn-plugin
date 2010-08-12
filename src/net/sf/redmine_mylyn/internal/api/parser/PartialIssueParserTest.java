@@ -6,7 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import java.io.InputStream;
 
 import net.sf.redmine_mylyn.internal.api.PartialIssueValidator;
-import net.sf.redmine_mylyn.internal.api.parser.adapter.type.PartialIssues;
+import net.sf.redmine_mylyn.internal.api.parser.adapter.type.Issues;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.junit.After;
@@ -16,12 +16,12 @@ import org.junit.Test;
 public class PartialIssueParserTest {
 
 	InputStream input;
-	PartialIssueParser testee;
+	TypedParser<Issues> testee;
 	
 	@Before
 	public void setUp() throws Exception {
 		input = getClass().getResourceAsStream(PartialIssueValidator.RESOURCE_FILE);
-		testee = new PartialIssueParser();
+		testee = new TypedParser<Issues>(Issues.class);
 	}
 
 	@After
@@ -31,13 +31,13 @@ public class PartialIssueParserTest {
 
 	@Test
 	public void testParseResponse() throws Exception {
-		PartialIssues ct = testee.parseResponse(input, HttpStatus.SC_OK);
+		Issues ct = testee.parseResponse(input, HttpStatus.SC_OK);
 		
 		assertNotNull(ct);
-		assertNotNull(ct.issues);
-		assertEquals(PartialIssueValidator.COUNT, ct.issues.length);
+		assertNotNull(ct.getAll());
+		assertEquals(PartialIssueValidator.COUNT, ct.getAll().size());
 		
-		PartialIssueValidator.validate1(ct.issues[5]);
+		PartialIssueValidator.validate1(ct.getAll().get(5));
 	}
 	
 }

@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import net.sf.redmine_mylyn.api.model.Attachment;
@@ -133,10 +134,10 @@ public class TestData {
 	static void buildProjects(Projects ct) throws Exception {
 		@SuppressWarnings("rawtypes")
 		List lst = getCollection(ct);
-		lst.add(buildProject(1, "eCookbook", "ecookbook", new int[]{1,2,3}, new int[]{1,2,3,4,6,7}, new int[]{1,2}));
+		lst.add(buildProject(1, "eCookbook", "ecookbook", new int[]{1,2,3}, new int[]{1,2,3,4,6,7}, new int[]{1,2}, new int[]{1,2,6,9}));
 	}
 	
-	static Project buildProject(int id, String name, String identifier, int[] trackers, int[] versions, int[] categories) throws Exception {
+	static Project buildProject(int id, String name, String identifier, int[] trackers, int[] versions, int[] categories, int[] customFields) throws Exception {
 		Project project = new Project();
 		setId(project, id);
 		project.setName(name);
@@ -145,8 +146,16 @@ public class TestData {
 		project.setVersionIds(versions);
 		project.setIssueCategoryIds(categories);
 		
+		//IssueCustomFields
+		Field field = Project.class.getDeclaredField("customFieldIdsByTrackerId");
+		field.setAccessible(true);
+		HashMap<Integer, int[]> customFieldIdsByTrackerId = new HashMap<Integer, int[]>(trackers.length);
+		for (int i : trackers) {
+			customFieldIdsByTrackerId.put(i, customFields);
+		}
+		field.set(project, customFieldIdsByTrackerId);
+		
 		//TODO member
-		//TODO issueCustomFields
 		
 		return project;
 	}
@@ -183,6 +192,7 @@ public class TestData {
 		lst.add(buildCustomField(7, "Billable", Type.TimeEntryActivityCustomField, Format.BOOL, 0, 0, null, null, false, true, false));
 		lst.add(buildCustomField(8, "Custom date", Type.IssueCustomField, Format.DATE, 0, 0, null, null, false, false, true));
 		lst.add(buildCustomField(9, "Project 1 cf", Type.IssueCustomField, Format.DATE, 0, 0, null, null, false, true, false));
+		lst.add(buildCustomField(10, "Date of xx", Type.TimeEntryActivityCustomField, Format.DATE, 0, 0, null, null, false, true, false));
 		//TODO
 	}
 	
