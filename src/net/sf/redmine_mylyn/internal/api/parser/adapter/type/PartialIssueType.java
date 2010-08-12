@@ -12,12 +12,11 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import net.sf.redmine_mylyn.api.model.IModel;
 import net.sf.redmine_mylyn.api.model.Issue;
-import net.sf.redmine_mylyn.internal.api.parser.PartialIssueParser;
 import net.sf.redmine_mylyn.internal.api.parser.adapter.DateAdapter;
 import net.sf.redmine_mylyn.internal.api.parser.adapter.EmbededPropertyAdapter;
 
 @XmlRootElement(name="issue")
-@XmlType(name="issue", namespace=PartialIssueParser.FAKE_NS)
+@XmlType(name="issue", namespace="http://redmin-mylyncon.sf.net/api")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class PartialIssueType implements IModel {
 

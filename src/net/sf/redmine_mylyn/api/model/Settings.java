@@ -13,13 +13,17 @@ public class Settings implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	private boolean useIssueDoneRatio = true;
+	
+	private int maxPerPage = 25;
 
 	public boolean isUseIssueDoneRatio() {
 		return useIssueDoneRatio;
 	}
 
-	public void setUseIssueDoneRatio(boolean useIssueDoneRatio) {
-		this.useIssueDoneRatio = useIssueDoneRatio;
+	public int getMaxPerPage() {
+		return maxPerPage;
 	}
+	
+	
 	
 }

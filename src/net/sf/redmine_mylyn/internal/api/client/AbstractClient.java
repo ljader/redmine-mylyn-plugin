@@ -88,6 +88,7 @@ public abstract class AbstractClient implements IRedmineApiClient {
 						input.close();
 					}
 				} else {
+					System.out.println(sc);
 					//TODO
 //					String msg = Messages.AbstractRedmineClient_UNEXPECTED_RESPONSE_CODE;
 //					msg = String.format(msg, sc, method.getPath(), method.getName());
@@ -105,54 +106,6 @@ public abstract class AbstractClient implements IRedmineApiClient {
 		return response;
 	}
 	
-//	/**
-//	 * Execute the given method - handle authentication concerns.
-//	 * 
-//	 * @param method
-//	 * @param hostConfiguration
-//	 * @param monitor
-//	 * @param authenticated
-//	 * @return
-//	 * @throws RedmineException
-//	 */
-//	protected int executeMethod(HttpMethod method, HostConfiguration hostConfiguration, IProgressMonitor monitor) throws RedmineException {
-//		monitor = Policy.monitorFor(monitor);
-//
-//		int statusCode = performExecuteMethod(method, hostConfiguration, monitor);
-//
-//		if (statusCode==HttpStatus.SC_INTERNAL_SERVER_ERROR) {
-//			Header statusHeader = method.getResponseHeader(HEADER_STATUS);
-//			String msg = Messages.AbstractRedmineClient_SERVER_ERROR;
-//			if (statusHeader != null) {
-//				msg += " : " + statusHeader.getValue().replace(""+HttpStatus.SC_INTERNAL_SERVER_ERROR, "").trim(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-//			}
-//			
-//			throw new RedmineRemoteException(msg);
-//		}
-//		
-//		//TODO testen, sollte ohne gehen
-////		if (statusCode==HttpStatus.SC_PROXY_AUTHENTICATION_REQUIRED) {
-////			hostConfiguration = refreshCredentials(AuthenticationType.PROXY, method, monitor);
-////			return executeMethod(method, hostConfiguration, monitor, authenticated);
-////		}
-////		
-////		if(statusCode==HttpStatus.SC_UNAUTHORIZED && supportAdditionalHttpAuth()) {
-////			hostConfiguration = refreshCredentials(AuthenticationType.HTTP, method, monitor);
-////			return executeMethod(method, hostConfiguration, monitor, authenticated);
-////		}
-////
-////		if (statusCode>=400 && statusCode<=599) {
-////			throw new RedmineRemoteException(method.getStatusLine().toString());
-////		}
-//		
-//		Header respHeader = method.getResponseHeader(HEADER_REDIRECT);
-//		if (respHeader != null && (respHeader.getValue().endsWith(REDMINE_URL_LOGIN) || respHeader.getValue().indexOf(REDMINE_URL_LOGIN_CALLBACK)>=0)) {
-//			throw new RedmineException(Messages.AbstractRedmineClient_LOGIN_FORMALY_INEFFECTIVE);
-//		}		
-//
-//		return statusCode;
-//	}
-//	
 	synchronized protected int performExecuteMethod(HttpMethod method, HostConfiguration hostConfiguration, IProgressMonitor monitor) throws RedmineApiErrorException {
 		try {
 			//complete URL
@@ -174,15 +127,28 @@ public abstract class AbstractClient implements IRedmineApiClient {
 					httpCredentials = new NTCredentials(username.substring(i + 1), password, host, username.substring(0, i));
 				}
 
+				//TODO use correct realm "Redmine API"
 				AuthScope authScope = new AuthScope(host, hostConfiguration.getPort(), AuthScope.ANY_REALM);
 				httpClient.getState().setCredentials(authScope, httpCredentials);
 			}
 			
 			
-			//TODO csrf token
+			int sc = WebUtil.execute(httpClient, hostConfiguration, method, monitor);
 			
-			return WebUtil.execute(httpClient, hostConfiguration, method, monitor);
+//			if(sc==HttpStatus.SC_MOVED_TEMPORARILY) {
+//				Header respHeader = method.getResponseHeader(HEADER_REDIRECT);
+//				if (respHeader != null && (respHeader.getValue().endsWith(REDMINE_URL_LOGIN) || respHeader.getValue().indexOf(REDMINE_URL_LOGIN_CALLBACK)>=0)) {
+//					throw new RedmineException(Messages.AbstractRedmineClient_LOGIN_FORMALY_INEFFECTIVE);
+//				}		
+//			} else if(sc==HttpStatus.SC_PROXY_AUTHENTICATION_REQUIRED) {
+//				hostConfiguration = refreshCredentials(AuthenticationType.PROXY, method, monitor);
+//				return executeMethod(method, hostConfiguration, monitor, authenticated);
+//			} else if(sc==HttpStatus.SC_UNAUTHORIZED) {
+//				hostConfiguration = refreshCredentials(AuthenticationType.HTTP, method, monitor);
+//				return executeMethod(method, hostConfiguration, monitor, authenticated);
+//			}
 			
+			return sc;
 		} catch (RuntimeException e) {
 			throw new RedmineApiErrorException("Execution of method failed - unexpected RuntimeException", e);
 		} catch (IOException e) {

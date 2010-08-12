@@ -82,10 +82,15 @@ public class Issue implements IModel {
 	@IssuePropertyMapping(RedmineApiIssueProperty.FIXED_VERSION)
 	private int fixedVersionId;
 	
+	@IssuePropertyMapping(RedmineApiIssueProperty.PARENT)
 	private int parentId;
 
 	public Issue(){
 		
+	}
+	
+	public Issue(int id){
+		this.id = id;
 	}
 	
 	@XmlElement(name="availableStatus")

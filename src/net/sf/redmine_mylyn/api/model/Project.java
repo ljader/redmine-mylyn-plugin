@@ -1,5 +1,6 @@
 package net.sf.redmine_mylyn.api.model;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -107,7 +108,11 @@ public class Project extends Property {
 		this.issueCategoryIds = issueCategoryIds;
 	}
 
+	//TODO should not be public
 	public Map<Integer, int[]> getCustomFieldIdsByTrackerId() {
+		if(customFieldIdsByTrackerId==null) {
+			customFieldIdsByTrackerId = new HashMap<Integer, int[]>();
+		}
 		return customFieldIdsByTrackerId;
 	}
 

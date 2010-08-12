@@ -8,11 +8,11 @@ import java.util.EnumSet;
 import net.sf.redmine_mylyn.api.model.Issue;
 
 public enum RedmineApiIssueProperty {
-	SUBJECT, DESCRIPTION, ASSIGNED_TO, CATEGORY, DONE_RATIO, DUE_DATE, ESTIMATED_HOURS, FIXED_VERSION, PRIORITY, PROJECT, START_DATE, STATUS, TRACKER;
+	SUBJECT, DESCRIPTION, ASSIGNED_TO, CATEGORY, DONE_RATIO, DUE_DATE, ESTIMATED_HOURS, FIXED_VERSION, PARENT, PRIORITY, PROJECT, START_DATE, STATUS, TRACKER;
 	
 	private static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 	
-	private static EnumSet<RedmineApiIssueProperty> REFERENCES = EnumSet.of(PROJECT, TRACKER, STATUS, PRIORITY, CATEGORY, FIXED_VERSION, ASSIGNED_TO);
+	private static EnumSet<RedmineApiIssueProperty> REFERENCES = EnumSet.of(PROJECT, TRACKER, PARENT, STATUS, PRIORITY, CATEGORY, FIXED_VERSION, ASSIGNED_TO);
 
 	private static EnumSet<RedmineApiIssueProperty> DATE = EnumSet.of(START_DATE, DUE_DATE);
 	

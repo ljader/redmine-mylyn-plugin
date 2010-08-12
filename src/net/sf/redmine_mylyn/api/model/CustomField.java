@@ -35,7 +35,11 @@ public class CustomField extends Property implements IQueryField {
 		@XmlEnumValue("date")
 		DATE, 
 		@XmlEnumValue("bool")
-		BOOL
+		BOOL;
+		
+		public String getLabel() {
+			return name().toLowerCase();
+		}
 	};
 
 	private Type type;

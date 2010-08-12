@@ -28,13 +28,11 @@ import net.sf.redmine_mylyn.api.model.container.Versions;
 import net.sf.redmine_mylyn.api.query.Query;
 import net.sf.redmine_mylyn.internal.api.parser.AttributeParser;
 import net.sf.redmine_mylyn.internal.api.parser.IModelParser;
-import net.sf.redmine_mylyn.internal.api.parser.PartialIssueParser;
 import net.sf.redmine_mylyn.internal.api.parser.SettingsParser;
 import net.sf.redmine_mylyn.internal.api.parser.SubmitedIssueParser;
 import net.sf.redmine_mylyn.internal.api.parser.TypedParser;
 import net.sf.redmine_mylyn.internal.api.parser.adapter.type.Issues;
 import net.sf.redmine_mylyn.internal.api.parser.adapter.type.PartialIssueType;
-import net.sf.redmine_mylyn.internal.api.parser.adapter.type.PartialIssues;
 import net.sf.redmine_mylyn.internal.api.parser.adapter.type.SubmitError;
 import net.sf.redmine_mylyn.internal.api.parser.adapter.type.UpdatedIssuesType;
 
@@ -66,8 +64,7 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	private final static String URL_ISSUES_UPDATED = "/mylyn/issues/updatedsince?issues=%s&unixtime=%d";
 	private final static String URL_ISSUES_LIST = "/mylyn/issues/list?issues=%s";
 	private final static String URL_ISSUE = "/mylyn/issue/%d";
-	
-	private final static String URL_QUERY = "/issues.xml";
+	private final static String URL_QUERY = "/mylyn/issues";
 
 	private final static String URL_UPDATE_ISSUE = "/issues/%d.xml";
 	
@@ -79,7 +76,6 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	private TypedParser<Issues> issuesParser;
 	private TypedParser<RedmineServerVersion> versionParser;
 	
-	private PartialIssueParser queryParser;
 	private SubmitedIssueParser submitIssueParser;
 	
 	private Configuration configuration;
@@ -127,7 +123,7 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 
 		Configuration conf = new Configuration();
 		
-		monitor.beginTask("Updating Attributes", parserByClass.size());
+		monitor.beginTask("Updating Attributes", parserByClass.size()+1);
 		GetMethod method = null;
 		
 		for (Entry<String, IModelParser<? extends AbstractPropertyContainer<?>>> entry : parserByClass.entrySet()) {
@@ -228,19 +224,20 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 		monitor.beginTask("Execute query", 1);
 
 		GetMethod method = new GetMethod(URL_QUERY);
-		
 		List<NameValuePair> params = query.getParams();
-		method.setQueryString(params.toArray(new NameValuePair[params.size()]));
 		
-		PartialIssues issues = executeMethod(method, queryParser, monitor);
+		if(params.size()>0) {
+			method.setQueryString(params.toArray(new NameValuePair[params.size()]));
+		}
+		Issues partialIssues = executeMethod(method, issuesParser, monitor);
 
 		if(monitor.isCanceled()) {
 			throw new OperationCanceledException();
 		} else {
 			monitor.worked(1);
 		}
-
-		return issues.issues;
+		
+		return partialIssues.getAll().toArray(new Issue[partialIssues.getAll().size()]);
 	}
 
 	@Override
@@ -325,7 +322,6 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 		issuesParser = new TypedParser<Issues>(Issues.class);
 		versionParser = new TypedParser<RedmineServerVersion>(RedmineServerVersion.class);
 
-		queryParser = new PartialIssueParser();
 		submitIssueParser = new SubmitedIssueParser();
 	}
 	

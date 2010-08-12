@@ -57,8 +57,6 @@ public class Query {
 		}
 		
 		if(params.isEmpty()) {
-			params.add(new NameValuePair("set_filter", "1"));
-			
 			for (QueryFilter queryFilter : filterByQueryFieldValue.values()) {
 				queryFilter.appendParams(params);
 			}
@@ -72,7 +70,6 @@ public class Query {
 			encoding="UTF-8";
 		}
 		StringBuilder builder = new StringBuilder();
-		//TODO filter + project param
 
 		try {
 			
@@ -84,8 +81,10 @@ public class Query {
 			throw new RedmineApiErrorException("Invalid encoding {}", e, encoding);
 		}
 		
-		builder.deleteCharAt(0);
-		builder.insert(0, "?");
+		if(builder.length()>0) {
+			builder.deleteCharAt(0);
+			builder.insert(0, "?");
+		}
 		
 		return builder.toString();
 	}
@@ -100,7 +99,9 @@ public class Query {
 
 		List<NameValuePair> nvp = new ArrayList<NameValuePair>();
 		
-		url = url.substring(url.indexOf('&'));
+		if(url.charAt(0)=='?' && url.length()>=1) {
+			url =  url.substring(1);
+		}
 
 		/* URL to NamedValuePairs */
 		for(String part : url.split("&")) {

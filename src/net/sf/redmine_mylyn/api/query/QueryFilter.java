@@ -95,8 +95,12 @@ public class QueryFilter {
 			throw new RedmineApiErrorException("Invalid Integer-Value `{}` for Query-Field `{}`", e, ""+values.get(0), queryField.getQueryValue());
 		}
 		
-		appendFieldAndOperator(parts);
-		appendValues(parts);
+		if(queryField==QueryField.PROJECT) {
+			parts.add(new NameValuePair(QueryField.PROJECT.getQueryValue(), values.get(0)));
+		} else {
+			appendFieldAndOperator(parts);
+			appendValues(parts);
+		}
 	}
 	
 	private void appendFieldAndOperator(List<NameValuePair> parts) {
@@ -135,6 +139,10 @@ public class QueryFilter {
 					filter = new QueryFilter(queryField);
 				}
 			}
+		} else if(nvp.getName().equals(QueryField.PROJECT.getQueryValue())) {
+			filter = new QueryFilter(QueryField.PROJECT);
+			filter.setOperator(CompareOperator.IS);
+			filter.addValue(nvp.getValue());
 		}
 		
 		return filter;
