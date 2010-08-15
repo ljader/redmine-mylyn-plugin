@@ -16,6 +16,7 @@ import net.sf.redmine_mylyn.api.model.CustomValue;
 import net.sf.redmine_mylyn.api.model.Issue;
 import net.sf.redmine_mylyn.api.model.Journal;
 import net.sf.redmine_mylyn.api.model.TimeEntry;
+import net.sf.redmine_mylyn.api.model.container.CustomValues;
 import net.sf.redmine_mylyn.core.IRedmineConstants;
 import net.sf.redmine_mylyn.core.RedmineAttribute;
 import net.sf.redmine_mylyn.core.RedmineCorePlugin;
@@ -84,7 +85,7 @@ public class IssueMapperTest {
 		assertEquals("", root.getAttribute(RedmineAttribute.CATEGORY.getTaskKey()).getValue());
 		assertEquals(""+issue.getAssignedToId(), root.getAttribute(RedmineAttribute.ASSIGNED_TO.getTaskKey()).getValue());
 		assertEquals(""+issue.getFixedVersionId(), root.getAttribute(RedmineAttribute.VERSION.getTaskKey()).getValue());
-		//TODO PARENT
+		assertEquals(""+issue.getParentId(), root.getAttribute(RedmineAttribute.PARENT.getTaskKey()).getValue());
 		//TODO available Status
 
 		/* CustomValues */
@@ -153,25 +154,56 @@ public class IssueMapperTest {
 		//TODO was ist die benötigte string-repräsentation von Booleschen werten?
 		assertEquals("1", attribute.getAttribute(IRedmineConstants.TASK_KEY_PREFIX_TIMEENTRY_CF+cv.getCustomFieldId()).getValue());
 		
-		fail("Not yet implemented");
+		fail("Not finished yet implemented");
 	}
 
 	@Test
-	public void readTaskData() throws Exception {
-
+	public void testUpdateTaskData_empty() throws Exception{
+		Issue issue = new Issue();
+		issue.setProjectId(1);
+		issue.setTrackerId(1);
+		TaskData taskData = buildEmptyTaskData(issue);
+		
+		TaskAttribute root = taskData.getRoot();
+		IssueMapper.updateTaskData(repository, taskData, cfg, issue);
+		
+		assertEquals("", root.getAttribute(RedmineAttribute.SUMMARY.getTaskKey()).getValue());
+		assertEquals("", root.getAttribute(RedmineAttribute.DESCRIPTION.getTaskKey()).getValue());
+		assertEquals("1", root.getAttribute(RedmineAttribute.TRACKER.getTaskKey()).getValue());
+		assertEquals("1", root.getAttribute(RedmineAttribute.PROJECT.getTaskKey()).getValue());
+		assertEquals("", root.getAttribute(RedmineAttribute.STATUS.getTaskKey()).getValue());
+		assertEquals("", root.getAttribute(RedmineAttribute.STATUS_CHG.getTaskKey()).getValue());
+		assertEquals("", root.getAttribute(RedmineAttribute.PRIORITY.getTaskKey()).getValue());
+		//TODO watched
+		//TODO watchers
+		assertEquals("", root.getAttribute(RedmineAttribute.DATE_START.getTaskKey()).getValue());
+		assertEquals("", root.getAttribute(RedmineAttribute.DATE_DUE.getTaskKey()).getValue());
+		assertEquals("", root.getAttribute(RedmineAttribute.PROGRESS.getTaskKey()).getValue());
+//		assertEquals("", root.getAttribute(RedmineAttribute.ESTIMATED.getTaskKey()).getValue());
+		assertEquals("", root.getAttribute(RedmineAttribute.CATEGORY.getTaskKey()).getValue());
+		assertEquals("", root.getAttribute(RedmineAttribute.ASSIGNED_TO.getTaskKey()).getValue());
+		assertEquals("", root.getAttribute(RedmineAttribute.VERSION.getTaskKey()).getValue());
+		assertEquals("", root.getAttribute(RedmineAttribute.PARENT.getTaskKey()).getValue());
+		//TODO available Status
+	}
+	
+	@Test
+	public void createIssue() throws Exception {
 		TaskData taskData = buildEmptyTaskData(TestData.issue2);
 		fillTaskData(taskData, TestData.issue2);
 		
-		Issue issue = IssueMapper.readTaskData(repository, taskData, null, cfg);
+		Issue issue = IssueMapper.createIssue(repository, taskData, null, cfg);
 		assertNotNull(issue);
 		
+		assertEquals(2, issue.getId());
 		assertEquals("Add ingredients categories", issue.getSubject());
 		assertEquals("Ingredients of the recipe should be classified by categories", issue.getDescription());
-		//TODO Comment
 		assertEquals(1, issue.getProjectId());
 		assertEquals(2, issue.getTrackerId());
 		assertEquals(2, issue.getStatusId());
 		//TODO change status and validate again
+		assertEquals(1, issue.getParentId());
+		//TODO change parent and validate again
 		assertEquals(5, issue.getPriorityId());
 		assertEquals(0, issue.getCategoryId());
 		assertEquals(2, issue.getAuthorId());
@@ -183,10 +215,42 @@ public class IssueMapperTest {
 		assertNull(issue.getDueDate());
 		assertEquals(3.5f, issue.getEstimatedHours(), 0.0);
 		assertEquals(10, issue.getDoneRatio());
+		//TODO parentId
 
-		fail("Not yet implemented");
+		//CustomValues
+		CustomValues customValues = issue.getCustomValues();
+		assertNotNull(customValues);
+		assertNotNull(customValues.getAll());
+		assertEquals(4, customValues.getAll().size());
+		assertEquals("", customValues.getByCustomFieldId(2).getValue());
+		assertEquals("2.05", customValues.getByCustomFieldId(6).getValue());
+		assertEquals("Oracle", customValues.getByCustomFieldId(1).getValue());
+		assertEquals("2009-12-01", customValues.getByCustomFieldId(9).getValue());
+		
+		fail("Not finished yet implemented");
 	}
-	
+
+	@Test
+	public void createTimeEntry() throws Exception {
+		TaskData taskData = buildEmptyTaskData(TestData.issue2);
+		fillTaskData(taskData, TestData.issue2);
+		
+		TimeEntry timeEntry = IssueMapper.createTimeEntry(repository, taskData, null, cfg);
+		assertNotNull(timeEntry);
+		
+		assertEquals(1.5, timeEntry.getHours(), 0.0);
+		assertEquals(1, timeEntry.getActivityId());
+		assertEquals("hard work", timeEntry.getComments());
+
+		//CustomValues
+		CustomValues customValues = timeEntry.getCustomValues();
+		assertNotNull(customValues);
+		assertNotNull(customValues.getAll());
+		assertEquals(2, customValues.getAll().size());
+		assertEquals("1", customValues.getByCustomFieldId(7).getValue());
+		assertEquals("2010-08-20", customValues.getByCustomFieldId(10).getValue());
+	}
+
 	TaskData buildEmptyTaskData(Issue issue) throws Exception {
 		TaskData taskData = new TaskData(new RedmineTaskAttributeMapper(repository, cfg), RedmineCorePlugin.REPOSITORY_KIND, repository.getUrl(), "" + issue.getId());
 	
@@ -206,6 +270,7 @@ public class IssueMapperTest {
 		setAttributeValue(root, RedmineAttribute.TRACKER, issue.getTrackerId());
 		setAttributeValue(root, RedmineAttribute.STATUS, issue.getStatusId());
 		setAttributeValue(root, RedmineAttribute.STATUS_CHG, issue.getStatusId());
+		setAttributeValue(root, RedmineAttribute.PARENT, issue.getParentId());
 		setAttributeValue(root, RedmineAttribute.PRIORITY, issue.getPriorityId());
 		setAttributeValue(root, RedmineAttribute.CATEGORY, issue.getCategoryId());
 		setAttributeValue(root, RedmineAttribute.REPORTER, issue.getAuthorId());
@@ -220,6 +285,20 @@ public class IssueMapperTest {
 //		setAttributeValue(root, RedmineAttribute.COMMENT, "");
 		
 		//new time entry
+		root.getAttribute(RedmineAttribute.TIME_ENTRY_HOURS.getTaskKey()).setValue("1.5");
+		root.getAttribute(RedmineAttribute.TIME_ENTRY_ACTIVITY.getTaskKey()).setValue("1");
+		root.getAttribute(RedmineAttribute.TIME_ENTRY_COMMENTS.getTaskKey()).setValue("hard work");
+		root.getAttribute(IRedmineConstants.TASK_KEY_PREFIX_TIMEENTRY_CF+"7").setValue("TRUE");
+		root.getAttribute(IRedmineConstants.TASK_KEY_PREFIX_TIMEENTRY_CF+"10").setValue("1282255200000");
+		
+		//CustomFields
+		for (CustomValue cv : issue.getCustomValues().getAll()) {
+			TaskAttribute attribute = root.getAttribute(IRedmineConstants.TASK_KEY_PREFIX_ISSUE_CF + cv.getCustomFieldId()); 
+			attribute.setValue(cv.getValue()==null ? "" : cv.getValue());
+		}
+		root.getAttribute(IRedmineConstants.TASK_KEY_PREFIX_ISSUE_CF+"9").setValue("1259622000000");
+		
+		
 		//operation
 	}
 	

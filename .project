@@ -3,6 +3,7 @@
 	<name>net.sf.redmine_mylyn.core-test</name>
 	<comment></comment>
 	<projects>
+		<project>net.sf.redmine_mylyn.core</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
