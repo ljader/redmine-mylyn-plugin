@@ -93,7 +93,7 @@
   </customField>
   <customField id="7">
     <name>Billable</name>
-    <type>TimeEntryActivityCustomField</type>
+    <type>TimeEntryCustomField</type>
     <fieldFormat>bool</fieldFormat>
     <minLength>0</minLength>
     <maxLength>0</maxLength>

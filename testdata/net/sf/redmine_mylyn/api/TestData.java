@@ -189,10 +189,10 @@ public class TestData {
 		lst.add(buildCustomField(2, "Searchable field", Type.IssueCustomField, Format.STRING, 1, 100, "^.*$", "Default String", false, false, true));
 		lst.add(buildCustomField(5, "Money", Type.IssueCustomField, Format.FLOAT, 0, 0, null, null, false, false, false));
 		lst.add(buildCustomField(6, "Float field", Type.IssueCustomField, Format.FLOAT, 0, 0, null, null, false, false, true));
-		lst.add(buildCustomField(7, "Billable", Type.TimeEntryActivityCustomField, Format.BOOL, 0, 0, null, null, false, true, false));
+		lst.add(buildCustomField(7, "Billable", Type.TimeEntryCustomField, Format.BOOL, 0, 0, null, null, false, true, false));
 		lst.add(buildCustomField(8, "Custom date", Type.IssueCustomField, Format.DATE, 0, 0, null, null, false, false, true));
 		lst.add(buildCustomField(9, "Project 1 cf", Type.IssueCustomField, Format.DATE, 0, 0, null, null, false, true, false));
-		lst.add(buildCustomField(10, "Date of xx", Type.TimeEntryActivityCustomField, Format.DATE, 0, 0, null, null, false, true, false));
+		lst.add(buildCustomField(10, "Date of xx", Type.TimeEntryCustomField, Format.DATE, 0, 0, null, null, false, true, false));
 		//TODO
 	}
 	

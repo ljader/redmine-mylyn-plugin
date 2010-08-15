@@ -64,7 +64,7 @@ public class CustomFieldValidator {
 		assertNotNull(obj);
 		assertEquals(7, obj.getId());
 		assertEquals("Billable", obj.getName());
-		assertEquals(Type.TimeEntryActivityCustomField, obj.getType());
+		assertEquals(Type.TimeEntryCustomField, obj.getType());
 		assertEquals(Format.BOOL, obj.getFieldFormat());
 		
 		List<String> possibleValues = obj.getPossibleValues();
