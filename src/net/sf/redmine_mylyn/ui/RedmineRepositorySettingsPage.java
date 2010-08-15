@@ -2,6 +2,7 @@ package net.sf.redmine_mylyn.ui;
 
 import net.sf.redmine_mylyn.api.client.RedmineServerVersion;
 import net.sf.redmine_mylyn.api.client.RedmineServerVersion.Release;
+import net.sf.redmine_mylyn.api.exception.RedmineApiAuthenticationException;
 import net.sf.redmine_mylyn.core.RedmineCorePlugin;
 import net.sf.redmine_mylyn.core.RedmineStatusException;
 import net.sf.redmine_mylyn.core.client.ClientFactory;
@@ -11,7 +12,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.mylyn.commons.net.UnsupportedRequestException;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.ui.wizards.AbstractRepositorySettingsPage;
 import org.eclipse.swt.widgets.Composite;
@@ -34,12 +34,12 @@ public class RedmineRepositorySettingsPage extends AbstractRepositorySettingsPag
 		super("Redmine Repository Settings", "Example: http://www.your-domain.de/redmine", taskRepository);
 
 		//TODO configure
-//		requiredVersion = new RedmineServerVersion(Release.REDMINE_1_0, Release.PLUGIN_2_7);
-		requiredVersion = new RedmineServerVersion(Release.REDMINE_0_9_DEVEL, Release.PLUGIN_2_7);
+		requiredVersion = new RedmineServerVersion(Release.REDMINE_1_0, Release.PLUGIN_2_7);
 
-		setNeedsAnonymousLogin(true);
+		setNeedsAnonymousLogin(false);
 		setNeedsValidation(true);
-		setNeedsHttpAuth(true);
+		//TODO needs API-KEY
+		setNeedsHttpAuth(false);
 	}
 	
 	@Override
@@ -76,7 +76,7 @@ public class RedmineRepositorySettingsPage extends AbstractRepositorySettingsPag
 					IClient client = ClientFactory.createClient(repository);
 					detectedVersion = client.checkClientConnection(monitor);
 				} catch (RedmineStatusException e) {
-					if(e.getCause() instanceof UnsupportedRequestException) {
+					if(e.getCause() instanceof RedmineApiAuthenticationException) {
 						throw new CoreException(new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, "Invalid credentials"));
 					}
 					throw new CoreException(e.getStatus());

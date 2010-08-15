@@ -2,7 +2,6 @@ package net.sf.redmine_mylyn.internal.ui.query;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -76,6 +75,8 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 	protected final Map<IQueryField, Text> queryText;
 	protected final Map<IQueryField, StructuredViewer> queryStructuredViewer;
 	
+	protected final List<CustomField> customFields;
+	
 	protected Button updateButton;
 
 	public RedmineRepositoryQueryPage(TaskRepository repository, IRepositoryQuery query) {
@@ -94,6 +95,7 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 		searchOperators = new HashMap<IQueryField, ComboViewer>();
 		queryText = new  LinkedHashMap<IQueryField, Text>();
 		queryStructuredViewer = new LinkedHashMap<IQueryField, StructuredViewer>();
+		customFields = new ArrayList<CustomField>();
 	}
 
 	public void createControl(final Composite parent) {
@@ -167,13 +169,14 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 	private void createCustomItemGroup(Composite parent) {
 		for (CustomField customField : configuration.getCustomFields().getIssueCustomFields()) {
 			QueryField queryField = customField.getQueryField();
-
 			if(!customField.isFilter() || queryField==null)
 				continue;
 
 			Control control = createInputControl(parent, queryField, customField);
 			ComboViewer combo = createOperatorComboViewer(parent, queryField, customField);
 			combo.addSelectionChangedListener(new CompareOperatorSelectionListener(control));
+			
+			customFields.add(customField);
 		}
 	}
 	
@@ -353,18 +356,12 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 		Assert.isTrue(oldComposites.size()==2);
 
 		/* Remove old CustomFields */
-		for(IQueryField queryField : Collections.unmodifiableSet(queryStructuredViewer.keySet())) {
-			if(queryField instanceof CustomField) {
-				queryStructuredViewer.remove(queryField);
-				searchOperators.remove(queryField);
-			}
+		for(CustomField customField : customFields) {
+//				queryStructuredViewer.remove(queryField);
+//				queryStructuredViewer.remove(queryField);
+//				searchOperators.remove(queryField);
 		}
-		for(IQueryField queryField : Collections.unmodifiableSet(queryText.keySet())) {
-			if(queryField instanceof CustomField) {
-				queryStructuredViewer.remove(queryField);
-				searchOperators.remove(queryField);
-			}
-		}
+		customFields.clear();
 		
 		/* Create new/updated CustomFields */
 		createCustomItemGroup(itemComposite);
