@@ -19,7 +19,6 @@ public class RedmineServerVersion {
 	public SubVersion redmine;
 
 	public enum Release {
-		REDMINE_0_9_DEVEL(0, 9, 4),
 		REDMINE_1_0(1, 0),
 		PLUGIN_2_7(2, 7);
 

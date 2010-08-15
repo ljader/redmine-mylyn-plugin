@@ -60,8 +60,8 @@ public class CustomFields extends AbstractPropertyContainer<CustomField> {
 		return Collections.unmodifiableList(getCustomFieldsByType(Type.IssueCustomField));
 	}
 
-	public List<CustomField> getTimeEntryActivityCustomFields() {
-		return Collections.unmodifiableList(getCustomFieldsByType(Type.TimeEntryActivityCustomField));
+	public List<CustomField> getTimeEntryCustomFields() {
+		return Collections.unmodifiableList(getCustomFieldsByType(Type.TimeEntryCustomField));
 	}
 	
 }

@@ -19,7 +19,7 @@ public class CustomField extends Property implements IQueryField {
 	
 	private static final long serialVersionUID = 1L;
 
-	public enum Type {IssueCustomField, TimeEntryActivityCustomField};
+	public enum Type {IssueCustomField, TimeEntryCustomField};
 
 	public enum Format {
 		@XmlEnumValue("string")

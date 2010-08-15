@@ -6,12 +6,14 @@ import java.net.URL;
 import java.util.Arrays;
 
 import net.sf.redmine_mylyn.api.client.IRedmineApiClient;
+import net.sf.redmine_mylyn.api.exception.RedmineApiAuthenticationException;
 import net.sf.redmine_mylyn.api.exception.RedmineApiErrorException;
 import net.sf.redmine_mylyn.api.exception.RedmineApiHttpStatusException;
 import net.sf.redmine_mylyn.internal.api.parser.IModelParser;
 
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HeaderElement;
 import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
@@ -23,10 +25,12 @@ import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
 import org.eclipse.mylyn.commons.net.AuthenticationCredentials;
 import org.eclipse.mylyn.commons.net.AuthenticationType;
 import org.eclipse.mylyn.commons.net.Policy;
+import org.eclipse.mylyn.commons.net.UnsupportedRequestException;
 import org.eclipse.mylyn.commons.net.WebUtil;
 
 public abstract class AbstractClient implements IRedmineApiClient {
@@ -34,6 +38,12 @@ public abstract class AbstractClient implements IRedmineApiClient {
 	protected final static String HEADER_STATUS = "status";
 
 	protected final static String HEADER_REDIRECT = "location";
+
+	protected final static String HEADER_WWW_AUTHENTICATE = "WWW-Authenticate"; //$NON-NLS-1$
+
+	protected final static String HEADER_WWW_AUTHENTICATE_REALM = "realm"; //$NON-NLS-1$
+	
+	protected final static String REDMINE_REALM = "Redmine API";
 
 	protected final HttpClient httpClient;
 	
@@ -127,26 +137,21 @@ public abstract class AbstractClient implements IRedmineApiClient {
 					httpCredentials = new NTCredentials(username.substring(i + 1), password, host, username.substring(0, i));
 				}
 
-				//TODO use correct realm "Redmine API"
-				AuthScope authScope = new AuthScope(host, hostConfiguration.getPort(), AuthScope.ANY_REALM);
+				AuthScope authScope = new AuthScope(host, hostConfiguration.getPort(), REDMINE_REALM);
 				httpClient.getState().setCredentials(authScope, httpCredentials);
 			}
 			
 			
 			int sc = WebUtil.execute(httpClient, hostConfiguration, method, monitor);
 			
-//			if(sc==HttpStatus.SC_MOVED_TEMPORARILY) {
-//				Header respHeader = method.getResponseHeader(HEADER_REDIRECT);
-//				if (respHeader != null && (respHeader.getValue().endsWith(REDMINE_URL_LOGIN) || respHeader.getValue().indexOf(REDMINE_URL_LOGIN_CALLBACK)>=0)) {
-//					throw new RedmineException(Messages.AbstractRedmineClient_LOGIN_FORMALY_INEFFECTIVE);
-//				}		
-//			} else if(sc==HttpStatus.SC_PROXY_AUTHENTICATION_REQUIRED) {
+//			if(sc==HttpStatus.SC_PROXY_AUTHENTICATION_REQUIRED) {
 //				hostConfiguration = refreshCredentials(AuthenticationType.PROXY, method, monitor);
 //				return executeMethod(method, hostConfiguration, monitor, authenticated);
-//			} else if(sc==HttpStatus.SC_UNAUTHORIZED) {
-//				hostConfiguration = refreshCredentials(AuthenticationType.HTTP, method, monitor);
-//				return executeMethod(method, hostConfiguration, monitor, authenticated);
-//			}
+//			} else 
+			if(sc==HttpStatus.SC_UNAUTHORIZED) {
+				hostConfiguration = refreshCredentials(AuthenticationType.HTTP, method, monitor);
+				performExecuteMethod(method, hostConfiguration, monitor);
+			}
 			
 			return sc;
 		} catch (RuntimeException e) {
@@ -156,5 +161,38 @@ public abstract class AbstractClient implements IRedmineApiClient {
 		}
 	}
 	
+	protected HostConfiguration refreshCredentials(AuthenticationType authenticationType, HttpMethod method, IProgressMonitor monitor) throws RedmineApiErrorException {
+		if (Policy.isBackgroundMonitor(monitor)) {
+			throw new RedmineApiAuthenticationException("Credentials not stored, manually syncronization required");
+		}
+		
+		try {
+			String message = "Authentication required";
+			if(authenticationType.equals(AuthenticationType.HTTP)) {
+				Header authHeader = method.getResponseHeader(HEADER_WWW_AUTHENTICATE);
+				if(authHeader!=null) {
+					for (HeaderElement headerElem : authHeader.getElements()) {
+						if (headerElem.getName().contains(HEADER_WWW_AUTHENTICATE_REALM)) {
+							
+							if(headerElem.getValue().equals(REDMINE_REALM)) {
+								authenticationType = AuthenticationType.REPOSITORY;
+							} else {
+								throw new RedmineApiErrorException("Additional Http-Auth is currently not supported.");
+							}
+							break;
+						}
+					}
+				}
+			}
+			location.requestCredentials(authenticationType, message, monitor);
+			
+			return WebUtil.createHostConfiguration(httpClient, location, monitor);
+		} catch (UnsupportedRequestException e) {
+			throw new RedmineApiAuthenticationException("Request credentials failed - not supported", e);
+		} catch (OperationCanceledException e) {
+			monitor.setCanceled(true);
+			throw new RedmineApiAuthenticationException("Authentication canceled");
+		}
+	}
 
 }
