@@ -2,19 +2,23 @@ package net.sf.redmine_mylyn.internal.core;
 
 import java.lang.reflect.Field;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import net.sf.redmine_mylyn.api.model.Attachment;
 import net.sf.redmine_mylyn.api.model.Configuration;
+import net.sf.redmine_mylyn.api.model.CustomField;
 import net.sf.redmine_mylyn.api.model.CustomValue;
 import net.sf.redmine_mylyn.api.model.Issue;
 import net.sf.redmine_mylyn.api.model.Journal;
 import net.sf.redmine_mylyn.api.model.TimeEntry;
+import net.sf.redmine_mylyn.api.model.container.CustomValues;
 import net.sf.redmine_mylyn.core.IRedmineConstants;
 import net.sf.redmine_mylyn.core.RedmineAttribute;
 import net.sf.redmine_mylyn.core.RedmineCorePlugin;
 import net.sf.redmine_mylyn.core.RedmineRepositoryConnector;
 import net.sf.redmine_mylyn.core.RedmineUtil;
+import net.sf.redmine_mylyn.core.RedmineTaskTimeEntryMapper;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
@@ -104,7 +108,7 @@ public class IssueMapper {
 				
 				
 				for (TimeEntry timeEntry : issue.getTimeEntries().getAll()) {
-					TaskTimeEntryMapper mapper = new TaskTimeEntryMapper(cfg);
+					RedmineTaskTimeEntryMapper mapper = new RedmineTaskTimeEntryMapper();
 					mapper.setTimeEntryId(timeEntry.getId());
 					mapper.setUser(repository.createPerson(""+timeEntry.getUserId()));
 					mapper.setActivityId(timeEntry.getActivityId());
@@ -114,15 +118,15 @@ public class IssueMapper {
 					mapper.setCustomValues(timeEntry.getCustomValues().getAll());
 					
 					taskAttribute = taskData.getRoot().createAttribute(IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY_PREFIX + mapper.getTimeEntryId());
-					mapper.applyTo(taskAttribute);
+					mapper.applyTo(taskAttribute, cfg);
 				}
 			}
 			
 		}
 	}
 
-	public static Issue readTaskData(TaskRepository repository, TaskData taskData, Set<TaskAttribute> oldAttributes, Configuration cfg) throws CoreException {
-		Issue issue = new Issue();
+	public static Issue createIssue(TaskRepository repository, TaskData taskData, Set<TaskAttribute> oldAttributes, Configuration cfg) throws CoreException {
+		Issue issue = taskData.getTaskId().isEmpty() ? new Issue() : new Issue(RedmineUtil.parseIntegerId(taskData.getTaskId()));
 
 		TaskAttribute root = taskData.getRoot();
 		TaskAttribute taskAttribute = null;
@@ -130,19 +134,18 @@ public class IssueMapper {
 		/* Default Attributes */
 		for (RedmineAttribute redmineAttribute : RedmineAttribute.values()) {
 			Field field = redmineAttribute.getAttributeField();
-			if(field!=null) {
+			if(!redmineAttribute.isOperationValue() && field!=null) {
 				taskAttribute = root.getAttribute(redmineAttribute.getTaskKey());
 				if(taskAttribute !=null ) {
 					try {
-						
 						switch(redmineAttribute) {
 						case SUMMARY:
 						case DESCRIPTION:
 						case COMMENT: field.set(issue, taskAttribute.getValue()); break;
-						case PROGRESS:field.setInt(issue, Integer.parseInt(taskAttribute.getValue())); break;
+						case PROGRESS:field.setInt(issue, taskAttribute.getValue().isEmpty() ? 0 : Integer.parseInt(taskAttribute.getValue())); break;
 						case ESTIMATED:field.setFloat(issue, Float.parseFloat(taskAttribute.getValue())); break;
 						default:
-							if(redmineAttribute.getType().equals(TaskAttribute.TYPE_SINGLE_SELECT) || redmineAttribute.getType().equals(TaskAttribute.TYPE_PERSON)) {
+							if(redmineAttribute.getType().equals(TaskAttribute.TYPE_SINGLE_SELECT) || redmineAttribute.getType().equals(TaskAttribute.TYPE_PERSON) || redmineAttribute==RedmineAttribute.PARENT) {
 								int idVal = RedmineUtil.parseIntegerId(taskAttribute.getValue());
 								if(idVal>0) {
 									field.setInt(issue, idVal);
@@ -163,10 +166,76 @@ public class IssueMapper {
 			}
 		}
 
+		/* Custom Attributes */
+		int[] customFieldIds = cfg.getProjects().getById(issue.getProjectId()).getCustomFieldIdsByTrackerId(issue.getTrackerId());
+		if(customFieldIds!=null && customFieldIds.length>0) {
+			CustomValues customValues = new CustomValues();
+			issue.setCustomValues(customValues);
+			for (int customFieldId : customFieldIds) {
+				taskAttribute = root.getAttribute(IRedmineConstants.TASK_KEY_PREFIX_ISSUE_CF + customFieldId);
+				if(taskAttribute!=null) {
+					customValues.setCustomValue(customFieldId, formatCustomValue(taskAttribute.getValue(), customFieldId, cfg));
+				}
+			}
+		}
+		
+		//TODO Operation
 		
 		return issue;
 	}
 
+	public static TimeEntry createTimeEntry(TaskRepository repository, TaskData taskData, Set<TaskAttribute> oldAttributes, Configuration cfg) throws CoreException {
+		TimeEntry timeEntry = null;
+		
+		try {
+			String val = getValue(taskData, RedmineAttribute.TIME_ENTRY_HOURS);
+			if(!val.isEmpty()) {
+				timeEntry = new TimeEntry();
+				
+				/* Default Attributes */
+				timeEntry.setHours(Float.parseFloat(val));
+				timeEntry.setActivityId(Integer.parseInt(getValue(taskData, RedmineAttribute.TIME_ENTRY_ACTIVITY)));
+				timeEntry.setComments(getValue(taskData, RedmineAttribute.TIME_ENTRY_COMMENTS));
+				
+				/* Custom Attributes */
+				List<CustomField> customFields = cfg.getCustomFields().getTimeEntryCustomFields();
+				if(customFields!=null && customFields.size()>0) {
+					CustomValues customValues = new CustomValues();
+					timeEntry.setCustomValues(customValues);
+					for (CustomField customField : customFields) {
+						String value = getValue(taskData, IRedmineConstants.TASK_KEY_PREFIX_TIMEENTRY_CF+customField.getId());
+						customValues.setCustomValue(customField.getId(), formatCustomValue(value, customField.getId(), cfg));
+					}
+				}
+			}
+		} catch (NumberFormatException e) {
+			timeEntry = null;
+			IStatus status = RedmineCorePlugin.toStatus(e, "Illegal Attribute Value");
+			StatusHandler.log(status);
+		}
+		
+		return timeEntry;
+	}
+	
+	private static String formatCustomValue(String value, int customFieldId, Configuration cfg) {
+		CustomField field = cfg.getCustomFields().getById(customFieldId);
+		if(field!=null) {
+			switch(field.getFieldFormat()) {
+			case DATE: value = value.isEmpty() ? "" : RedmineUtil.formatDate(RedmineUtil.parseDate(value)); break;
+			case BOOL: value = Boolean.parseBoolean(value) ? "1" : "0";
+			}
+		}
+		return value;
+	}
+	
+	private static String getValue(TaskData taskData, RedmineAttribute redmineAttribute) {
+		return getValue(taskData, redmineAttribute.getTaskKey());
+	}
+	
+	private static String getValue(TaskData taskData, String taskKey) {
+		TaskAttribute attribute = taskData.getRoot().getAttribute(taskKey);
+		return attribute==null ? "" : attribute.getValue();
+	}
 	
 	private static void setValue(TaskAttribute attribute, Object value) {
 		if(value==null) {
@@ -204,7 +273,7 @@ public class IssueMapper {
 	}
 	
 	private static void setValue(TaskAttribute attribute, int value) {
-		if(attribute.getMetaData().getType().equals(TaskAttribute.TYPE_SINGLE_SELECT) && value<1) {
+		if((attribute.getMetaData().getType().equals(TaskAttribute.TYPE_SINGLE_SELECT) || attribute.getId().equals(RedmineAttribute.PARENT.getTaskKey())) && value<1) {
 			attribute.setValue("");
 		} else {
 			attribute.setValue(""+value);

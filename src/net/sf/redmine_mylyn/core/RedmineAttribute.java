@@ -1,5 +1,6 @@
 package net.sf.redmine_mylyn.core;
 
+import static net.sf.redmine_mylyn.core.IRedmineConstants.TASK_ATTRIBUTE_PARENT;
 import static net.sf.redmine_mylyn.core.IRedmineConstants.TASK_ATTRIBUTE_STATUS_CHANGE;
 import static net.sf.redmine_mylyn.core.IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY_ACTIVITY;
 import static net.sf.redmine_mylyn.core.IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY_COMMENTS;
@@ -49,9 +50,11 @@ public enum RedmineAttribute {
 	@PropertyAccessor
 	TRACKER("Tracker:", RedmineAttribute.TASK_KEY_TRACKER, TaskAttribute.TYPE_SINGLE_SELECT, Flag.REQUIRED),
 	@PropertyAccessor
-	STATUS("Status:", TaskAttribute.STATUS, TaskAttribute.TYPE_SINGLE_SELECT, Flag.REQUIRED, Flag.HIDDEN),
+	STATUS("Status:", TaskAttribute.STATUS, TaskAttribute.TYPE_SINGLE_SELECT, Flag.REQUIRED),
 	@PropertyAccessor("statusId")
-	STATUS_CHG("Status:",  TASK_ATTRIBUTE_STATUS_CHANGE, TaskAttribute.TYPE_SINGLE_SELECT, Flag.OPERATION),
+	STATUS_CHG("Status:",  TASK_ATTRIBUTE_STATUS_CHANGE, TaskAttribute.TYPE_SINGLE_SELECT, Flag.OPERATION, Flag.HIDDEN),
+	@PropertyAccessor("parentId")
+	PARENT("Parent:",  TASK_ATTRIBUTE_PARENT, IRedmineConstants.EDITOR_TYPE_PARENTTASK),
 	COMMENT("Comment: ", TaskAttribute.COMMENT_NEW, TaskAttribute.TYPE_LONG_RICH_TEXT, Flag.HIDDEN),
 	@PropertyAccessor("doneRatio")
 	PROGRESS("Done ratio: ", RedmineAttribute.TASK_KEY_PROGRESS, TaskAttribute.TYPE_SINGLE_SELECT),
@@ -67,7 +70,6 @@ public enum RedmineAttribute {
 
 	
 	public final static String TASK_KEY_CATEGORY = "task.redmine.category";
-	public final static String TASK_KEY_VERSION = "task.redmine.version";
 	public final static String TASK_KEY_TRACKER = "task.redmine.tracker";
 	public final static String TASK_KEY_PROGRESS = "task.redmine.progress";
 	public final static String TASK_KEY_ESTIMATE = "task.redmine.estimate";

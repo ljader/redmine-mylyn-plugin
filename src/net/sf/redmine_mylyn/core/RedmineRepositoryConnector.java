@@ -34,6 +34,7 @@ import org.eclipse.mylyn.tasks.core.data.TaskDataCollector;
 import org.eclipse.mylyn.tasks.core.data.TaskMapper;
 import org.eclipse.mylyn.tasks.core.sync.ISynchronizationSession;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
@@ -44,11 +45,12 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 	
 	private ClientManager clientManager;
 	
-//	private final static Logger LOGGER = LoggerFactory.getLogger(RedmineRepositoryConnector.class);
-	private final static Logger LOGGER = null;
+	private final static Logger LOGGER = LoggerFactory.getLogger(RedmineRepositoryConnector.class);
+//	private final static Logger LOGGER = null;
 	
 	public RedmineRepositoryConnector() {
 		taskDataHandler = new RedmineTaskDataHandler(this);
+		
 	}
 
 	public synchronized ClientManager getClientManager() {
@@ -185,8 +187,14 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 
 	@Override
 	public boolean hasTaskChanged(TaskRepository taskRepository, ITask task, TaskData taskData) {
-		// TODO Auto-generated method stub
-		return false;
+		TaskAttribute attribute = taskData.getRoot().getMappedAttribute(RedmineAttribute.DATE_UPDATED.getTaskKey());
+		String repositoryDate = attribute.getValue();
+		Date localeDate = task.getModificationDate();
+		if (localeDate!=null) {
+			return RedmineUtil.parseDate(repositoryDate).compareTo(localeDate)<0;
+		}
+
+		return true;
 	}
 	
 	@Override

@@ -1,22 +1,25 @@
-package net.sf.redmine_mylyn.internal.core;
+package net.sf.redmine_mylyn.core;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map.Entry;
 
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.CustomField;
 import net.sf.redmine_mylyn.api.model.CustomValue;
 import net.sf.redmine_mylyn.api.model.TimeEntryActivity;
-import net.sf.redmine_mylyn.core.IRedmineConstants;
-import net.sf.redmine_mylyn.core.RedmineAttribute;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.mylyn.commons.core.StatusHandler;
 import org.eclipse.mylyn.tasks.core.IRepositoryPerson;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskAttributeMapper;
 import org.eclipse.mylyn.tasks.core.data.TaskData;
 
-public class TaskTimeEntryMapper {
+public class RedmineTaskTimeEntryMapper {
 
 	private int id;
 
@@ -32,28 +35,18 @@ public class TaskTimeEntryMapper {
 	
 	private List<CustomValue> customValues;
 	
-	private final Configuration cfg;
-	
-	public TaskTimeEntryMapper(Configuration cfg) {
-		this.cfg = cfg;
+	public static RedmineTaskTimeEntryMapper fromTimeEntryAttribute(TaskAttribute attribute) {
+		RedmineTaskTimeEntryMapper mapper = new RedmineTaskTimeEntryMapper();
+		mapper.readTaskAttribute(attribute);
+		return mapper;
 	}
-
-//	public static TaskTimeEntryMapper createFrom(TaskAttribute taskAttribute) {
-//		Assert.isNotNull(taskAttribute);
-//		
-//		TaskTimeEntryMapper mapper = new TaskTimeEntryMapper();
-//		mapper.readTaskAttribute(taskAttribute);
-//		
-//		return mapper;
-//	}
-
-	public void applyTo(TaskAttribute taskAttribute) {
+	
+	public void applyTo(TaskAttribute taskAttribute, Configuration configuration) {
 		Assert.isNotNull(taskAttribute);
 		
 		TaskData taskData = taskAttribute.getTaskData();
 		TaskAttributeMapper mapper = taskData.getAttributeMapper();
-		//TODO prüfen, solle ohne setType gehen
-//		taskAttribute.getMetaData().defaults().setType(TASK_ATTRIBUTE_TIMEENTRY);
+		taskAttribute.getMetaData().defaults().setType(IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY);
 		if (getTimeEntryId() > 0) {
 			mapper.setIntegerValue(taskAttribute, getTimeEntryId());
 		}
@@ -70,7 +63,7 @@ public class TaskTimeEntryMapper {
 			mapper.setIntegerValue(child, getActivityId());
 
 			//Option for ActivityId
-			TimeEntryActivity activity = cfg.getTimeEntryActivities().getById(getActivityId());
+			TimeEntryActivity activity = configuration.getTimeEntryActivities().getById(getActivityId());
 			if (activity!=null) {
 				child.putOption(""+activity.getId(), activity.getName());
 			}
@@ -97,7 +90,7 @@ public class TaskTimeEntryMapper {
 				child.setValue(customValue.getValue());
 
 				//Labels of CustomFields
-				CustomField customField = cfg.getCustomFields().getById(customValue.getCustomFieldId());
+				CustomField customField = configuration.getCustomFields().getById(customValue.getCustomFieldId());
 				if(customField!=null) {
 					child.getMetaData().setLabel(customField.getName());
 				}
@@ -105,24 +98,23 @@ public class TaskTimeEntryMapper {
 		}
 	}
 	
-//	private void readTaskAttribute(TaskAttribute taskAttribute) {
-//		TaskData taskData = taskAttribute.getTaskData();
-//		TaskAttributeMapper mapper = taskData.getAttributeMapper();
-//		
-//		id = mapper.getIntegerValue(taskAttribute);
-//		try {
-//			hours = Float.parseFloat(mapper.getValue(taskAttribute.getMappedAttribute(TASK_ATTRIBUTE_TIMEENTRY_HOURS)));
-//		} catch (NumberFormatException e) {
-//			IStatus status = RedmineCorePlugin.toStatus(e, null, "INVALID_HOURS_FORMAT_{0}", 
-//					mapper.getValue(taskAttribute.getMappedAttribute(TASK_ATTRIBUTE_TIMEENTRY_HOURS)));
-//			StatusHandler.log(status);
-//		}
-//		activityId = mapper.getIntegerValue(taskAttribute.getMappedAttribute(TASK_ATTRIBUTE_TIMEENTRY_ACTIVITY));
-//		userId = mapper.getIntegerValue(taskAttribute.getMappedAttribute(TASK_ATTRIBUTE_TIMEENTRY_AUTHOR));
-//		spentOn = mapper.getDateValue(taskAttribute.getMappedAttribute(TASK_ATTRIBUTE_TIMEENTRY_SPENTON));
-//		comments = mapper.getValue(taskAttribute.getMappedAttribute(TASK_ATTRIBUTE_TIMEENTRY_COMMENTS));
-//		//TODO customs
-//	}
+	private void readTaskAttribute(TaskAttribute taskAttribute) {
+		TaskData taskData = taskAttribute.getTaskData();
+		TaskAttributeMapper mapper = taskData.getAttributeMapper();
+		
+		id = mapper.getIntegerValue(taskAttribute);
+		try {
+			hours = Float.parseFloat(mapper.getValue(taskAttribute.getMappedAttribute(IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY_HOURS)));
+		} catch (NumberFormatException e) {
+			IStatus status = RedmineCorePlugin.toStatus(e, null, "INVALID_HOURS_FORMAT_{0}", mapper.getValue(taskAttribute.getMappedAttribute(IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY_HOURS)));
+			StatusHandler.log(status);
+		}
+		activityId = mapper.getIntegerValue(taskAttribute.getMappedAttribute(IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY_ACTIVITY));
+		user = mapper.getRepositoryPerson(taskAttribute.getMappedAttribute(IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY_AUTHOR));
+		spentOn = mapper.getDateValue(taskAttribute.getMappedAttribute(IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY_SPENTON));
+		comments = mapper.getValue(taskAttribute.getMappedAttribute(IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY_COMMENTS));
+		//TODO customs
+	}
 
 	public int getTimeEntryId() {
 		return id;
@@ -181,32 +173,30 @@ public class TaskTimeEntryMapper {
 	}
 
 	
-//	public static TaskAttribute getAuthorAttribute(TaskAttribute timeEntryAttribute) {
-//		return timeEntryAttribute.getMappedAttribute(TASK_ATTRIBUTE_TIMEENTRY_AUTHOR);
-//	}
-//
-//	public static TaskAttribute getHoursAttribute(TaskAttribute timeEntryAttribute) {
-//		return timeEntryAttribute.getMappedAttribute(TASK_ATTRIBUTE_TIMEENTRY_HOURS);
-//	}
-//
-//	public static TaskAttribute getActivityAttribute(TaskAttribute timeEntryAttribute) {
-//		return timeEntryAttribute.getMappedAttribute(TASK_ATTRIBUTE_TIMEENTRY_ACTIVITY);
-//	}
-//	
-//	public static TaskAttribute getCommentsAttribute(TaskAttribute timeEntryAttribute) {
-//		return timeEntryAttribute.getMappedAttribute(TASK_ATTRIBUTE_TIMEENTRY_COMMENTS);
-//	}
-//	
-//	public static Collection<TaskAttribute> getCustomAttributes(TaskAttribute timeEntryAttribute) {
-//		TaskAttribute customs = timeEntryAttribute.getMappedAttribute(TASK_ATTRIBUTE_TIMEENTRY_CUSTOMVALUES);
-//		if (customs!=null) {
-//			return customs.getAttributes().values();
-//		}
-//		return null;
-//	}
-//
-//	public static TaskAttribute getCustomAttribute(TaskAttribute timeEntryAttribute, int customFieldId) {
-//		String[] path = new String[]{TASK_ATTRIBUTE_TIMEENTRY_CUSTOMVALUES, TASK_ATTRIBUTE_TIMEENTRY_CUSTOMVALUE + customFieldId};
-//		return timeEntryAttribute.getMappedAttribute(path);
-//	}
+	public static TaskAttribute getAuthorAttribute(TaskAttribute timeEntryAttribute) {
+		return timeEntryAttribute.getMappedAttribute(IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY_AUTHOR);
+	}
+
+	public static TaskAttribute getHoursAttribute(TaskAttribute timeEntryAttribute) {
+		return timeEntryAttribute.getMappedAttribute(IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY_HOURS);
+	}
+
+	public static TaskAttribute getActivityAttribute(TaskAttribute timeEntryAttribute) {
+		return timeEntryAttribute.getMappedAttribute(IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY_ACTIVITY);
+	}
+	
+	public static TaskAttribute getCommentsAttribute(TaskAttribute timeEntryAttribute) {
+		return timeEntryAttribute.getMappedAttribute(IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY_HOURS);
+	}
+	
+	public static Collection<TaskAttribute> getCustomAttributes(TaskAttribute timeEntryAttribute) {
+		ArrayList<TaskAttribute> customAttributes = new ArrayList<TaskAttribute>();
+		for(Entry<String, TaskAttribute> entry : timeEntryAttribute.getAttributes().entrySet()) {
+			if(entry.getKey().startsWith(IRedmineConstants.TASK_KEY_PREFIX_TIMEENTRY_CF)) {
+				customAttributes.add(entry.getValue());
+			}
+		}
+		return customAttributes;
+	}
+
 }

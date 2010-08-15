@@ -6,6 +6,7 @@ import java.util.Set;
 import net.sf.redmine_mylyn.api.client.RedmineServerVersion;
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.Issue;
+import net.sf.redmine_mylyn.api.model.TimeEntry;
 import net.sf.redmine_mylyn.api.query.Query;
 import net.sf.redmine_mylyn.core.RedmineStatusException;
 
@@ -28,16 +29,13 @@ public interface IClient {
 
 	public Issue[] query(Query query, IProgressMonitor monitor) throws RedmineStatusException;
 	
-//	public void updateAttributes(boolean force, IProgressMonitor monitor) throws RedmineException;
-//	
-//	public int createTicket(String project, Map<String, String> postValues, IProgressMonitor monitor) throws RedmineException;
-//	
-//	public void updateTicket(int ticketId, Map<String, String> postValues, String comment, IProgressMonitor monitor) throws RedmineException;
-//
+	public int createIssue(Issue issue, IProgressMonitor monitor) throws RedmineStatusException;
+
+	public void updateIssue(Issue issue, String comment, TimeEntry timeEntry, IProgressMonitor monitor) throws RedmineStatusException;
+
 //	public InputStream getAttachmentContent(int attachmentId, IProgressMonitor monitor) throws RedmineException;
 //
 //	public void uploadAttachment(int ticketId, String fileName, String comment, String description, AbstractTaskAttachmentSource source, IProgressMonitor monitor) throws RedmineException;
-	
 	
 //	public void refreshRepositorySettings(TaskRepository repository, AbstractWebLocation location);
 

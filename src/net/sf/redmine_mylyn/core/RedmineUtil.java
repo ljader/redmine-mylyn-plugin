@@ -10,6 +10,8 @@ import org.eclipse.mylyn.commons.core.StatusHandler;
 
 public class RedmineUtil {
 	
+	private final static SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+	
 	public static int parseIntegerId(String intVal) {
 		if(intVal!=null && !intVal.isEmpty()) {
 			try {
@@ -24,6 +26,13 @@ public class RedmineUtil {
 
 	public static Boolean parseBoolean(String value) {
 		return value!=null && value.trim().equals("1") ? Boolean.TRUE : Boolean.parseBoolean(value);
+	}
+	
+	public static String formatDate(Date date) {
+		if(date!=null) {
+			return df.format(date);
+		}
+		return null;
 	}
 	
 	public static Date parseDate(String value) {
@@ -47,7 +56,6 @@ public class RedmineUtil {
 			} catch(NumberFormatException e) {
 				try {
 					//try formated date
-					SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 					return df.parse(value);
 				} catch (ParseException e1) {
 					IStatus status = RedmineCorePlugin.toStatus(e, "Parameter `{0}` isn't a valid unixtime(long) or formated date(yyyy-MM-dd )", value);

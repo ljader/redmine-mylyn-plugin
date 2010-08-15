@@ -7,7 +7,9 @@ public interface IRedmineConstants {
 	public final static String REDMINE_URL_ATTACHMENT_DOWNLOAD = "%s/attachments/download/%d";
 
 	public final static String EDITOR_TYPE_ESTIMATED = "estimated";
+	public final static String EDITOR_TYPE_PARENTTASK = "parenttask";
 	
+	public final static String TASK_ATTRIBUTE_TIMEENTRY = "task.redmine.timeentry";
 	public final static String TASK_ATTRIBUTE_TIMEENTRY_PREFIX = "task.redmine.timeentry.";
 	public final static String TASK_ATTRIBUTE_TIMEENTRY_AUTHOR = "task.redmine.timeentry.author";
 	public final static String TASK_ATTRIBUTE_TIMEENTRY_ACTIVITY = "task.redmine.timeentry.activity";
@@ -20,6 +22,7 @@ public interface IRedmineConstants {
 	public final static String TASK_ATTRIBUTE_TIMEENTRY_NEW = "task.redmine.timeentry.new";
 
 	public final static String TASK_ATTRIBUTE_STATUS_CHANGE = "task.redmine.status.change";
+	public final static String TASK_ATTRIBUTE_PARENT = "task.redmine.parent";
 	public final static String TASK_ATTRIBUTE_OPERATION_RESTORE = "task.redmine.operation.restorevalue";
 
 	public final static String TASK_KEY_PREFIX_ISSUE_CF = "task.redmine.custom.";

@@ -6,14 +6,19 @@ import java.util.Set;
 import net.sf.redmine_mylyn.api.client.IRedmineApiClient;
 import net.sf.redmine_mylyn.api.client.RedmineServerVersion;
 import net.sf.redmine_mylyn.api.exception.RedmineApiErrorException;
+import net.sf.redmine_mylyn.api.exception.RedmineApiInvalidDataException;
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.Issue;
+import net.sf.redmine_mylyn.api.model.TimeEntry;
 import net.sf.redmine_mylyn.api.query.Query;
+import net.sf.redmine_mylyn.core.RedmineCorePlugin;
 import net.sf.redmine_mylyn.core.RedmineStatusException;
 import net.sf.redmine_mylyn.core.RedmineUtil;
 import net.sf.redmine_mylyn.core.client.IClient;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.mylyn.tasks.core.ITask;
 
 public class Client implements IClient {
@@ -102,4 +107,29 @@ public class Client implements IClient {
 		}
 	}
 
+	@Override
+	public int createIssue(Issue issue, IProgressMonitor monitor) throws RedmineStatusException {
+		ErrrorCollector errorCollector = new ErrrorCollector();
+		try {
+			return apiClient.createIssue(issue, errorCollector, monitor).getId();
+		} catch (RedmineApiErrorException e) {
+			throw new RedmineStatusException(e);
+		} catch (RedmineApiInvalidDataException e) {
+			IStatus status = new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, errorCollector.getErrorString(), e);
+			throw new RedmineStatusException(status);
+		}
+	}
+	
+	@Override
+	public void updateIssue(Issue issue, String comment, TimeEntry timeEntry, IProgressMonitor monitor) throws RedmineStatusException {
+		ErrrorCollector errorCollector = new ErrrorCollector();
+		try {
+			apiClient.updateIssue(issue, comment, timeEntry, errorCollector, monitor);
+		} catch (RedmineApiErrorException e) {
+			throw new RedmineStatusException(e);
+		} catch (RedmineApiInvalidDataException e) {
+			IStatus status = new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, errorCollector.getErrorString(), e);
+			throw new RedmineStatusException(status);
+		}
+	}
 }
