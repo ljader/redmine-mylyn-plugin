@@ -33,8 +33,6 @@ import org.eclipse.mylyn.tasks.core.data.TaskData;
 import org.eclipse.mylyn.tasks.core.data.TaskDataCollector;
 import org.eclipse.mylyn.tasks.core.data.TaskMapper;
 import org.eclipse.mylyn.tasks.core.sync.ISynchronizationSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
@@ -44,9 +42,6 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 	private RedmineTaskDataHandler taskDataHandler;
 	
 	private ClientManager clientManager;
-	
-	private final static Logger LOGGER = LoggerFactory.getLogger(RedmineRepositoryConnector.class);
-//	private final static Logger LOGGER = null;
 	
 	public RedmineRepositoryConnector() {
 		taskDataHandler = new RedmineTaskDataHandler(this);
@@ -111,8 +106,6 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 
 	@Override
 	public TaskData getTaskData(TaskRepository repository, String taskId, IProgressMonitor monitor) throws CoreException {
-		LOGGER.debug("get task #{}", taskId);
-		
 		monitor = Policy.monitorFor(monitor);
 		monitor.beginTask("Task Download", IProgressMonitor.UNKNOWN);
 		
@@ -143,8 +136,6 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 	}
 
 	public TaskData[] getTaskData(TaskRepository repository, Set<String> taskIds, IProgressMonitor monitor) throws CoreException {
-		LOGGER.debug("get tasks :{}", Arrays.toString(taskIds.toArray()));		
-
 		monitor = Policy.monitorFor(monitor);
 		monitor.beginTask("Task Download", IProgressMonitor.UNKNOWN);
 
@@ -249,15 +240,11 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 		
 		TaskRepository repository = session.getTaskRepository();
 		if(repository.getSynchronizationTimeStamp()==null || repository.getSynchronizationTimeStamp().isEmpty()) {
-			LOGGER.debug("old Syncronization-Timestamp {}" , "n.a.");
-
 			for (ITask task : session.getTasks()) {
 				session.markStale(task);
 			}
 			return;
 		}
-		LOGGER.debug("old Syncronization-Timestamp {}" , RedmineUtil.parseDate(repository.getSynchronizationTimeStamp()).toString());
-
 		
 		try {
 			Date updatedSince = RedmineUtil.parseDate(repository.getSynchronizationTimeStamp());
@@ -270,11 +257,9 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 				Arrays.sort(changedIds);
 				for(ITask task : tasks) {
 					if(Arrays.binarySearch(changedIds, RedmineUtil.parseIntegerId(task.getTaskId()))>=0) {
-						LOGGER.debug("mark stale task +{}" , task.getTaskId());
 						session.markStale(task);
 					}
 				}
-				LOGGER.debug("mark {} task of {} as stale" , changedIds.length, tasks.size());
 			}
 		} catch (RedmineStatusException e) {
 			throw new CoreException(e.getStatus());
@@ -288,7 +273,6 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 			monitor.beginTask("", 1);
 			if (event.isFullSynchronization() && event.getStatus() == null) {
 				event.getTaskRepository().setSynchronizationTimeStamp(""+getSynchronizationTimestamp(event));
-				LOGGER.debug("new Syncronization-Timestamp {}" , RedmineUtil.parseDate(event.getTaskRepository().getSynchronizationTimeStamp()).toString());
 			} else {
 				
 			}
@@ -309,8 +293,6 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 
 	@Override
 	public void updateTaskFromTaskData(TaskRepository taskRepository, ITask task, TaskData taskData) {
-		LOGGER.debug("updating TaskData ITask #{}" , task.getTaskId());
-
 		TaskMapper mapper = getTaskMapping(taskData);
 		mapper.applyTo(task);
 

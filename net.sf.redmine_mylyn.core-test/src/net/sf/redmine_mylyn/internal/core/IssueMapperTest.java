@@ -65,7 +65,7 @@ public class IssueMapperTest {
 		TaskAttribute attribute = null;
 
 		IssueMapper.updateTaskData(repository, taskData, cfg, issue);
-		
+
 		assertEquals(issue.getSubject(), root.getAttribute(RedmineAttribute.SUMMARY.getTaskKey()).getValue());
 		assertEquals(issue.getDescription(), root.getAttribute(RedmineAttribute.DESCRIPTION.getTaskKey()).getValue());
 		assertEquals(""+issue.getCreatedOn().getTime(), root.getAttribute(RedmineAttribute.DATE_SUBMITTED.getTaskKey()).getValue());
