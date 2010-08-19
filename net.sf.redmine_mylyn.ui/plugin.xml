@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.mylyn.tasks.ui.repositories">
+      <connectorCore
+            class="net.sf.redmine_mylyn.core.RedmineRepositoryConnector"
+            name="RedmineRepositoryConnector">
+      </connectorCore>
+      <connectorUi
+            brandingIcon="icons/eview16/redmine-icon.png"
+            class="net.sf.redmine_mylyn.ui.RedmineRepositoryConnectorUi"
+            name="RedmineRepositoryConnectorUi"
+            overlayIcon="icons/eview16/redmine-overlay-icon.png">
+      </connectorUi>
+   </extension>
+   <extension
+         point="org.eclipse.mylyn.tasks.ui.editors">
+      <pageFactory
+            class="net.sf.redmine_mylyn.ui.editor.RedmineTaskEditorPageFactory"
+            id="net.sf.redmine_mylyn.ui.pageFactory">
+      </pageFactory>
+   </extension>
+
+</plugin>
