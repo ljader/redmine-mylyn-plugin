@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issue api="2.7.0.trunk" editAllowed="true" id="2" xmlns="http://redmin-mylyncon.sf.net/api">
+  <subject>Add ingredients categories</subject>
+  <description>Ingredients of the recipe should be classified by categories</description>
+  <createdOn unixtime="1153335861">2006-07-19T21:04:21+02:00</createdOn>
+  <updatedOn unixtime="1153336190">2006-07-19T21:09:50+02:00</updatedOn>
+  <trackerId>2</trackerId>
+  <projectId>1</projectId>
+  <statusId>2</statusId>
+  <priorityId>5</priorityId>
+  <watched>true</watched>
+  <watchers>1 3</watchers>
+  <startDate>2010-05-08</startDate>
+  <doneRatio>10</doneRatio>
+  <estimatedHours>3.5</estimatedHours>
+  <authorId>2</authorId>
+  <assignedToId>3</assignedToId>
+  <fixedVersionId>2</fixedVersionId>
+  <parentId>1</parentId>
+  <availableStatus>1 3 4 5 6 2</availableStatus>
+  <customValues>
+    <customValue customFieldId="2" id="5"/>
+    <customValue customFieldId="6" id="11">2.05</customValue>
+  </customValues>
+  <journals>
+    <journal editAllowed="false" id="3">
+      <userId>2</userId>
+      <createdOn unixtime="1273356000">2010-05-09T00:00:00+02:00</createdOn>
+      <notes>A comment with inline image: !picture.jpg!</notes>
+    </journal>
+  </journals>
+  <attachments>
+    <attachment id="10">
+      <authorId>2</authorId>
+      <createdOn unixtime="1153336047">2006-07-19T21:07:27+02:00</createdOn>
+      <filename>picture.jpg</filename>
+      <filesize>452</filesize>
+      <digest>b91e08d0cf966d5c6ff411bd8c4cc3a2</digest>
+      <contentType>image/jpeg</contentType>
+      <description>kurze Beschreibung</description>
+    </attachment>
+  </attachments>
+  <issueRelations>
+    <issueRelation id="2">
+      <issueFromId>2</issueFromId>
+      <issueToId>3</issueToId>
+      <type>relates</type>
+    </issueRelation>
+  </issueRelations>
+  <timeEntries viewAllowed="true" newAllowed="false">
+    <sum>4.25</sum>
+    <timeEntry editAllowed="false" id="1">
+      <hours>4.25</hours>
+      <activityId>9</activityId>
+      <userId>2</userId>
+      <spentOn>2007-03-23</spentOn>
+      <comments>My hours</comments>
+	  <customValues>
+	    <customValue customFieldId="2" id="5"/>
+	  </customValues>
+    </timeEntry>
+  </timeEntries>
+</issue>

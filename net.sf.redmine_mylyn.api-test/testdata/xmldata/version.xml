@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<version api="2.7.0.trunk" xmlns="http://redmin-mylyncon.sf.net/api">
+  <plugin major="2" minor="7" tiny="0">2.7.0.trunk</plugin>
+  <redmine>0.9.4.devel.3735</redmine>
+  <rails>2.3.5</rails>
+</version>

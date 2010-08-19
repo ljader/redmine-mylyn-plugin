@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<versions api="2.7.0.trunk" xmlns="http://redmin-mylyncon.sf.net/api">
+  <version id="1">
+    <name>0.1</name>
+    <status>closed</status>
+  </version>
+  <version id="2">
+    <name>1.0</name>
+    <status>locked</status>
+  </version>
+  <version id="3">
+    <name>2.0</name>
+    <status>open</status>
+  </version>
+  <version id="4">
+    <name>2.0</name>
+    <status>open</status>
+  </version>
+  <version id="5">
+    <name>Alpha</name>
+    <status>open</status>
+  </version>
+  <version id="6">
+    <name>Private Version of public subproject</name>
+    <status>open</status>
+  </version>
+  <version id="7">
+    <name>Systemwide visible version</name>
+    <status>open</status>
+  </version>
+</versions>

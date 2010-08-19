@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<trackers api="2.7.0.trunk" xmlns="http://redmin-mylyncon.sf.net/api">
+  <tracker id="1">
+    <name>Bug</name>
+    <position>1</position>
+  </tracker>
+  <tracker id="2">
+    <name>Feature request</name>
+    <position>3</position>
+  </tracker>
+  <tracker id="3">
+    <name>Support request</name>
+    <position>2</position>
+  </tracker>
+</trackers>

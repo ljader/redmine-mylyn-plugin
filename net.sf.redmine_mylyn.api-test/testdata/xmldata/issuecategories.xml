@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issueCategories api="2.7.0.trunk" xmlns="http://redmin-mylyncon.sf.net/api">
+  <issueCategory id="1">
+    <name>Printing</name>
+  </issueCategory>
+  <issueCategory id="2">
+    <name>Recipes</name>
+  </issueCategory>
+  <issueCategory id="3">
+    <name>Stock management</name>
+  </issueCategory>
+  <issueCategory id="4">
+    <name>Printing</name>
+  </issueCategory>
+</issueCategories>
