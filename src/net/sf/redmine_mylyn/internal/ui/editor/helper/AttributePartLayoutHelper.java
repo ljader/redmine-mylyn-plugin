@@ -11,10 +11,11 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.ui.forms.widgets.FormToolkit;
 
 public class AttributePartLayoutHelper {
 
-	/* Value from TaskEditorAttributePart */
+	/* Values from TaskEditorAttributePart */
 	private static final int LABEL_WIDTH = 110;
 
 	private static final int COLUMN_WIDTH = 140;
@@ -28,8 +29,17 @@ public class AttributePartLayoutHelper {
 	private int numColumns;
 	
 	private int currentColumn;
+	
+	private int currentPriority = LayoutHint.DEFAULT_PRIORITY;
+	
+	private final FormToolkit toolkit;
+	
+	private final Composite parent;
 
-	public AttributePartLayoutHelper(Composite attributeComposite) {
+	public AttributePartLayoutHelper(Composite attributeComposite, FormToolkit toolkit) {
+		this.parent = attributeComposite;
+		this.toolkit = toolkit;
+		
 		if (attributeComposite.getLayout() instanceof GridLayout) {
 			numColumns = ((GridLayout)attributeComposite.getLayout()).numColumns;
 
@@ -52,6 +62,19 @@ public class AttributePartLayoutHelper {
 		if(numColumns<1)
 			return;
 
+		//goto next row/first column if col-span and/or row-span changed
+		int priority = (editor.getLayoutHint() != null) ? editor.getLayoutHint().getPriority() : LayoutHint.DEFAULT_PRIORITY;
+		if (priority != currentPriority) {
+			currentPriority = priority;
+			if (currentColumn > 0) {
+				while (currentColumn < numColumns) {
+					toolkit.createLabel(parent, ""); //$NON-NLS-1$
+					currentColumn++;
+				}
+				currentColumn = 0;
+			}
+		}
+		
 		Label label = editor.getLabelControl();
 		GridData gd = GridDataFactory.fillDefaults()
 				.align(SWT.RIGHT, SWT.CENTER)
@@ -67,8 +90,7 @@ public class AttributePartLayoutHelper {
 
 		LayoutHint layoutHint = editor.getLayoutHint();
 		gd = new GridData(SWT.FILL, SWT.CENTER, false, false);
-		if (layoutHint != null
-				&& !(layoutHint.rowSpan == RowSpan.SINGLE && layoutHint.columnSpan == ColumnSpan.SINGLE)) {
+		if (layoutHint != null && !(layoutHint.rowSpan == RowSpan.SINGLE && layoutHint.columnSpan == ColumnSpan.SINGLE)) {
 			if (layoutHint.rowSpan == RowSpan.MULTIPLE) {
 				gd.heightHint = MULTI_ROW_HEIGHT;
 			}
@@ -77,7 +99,7 @@ public class AttributePartLayoutHelper {
 				gd.horizontalSpan = 1;
 			} else {
 				gd.widthHint = MULTI_COLUMN_WIDTH;
-				gd.horizontalSpan = numColumns - currentColumn + 1;
+				gd.horizontalSpan = numColumns - currentColumn;
 			}
 		} else {
 			gd.widthHint = COLUMN_WIDTH;
