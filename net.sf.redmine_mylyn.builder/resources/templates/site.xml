@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <description url="http://redmin-mylyncon.sourceforge.net/update-site/N/">
+      Provides Task List integration, offline support and rich editing for the open source Redmine project management.
+   </description>
+   <feature url="features/net.sf.redmine_mylyn.feature_{version.full}.jar" id="net.sf.redmine_mylyn.feature" version="{version.full}">
+      <category name="mylyn_integration"/>
+   </feature>
+   <category-def name="mylyn_integration" label="Mylyn Integration"/>
+</site>

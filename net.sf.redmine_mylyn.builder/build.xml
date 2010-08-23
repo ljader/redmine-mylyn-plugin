@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Redmine-Mylyn Build" default="main">
+	<description>
+            description
+    </description>
+	
+	<property file="${basedir}/build.properties" />
+	
+	<property name="resourcesDir" value="${basedir}/resources" />
+	
+
+	<!--
+	<import file="${buildHome}/build-files/publish/publish.xml"/>
+	-->
+
+	<property name="logDir" value="${buildDirectory}/logs"/>
+
+	<target name="-clean">
+		<delete dir="${buildDirectory}/tmp/${archivePrefix}" failonerror="false"/>
+	</target>
+	
+	<target name="-prepare" >
+		<property name="updatesite" value="${buildDirectory}/updatesite" />
+		
+		<tstamp />
+
+		<fileset dir="${eclipseDir}/plugins" >
+			<include name="org.eclipse.equinox.launcher_*.jar"/>
+			<include name="org.eclipse.equinox.p2.metadata.generator_*.jar"/>
+		</fileset>
+
+		<!-- determine buildfiles --> 
+		<path id="path.buildfile">
+			<fileset dir="${eclipseDir}/plugins">
+				<include name="org.eclipse.pde.build*/scripts/build.xml" />
+			</fileset>
+		</path>
+		<property name="buildfile" refid="path.buildfile"></property>
+
+		<!-- update sources -->
+		<!-- Auf Git umstellen 
+		<echo>"Updating sources ..."</echo>
+		<exec executable="svn" output="${logDir}/svnupdate.log" >
+			<arg value="update"/>
+			<arg value="${buildHome}/svnfetch"/>
+		</exec>
+		<mkdir dir="${updatesite}"/>
+		-->
+		
+		<!-- Copy Map-Files into Builddirectory -->
+		<delete dir="${buildDirectory}/maps" />
+		<mkdir dir="${buildDirectory}/maps" />
+		<copy todir="${buildDirectory}/maps" >
+			<fileset dir="${buildHome}/build-files/maps">
+				<include name="*.map"/>
+			</fileset>
+		</copy>
+		
+	</target>
+	
+	<target name="-checkforchanges">
+		<property file="${logDir}/lastbuildrevision.log" />
+		<echo>"Software revision of last build: ${lastsvnrevision}"</echo>
+
+		<!-- svn reversion of this build -->
+		<exec executable="svn" output="~getbuildnr.xml">
+			<arg value="info" />
+			<arg value="--xml" />
+			<arg value="${buildHome}/svnfetch" />
+		</exec>
+		<xmlproperty file="~getbuildnr.xml" collapseAttributes="true" />
+		<property name="newsvnrevision" value="${info.entry.commit.revision}" />
+		<delete file="~getbuildnr.xml" />
+		<echo>"Software revision of this build: ${newsvnrevision}"</echo>
+
+		<property name="forceContextQualifier" value="${buildType}${DSTAMP}${TSTAMP}-r${newsvnrevision}"/>
+
+		<condition property="build.skip">
+			<and>
+				<isset property="lastsvnrevision"/>
+				<equals arg1="${lastsvnrevision}" arg2="${newsvnrevision}" />
+			</and>
+		</condition>
+	</target>
+	
+	<target name="-build" description="Call the Equinox Laucher" unless="build.skip" >
+		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true" >
+			<arg line="-application" />
+			<arg value="org.eclipse.ant.core.antRunner" />
+			<arg value="-buildfile" />
+			<arg value="${buildfile}" />
+			<arg value="${buildTarget}" />
+			<jvmarg value="-Dbuilder=${buildHome}/build-files" />
+			<jvmarg value="-DjavacFailOnError=true"/>
+			<jvmarg value="-DbuildDirectory=${buildDirectory}"/>
+			<jvmarg value="-DeclipseDir=${eclipseDir}"/>
+			<jvmarg value="-DbuildHome=${buildHome}"/>
+			<jvmarg value="-DforceContextQualifier=${forceContextQualifier}"/>
+			<jvmarg value="-DbuildProperties=${buildHome}/build-files/build.properties"/>
+			<jvmarg value="-Dupdatesite=${updatesite}"/>
+			<jvmarg value="-DarchivePrefix=${archivePrefix}"/>
+			<jvmarg value="-DbuildType=${buildType}"/>
+			<jvmarg value="-DsourceDir=${sourceDir}"/>
+			
+			<classpath>
+				<fileset dir="${eclipseDir}/plugins" >
+					<include name="org.eclipse.equinox.launcher_*.jar"/>
+					<include name="org.eclipse.equinox.p2.metadata.generator_*.jar"/>
+				</fileset>
+				<pathelement location="${eclipseDir}/plugins" />
+			</classpath>
+
+		</java>
+	</target>
+
+	<!-- check for build error -->
+	<target name="-checkforfailure">
+		<condition property="build.failure">
+			<isfileselected file="${logDir}/build.log">
+				<contains text="BUILD FAILED" casesensitive="true" />
+			</isfileselected>
+		</condition>
+		<condition property="build.success">
+			<and>
+				<not>
+					<isset property="build.skip" />
+				</not>
+				<not>
+					<isset property="build.failure" />
+				</not>
+			</and>
+		</condition>
+
+	</target>
+
+	<target name="main" description="Run the ..."  depends="-clean, -prepare" >
+		<antcall target="-build" />
+	</target>
+	
+	<!-- ===================================================================== -->
+	<!-- Publish to sf.net -->
+	<!-- ===================================================================== -->
+	<target name="publish" depends="-prepare" >
+		
+		<!-- check sf.password -->
+		<condition property="sf.missingAccount" >
+			<or>
+				<not><isset property="sf.password"/></not>
+				<equals arg1="${sf.password}" arg2="" trim="true"/>
+			</or>
+		</condition>
+		<fail if="sf.missingAccount" message="Missing SF password"/>
+
+		<!-- Detect Version -->
+		<property file="${buildDirectory}/finalFeaturesVersions.properties" />
+
+		<tstamp>
+			<format property="sf.releasedate" pattern="MM/dd/yyyy" />
+		</tstamp>
+		
+		<antcall target="-publish.sf.frs" />
+		<antcall target="-publish.sf.site" />
+		<antcall target="-publish.sf.archive" />
+	</target>
+
+	<target name="-publish.sf.frs">
+		<scp todir="${sf.username},${sf.project.unixname}@frs.sf.net:/home/frs/project/r/re/redmin-mylyncon/Update-Site/N/" password="${sf.password}" verbose="true" trust="true" >
+			<fileset dir="${updatesite}">
+				<include name="**/*.jar"/>
+				<exclude name="**/*.xml"/>
+			</fileset>
+		</scp>
+	</target>
+
+	<target name="-publish.sf.site" >
+		<scp todir="${sf.username},${sf.project.unixname}@web.sf.net:/home/groups/r/re/redmin-mylyncon/htdocs/update-site/N/" password="${sf.password}" verbose="true" trust="true" >
+			<fileset dir="${updatesite}" >
+				<include name="**/*.xml"/>
+				<exclude name="**/*.jar"/>
+			</fileset>
+		</scp>
+	</target>
+
+	<target name="-publish.sf.archive" >
+		<delete dir="${buildDirectory}/archive" />
+		<mkdir dir="${buildDirectory}/archive/updatesite"/>
+		<copy todir="${buildDirectory}/archive/updatesite" >
+			<fileset dir="${updatesite}" />
+		</copy>
+
+		<echo file="${buildDirectory}/archive/updatesite/README.TXT" append="false">Project Website: http://sourceforge.net/projects/redmin-mylyncon/${line.separator}</echo>
+		<echo file="${buildDirectory}/archive/updatesite/README.TXT" append="true">Eclipse Updatesite: http://redmin-mylyncon.sourceforge.net/update-site/N/${line.separator}</echo>
+
+		<zip destfile="${buildDirectory}/archive/redmine-mylyn_${net.sf.redmine_mylyn.feature}.zip" basedir="${buildDirectory}/archive" compress="true" update="false" />
+		<delete dir="${buildDirectory}/archive/updatesite" />
+
+		<scp todir="${sf.username},${sf.project.unixname}@frs.sf.net:/home/frs/project/r/re/redmin-mylyncon/Update-Site-Archive/N/" password="${sf.password}" verbose="true" trust="true" file="${buildDirectory}/archive/redmine-mylyn_${net.sf.redmine_mylyn.feature}.zip" />
+
+	</target>
+
+</project>

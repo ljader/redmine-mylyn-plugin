@@ -1,0 +1,53 @@
+<project name="Create Update-Site" >
+
+	<!--
+	<import file="common.xml" />
+	-->
+	
+	<target name="updatesite">
+		<antcall target="-updatesite.clean" />
+		<antcall target="-updateSite.create" />
+	</target>
+	
+	<!-- remove last nightly update-site -->
+	<target name="-updatesite.clean" >
+		<delete dir="${updatesite}" />
+	</target>
+
+	<target name="-updateSite.create">
+		<mkdir dir="${updatesite}"/>
+
+		<!-- Detect Version -->
+		<property file="${buildDirectory}/finalFeaturesVersions.properties" />
+		
+		<!-- Write site.xml -->
+		<copy file="${buildHome}/resources/templates/site.xml" tofile="${updatesite}/site.xml" />
+		<echo></echo>
+		<replace token="{version.full}" value="${net.sf.redmine_mylyn.feature}" file="${updatesite}/site.xml" />
+		
+		<!-- Copy features/plugin jars -->
+		<copy todir="${updatesite}" >
+			<fileset dir="${buildDirectory}/tmp/${archivePrefix}" >
+				<include name="**/net.sf.redmine_mylyn.*.jar"/>
+			</fileset>
+		</copy>
+
+		<!-- Generate p2 metadata -->
+		<java classname="org.eclipse.equinox.launcher.Main" fork="true" 
+			failonerror="true" >
+			<arg line="-application org.eclipse.equinox.p2.metadata.generator.EclipseGenerator" />
+			<arg line=" -updateSite ${updatesite}/ -site file:${updatesite}/site.xml" />
+			<arg line=" -metadataRepository file:${updatesite}/ -metadataRepositoryName &quot;Redmine-Mylyn Update Site&quot;" />
+			<arg line=" -artifactRepository file:${updatesite}/ -artifactRepositoryName &quot;Mylyn Connector: Redmine&quot;" />
+
+			<classpath>
+				<fileset dir="${eclipseDir}/plugins" >
+					<include name="org.eclipse.equinox.launcher_*.jar"/>
+					<include name="org.eclipse.equinox.p2.metadata.generator_*.jar"/>
+				</fileset>
+				<pathelement location="${eclipseDir}/plugins" />
+			</classpath>
+		</java>
+
+	</target>
+</project>

@@ -1,0 +1,25 @@
+<project name="Tooling build targets" >
+
+	<target name="custom.clean" >
+		<delete dir="${buildDirectory}/tmp/${collectingFolder}" />
+	</target>
+
+	<target name="custom.postGenerate" >
+		<xslt style="${buildHome}/build-files/aspectj.xsl" basedir="${buildDirectory}/plugins" destdir="${buildDirectory}/plugins" extension=".aspect.out.xml" includes="*/build.xml" excludes="org.svenk.redmine/build.xml" ></xslt>
+		
+		<move todir="${buildDirectory}/plugins">
+			<mapper type="glob" from="*/build.aspect.out.xml" to="*/build.xml" />
+			<fileset dir="${buildDirectory}/plugins">
+				<include name="*/build.aspect.out.xml"/>
+			</fileset>
+		</move>
+	</target>
+	
+	<!-- check for nightly build -->
+	<target name="nightlycheck">
+		<condition property="isNightly">
+			<equals arg1="${buildType}" arg2="N" />
+		</condition>
+	</target>
+
+</project>

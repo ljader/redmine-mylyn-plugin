@@ -1,0 +1,69 @@
+<project name="publish">
+	<dirname property="ant.file.publish.dir" file="${ant.file.publish}" />
+
+	<!--
+	<import file="../common.xml" />
+	-->
+
+	<!-- Detect Version -->
+	<property file="${buildDirectory}/finalFeaturesVersions.properties" />
+
+	<target name="publish.sf" depends="-publish.sf.checkAccount, -publish.sf" >
+	</target>
+
+	<!-- checks, that password for SF is configured -->
+	<target name="-publish.sf.checkAccount">
+		<property file="${buildHome}/build-files/account.properties" />
+		<condition property="missingAccount" >
+			<equals arg1="${sf.password}" arg2="" trim="true"/>
+		</condition>
+	</target>
+
+	
+	<target name="-publish.sf" unless="missingAccount" >
+		<property name="sf.user" value="${sf.username}" />
+		<tstamp>
+			<format property="sf.releasedate" pattern="MM/dd/yyyy" />
+		</tstamp>
+
+		<antcall target="-publish.sf.frs" />
+		<antcall target="-publish.sf.site" />
+		<antcall target="-publish.sf.archive" />
+	</target>
+
+	<target name="-publish.sf.archive" >
+		<delete dir="${buildDirectory}/archive" />
+		<mkdir dir="${buildDirectory}/archive/updatesite"/>
+		<copy todir="${buildDirectory}/archive/updatesite" >
+			<fileset dir="${updatesite}" />
+		</copy>
+
+		<echo file="${buildDirectory}/archive/updatesite/README.TXT" append="false">Project Website: http://sourceforge.net/projects/redmin-mylyncon/${line.separator}</echo>
+		<echo file="${buildDirectory}/archive/updatesite/README.TXT" append="true">Eclipse Updatesite: http://redmin-mylyncon.sourceforge.net/update-site/nightly/${line.separator}</echo>
+
+		<zip destfile="${buildDirectory}/archive/redmine-mylyn_${net.sf.redmine_mylyn.feature}.zip" basedir="${buildDirectory}/archive" compress="true" update="false" />
+		<delete dir="${buildDirectory}/archive/updatesite" />
+
+		<scp todir="${sf.username},${sf.project.unixname}@frs.sf.net:/home/frs/project/r/re/redmin-mylyncon/Update-Site-Archive/N/" password="${sf.password}" verbose="true" trust="true" file="${buildDirectory}/archive/redmine-mylyn_${net.sf.redmine_mylyn.feature}.zip" />
+
+	</target>
+
+	<target name="-publish.sf.site" >
+		<scp todir="${sf.username},${sf.project.unixname}@web.sf.net:/home/groups/r/re/redmin-mylyncon/htdocs/update-site/N/" password="${sf.password}" verbose="true" trust="true" >
+			<fileset dir="${updatesite}" >
+				<include name="**/*.xml"/>
+				<exclude name="**/*.jar"/>
+			</fileset>
+		</scp>
+	</target>
+
+	<target name="-publish.sf.frs">
+		<scp todir="${sf.username},${sf.project.unixname}@frs.sf.net:/home/frs/project/r/re/redmin-mylyncon/Update-Site/N/" password="${sf.password}" verbose="true" trust="true" >
+			<fileset dir="${updatesite}">
+				<include name="**/*.jar"/>
+				<exclude name="**/*.xml"/>
+			</fileset>
+		</scp>
+	</target>
+	
+</project>
