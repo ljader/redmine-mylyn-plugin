@@ -3,6 +3,7 @@ package net.sf.redmine_mylyn.internal.api.client;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,9 +32,9 @@ import net.sf.redmine_mylyn.api.model.container.Versions;
 import net.sf.redmine_mylyn.api.query.Query;
 import net.sf.redmine_mylyn.internal.api.parser.AttachmentParser;
 import net.sf.redmine_mylyn.internal.api.parser.AttributeParser;
-import net.sf.redmine_mylyn.internal.api.parser.StringParser;
 import net.sf.redmine_mylyn.internal.api.parser.IModelParser;
 import net.sf.redmine_mylyn.internal.api.parser.SettingsParser;
+import net.sf.redmine_mylyn.internal.api.parser.StringParser;
 import net.sf.redmine_mylyn.internal.api.parser.SubmitedIssueParser;
 import net.sf.redmine_mylyn.internal.api.parser.TypedParser;
 import net.sf.redmine_mylyn.internal.api.parser.adapter.type.Issues;
@@ -165,7 +166,7 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	}
 	
 	@Override
-	public int[] getUpdatedIssueIds(int[] issues, long updatedSince, IProgressMonitor monitor) throws RedmineApiErrorException {
+	public int[] getUpdatedIssueIds(int[] issues, Date updatedSince, IProgressMonitor monitor) throws RedmineApiErrorException {
 		if (issues==null || issues.length==0) {
 			return null;
 		}
@@ -173,7 +174,7 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 		monitor = Policy.monitorFor(monitor);
 		monitor.beginTask("Search updated issues", 1);
 
-		String uri = String.format(URL_ISSUES_UPDATED, Arrays.toString(issues).replaceAll("[\\[\\] ]", ""), updatedSince);
+		String uri = String.format(URL_ISSUES_UPDATED, Arrays.toString(issues).replaceAll("[\\[\\] ]", ""), updatedSince.getTime()/1000l);
 		GetMethod method = new GetMethod(uri);
 		
 		UpdatedIssuesType result = executeMethod(method, updatedIssuesParser, monitor);
