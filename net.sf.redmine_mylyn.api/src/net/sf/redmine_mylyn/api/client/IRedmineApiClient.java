@@ -1,8 +1,11 @@
 package net.sf.redmine_mylyn.api.client;
 
 
+import java.io.InputStream;
+
 import net.sf.redmine_mylyn.api.exception.RedmineApiErrorException;
 import net.sf.redmine_mylyn.api.exception.RedmineApiInvalidDataException;
+import net.sf.redmine_mylyn.api.model.Attachment;
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.Issue;
 import net.sf.redmine_mylyn.api.model.TimeEntry;
@@ -30,10 +33,8 @@ public interface IRedmineApiClient {
 
 	public void updateIssue(Issue issue, String comment, TimeEntry timeEntry, IRedmineApiErrorCollector errorCollector, IProgressMonitor monitor) throws RedmineApiInvalidDataException, RedmineApiErrorException;
 	
-//		
-//		public InputStream getAttachmentContent(int attachmentId, IProgressMonitor monitor) throws RedmineException;
-//	
-//		public void uploadAttachment(int ticketId, String fileName, String comment, String description, AbstractTaskAttachmentSource source, IProgressMonitor monitor) throws RedmineException;
-//		
+	public InputStream getAttachmentContent(int attachmentId, String fileName, IProgressMonitor monitor) throws RedmineApiErrorException;
+	
+	public void uploadAttachment(int issueId, Attachment attachment, InputStream content, String comment, IRedmineApiErrorCollector errorCollector, IProgressMonitor monitor) throws RedmineApiInvalidDataException, RedmineApiErrorException;
 
 }

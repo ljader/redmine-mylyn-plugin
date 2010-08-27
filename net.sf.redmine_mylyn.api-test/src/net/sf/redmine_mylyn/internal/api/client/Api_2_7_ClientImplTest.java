@@ -71,6 +71,8 @@ public class Api_2_7_ClientImplTest {
 	
 	private final static String RESOURCE_FILE_SUBMIT_NEW = "/xmldata/issues/created_issue.xml"; 
 
+	private final static String RESOURCE_FILE_TOKEN_PAGE = "/html/token"; 
+
 	private IProgressMonitor monitor;
 
 	private static AbstractWebLocation location;
@@ -284,6 +286,16 @@ public class Api_2_7_ClientImplTest {
 			assertEquals("Zielversion ist kein gültiger Wert", errorCollector.lst.get(0));
 			assertEquals("FooBar", errorCollector.lst.get(1));
 		}
+	}
+	
+	@Test
+	public void testGetAuthenticityToken() throws Exception {
+		server.responseResourcePath = RESOURCE_FILE_TOKEN_PAGE;
+		Method m = testee.getClass().getDeclaredMethod("getAuthenticityToken", IProgressMonitor.class);
+		m.setAccessible(true);
+		Object token = m.invoke(testee, monitor);
+		assertNotNull(token);
+		assertEquals("TRGcXOcqpj92D9ip7X44NaLZhaGJEdLOU7TCNFgqmZk=", (String)token);
 	}
 	
 	@Test

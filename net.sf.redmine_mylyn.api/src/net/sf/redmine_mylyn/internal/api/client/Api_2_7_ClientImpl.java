@@ -1,5 +1,6 @@
 package net.sf.redmine_mylyn.internal.api.client;
 
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -11,6 +12,8 @@ import net.sf.redmine_mylyn.api.client.IRedmineApiErrorCollector;
 import net.sf.redmine_mylyn.api.client.RedmineServerVersion;
 import net.sf.redmine_mylyn.api.exception.RedmineApiErrorException;
 import net.sf.redmine_mylyn.api.exception.RedmineApiInvalidDataException;
+import net.sf.redmine_mylyn.api.exception.RedmineApiRemoteException;
+import net.sf.redmine_mylyn.api.model.Attachment;
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.Issue;
 import net.sf.redmine_mylyn.api.model.TimeEntry;
@@ -26,7 +29,9 @@ import net.sf.redmine_mylyn.api.model.container.Trackers;
 import net.sf.redmine_mylyn.api.model.container.Users;
 import net.sf.redmine_mylyn.api.model.container.Versions;
 import net.sf.redmine_mylyn.api.query.Query;
+import net.sf.redmine_mylyn.internal.api.parser.AttachmentParser;
 import net.sf.redmine_mylyn.internal.api.parser.AttributeParser;
+import net.sf.redmine_mylyn.internal.api.parser.StringParser;
 import net.sf.redmine_mylyn.internal.api.parser.IModelParser;
 import net.sf.redmine_mylyn.internal.api.parser.SettingsParser;
 import net.sf.redmine_mylyn.internal.api.parser.SubmitedIssueParser;
@@ -41,6 +46,10 @@ import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
+import org.apache.commons.httpclient.methods.multipart.FilePart;
+import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
+import org.apache.commons.httpclient.methods.multipart.Part;
+import org.apache.commons.httpclient.methods.multipart.StringPart;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.mylyn.commons.net.AbstractWebLocation;
@@ -68,6 +77,10 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 
 	private final static String URL_UPDATE_ISSUE = "/issues/%d.xml";
 	
+	private final static String URL_GET_ATTACHMENT = "/attachment/%d/%s";
+
+	private final static String URL_GET_AUTHENTICITY_TOKEN = "/mylyn/token";
+	
 	private Map<String, IModelParser<? extends AbstractPropertyContainer<?>>> parserByClass;
 	
 	private SettingsParser settingsParser;
@@ -77,6 +90,8 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	private TypedParser<RedmineServerVersion> versionParser;
 	
 	private SubmitedIssueParser submitIssueParser;
+	private AttachmentParser attachmentParser;
+	private StringParser stringParser;
 	
 	private Configuration configuration;
 	
@@ -303,6 +318,84 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 		}
 	}
 	
+	@Override
+	public InputStream getAttachmentContent(int attachmentId, String fileName, IProgressMonitor monitor) throws RedmineApiErrorException {
+		monitor = Policy.monitorFor(monitor);
+		monitor.beginTask("Download attachment", 1);
+		
+		GetMethod method = new GetMethod(String.format(URL_GET_ATTACHMENT, attachmentId, fileName));
+		InputStream attachment = executeMethod(method, attachmentParser, monitor, HttpStatus.SC_OK, HttpStatus.SC_NOT_FOUND);
+
+		if(monitor.isCanceled()) {
+			throw new OperationCanceledException();
+		} else {
+			monitor.worked(1);
+		}
+
+		return attachment;
+	}
+	
+	public void uploadAttachment(int issueId, final Attachment attachment, final InputStream content, String comment, IRedmineApiErrorCollector errorCollector, IProgressMonitor monitor) throws RedmineApiInvalidDataException, RedmineApiErrorException {
+		monitor = Policy.monitorFor(monitor);
+		monitor.beginTask("Upload attachment", 1);
+		
+		Object response = null;
+		
+		String token = getAuthenticityToken(monitor);
+		if(token==null) {
+			throw new RedmineApiRemoteException("Request of a Authenticity-Token failed");
+		}
+		
+		try {
+			PutMethod method = new PutMethod(String.format(URL_UPDATE_ISSUE, issueId));
+			
+			Part[] parts = new Part[4];
+			parts[0] = new StringPart("authenticity_token", token, characterEncoding);
+			parts[1] = new StringPart("attachments[1][description]", attachment.getDescription(), characterEncoding);
+			parts[2] = new StringPart("notes", comment, characterEncoding);
+			
+			//Workaround: http://rack.lighthouseapp.com/projects/22435/tickets/79-multipart-handling-incorrectly-assuming-file-upload
+			for(int i=2;i>=0;i--) {
+				((StringPart)parts[i]).setContentType(null);
+			}
+			
+			parts[3] = new FilePart("attachments[1][file]", new AttachmentPartSource(attachment, content), attachment.getContentType(), characterEncoding);
+			method.setRequestEntity(new MultipartRequestEntity(parts, method.getParams()));
+			
+			response = executeMethod(method, submitIssueParser, monitor, HttpStatus.SC_CREATED, HttpStatus.SC_UNPROCESSABLE_ENTITY);
+		} finally {
+			if(monitor.isCanceled()) {
+				throw new OperationCanceledException();
+			} else {
+				monitor.worked(1);
+			}
+		}
+		
+		if(response instanceof SubmitError) {
+			SubmitError error = (SubmitError)response;
+			for (String errMsg : error.errors) {
+				errorCollector.accept(errMsg);
+			}
+			
+			throw new RedmineApiInvalidDataException();
+		}
+	}
+	
+	private String getAuthenticityToken(IProgressMonitor monitor) throws RedmineApiErrorException {
+		monitor.beginTask("Get Authenticity-Token", 1);
+		
+		GetMethod method = new GetMethod(URL_GET_AUTHENTICITY_TOKEN);
+		String token = executeMethod(method, stringParser, monitor);
+		
+		if(monitor.isCanceled()) {
+			throw new OperationCanceledException();
+		} else {
+			monitor.worked(1);
+		}
+		
+		return token;
+	}
+	
 	private void buildParser() {
 		parserByClass = new HashMap<String, IModelParser<? extends AbstractPropertyContainer<?>>>();
 		parserByClass.put(URL_ISSUE_STATUS, new AttributeParser<IssueStatuses>(IssueStatuses.class));
@@ -321,7 +414,9 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 		issueParser = new TypedParser<Issue>(Issue.class);
 		issuesParser = new TypedParser<Issues>(Issues.class);
 		versionParser = new TypedParser<RedmineServerVersion>(RedmineServerVersion.class);
+		attachmentParser = new AttachmentParser();
 
+		stringParser = new StringParser();
 		submitIssueParser = new SubmitedIssueParser();
 	}
 	
