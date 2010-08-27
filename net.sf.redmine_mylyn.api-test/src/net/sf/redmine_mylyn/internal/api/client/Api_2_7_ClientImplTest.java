@@ -16,6 +16,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -200,7 +201,7 @@ public class Api_2_7_ClientImplTest {
 	
 	@Test
 	public void testUpdatedIssues() throws Exception {
-		int[] ids = testee.getUpdatedIssueIds(new int[]{1,6,7,8}, 123456789l, monitor);
+		int[] ids = testee.getUpdatedIssueIds(new int[]{1,6,7,8}, new Date(123456789000l), monitor);
 		assertNotNull(ids);
 		assertEquals("[1, 7, 8]", Arrays.toString(ids));
 	}

@@ -2,6 +2,7 @@ package net.sf.redmine_mylyn.api.client;
 
 
 import java.io.InputStream;
+import java.util.Date;
 
 import net.sf.redmine_mylyn.api.exception.RedmineApiErrorException;
 import net.sf.redmine_mylyn.api.exception.RedmineApiInvalidDataException;
@@ -21,7 +22,7 @@ public interface IRedmineApiClient {
 	
 	public void updateConfiguration(IProgressMonitor monitor) throws RedmineApiErrorException;
 	
-	public int[] getUpdatedIssueIds(int[] issues, long updatedSince, IProgressMonitor monitor) throws RedmineApiErrorException;
+	public int[] getUpdatedIssueIds(int[] issues, Date updatedSince, IProgressMonitor monitor) throws RedmineApiErrorException;
 	
 	public Issue getIssue(int id, IProgressMonitor monitor) throws RedmineApiErrorException;
 	

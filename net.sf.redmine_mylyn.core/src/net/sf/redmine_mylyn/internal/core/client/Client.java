@@ -96,7 +96,7 @@ public class Client implements IClient {
 		}
 		
 		try {
-			return apiClient.getUpdatedIssueIds(ids, updatedSince.getTime(), monitor);
+			return apiClient.getUpdatedIssueIds(ids, updatedSince, monitor);
 		} catch (RedmineApiErrorException e) {
 			throw new RedmineStatusException(e);
 		}
