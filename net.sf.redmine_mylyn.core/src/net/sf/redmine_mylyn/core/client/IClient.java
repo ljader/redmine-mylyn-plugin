@@ -1,5 +1,6 @@
 package net.sf.redmine_mylyn.core.client;
 
+import java.io.InputStream;
 import java.util.Date;
 import java.util.Set;
 
@@ -12,6 +13,7 @@ import net.sf.redmine_mylyn.core.RedmineStatusException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.mylyn.tasks.core.ITask;
+import org.eclipse.mylyn.tasks.core.data.AbstractTaskAttachmentSource;
 
 public interface IClient {
 
@@ -33,10 +35,8 @@ public interface IClient {
 
 	public void updateIssue(Issue issue, String comment, TimeEntry timeEntry, IProgressMonitor monitor) throws RedmineStatusException;
 
-//	public InputStream getAttachmentContent(int attachmentId, IProgressMonitor monitor) throws RedmineException;
-//
-//	public void uploadAttachment(int ticketId, String fileName, String comment, String description, AbstractTaskAttachmentSource source, IProgressMonitor monitor) throws RedmineException;
+	public InputStream getAttachmentContent(int attachmentId, String fileName, IProgressMonitor monitor) throws RedmineStatusException;
 	
-//	public void refreshRepositorySettings(TaskRepository repository, AbstractWebLocation location);
+	public void uploadAttachment(int issueId, String fileName, String description, AbstractTaskAttachmentSource source, String comment, IProgressMonitor monitor) throws RedmineStatusException;
 
 }

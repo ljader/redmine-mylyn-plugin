@@ -22,7 +22,7 @@ public class Attachment implements IModel {
 	
 	private String filename;
 	
-	private int filesize;
+	private long filesize;
 	
 	private String digest;
 
@@ -54,11 +54,11 @@ public class Attachment implements IModel {
 		this.filename = filename;
 	}
 
-	public int getFilesize() {
+	public long getFilesize() {
 		return filesize;
 	}
 
-	public void setFilesize(int filesize) {
+	public void setFilesize(long filesize) {
 		this.filesize = filesize;
 	}
 

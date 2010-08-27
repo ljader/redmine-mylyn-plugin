@@ -10,6 +10,7 @@ import net.sf.redmine_mylyn.api.model.Issue;
 import net.sf.redmine_mylyn.api.model.IssueStatus;
 import net.sf.redmine_mylyn.api.query.Query;
 import net.sf.redmine_mylyn.core.client.IClient;
+import net.sf.redmine_mylyn.internal.core.RedmineAttachmentHandler;
 import net.sf.redmine_mylyn.internal.core.RedmineTaskMapper;
 import net.sf.redmine_mylyn.internal.core.client.ClientManager;
 
@@ -27,6 +28,7 @@ import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
 import org.eclipse.mylyn.tasks.core.ITask;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.core.TaskRepositoryLocationFactory;
+import org.eclipse.mylyn.tasks.core.data.AbstractTaskAttachmentHandler;
 import org.eclipse.mylyn.tasks.core.data.AbstractTaskDataHandler;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskData;
@@ -337,6 +339,11 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 		return new RedmineTaskMapper(taskData, getRepositoryConfiguration(repository));
 	}
 
+	@Override
+	public AbstractTaskAttachmentHandler getTaskAttachmentHandler() {
+		return new RedmineAttachmentHandler(this);
+	}
+	
 	private long getSynchronizationTimestamp(ISynchronizationSession event) {
 		Date mostRecent = new Date(0);
 		String mostRecentTimeStamp = event.getTaskRepository().getSynchronizationTimeStamp();
