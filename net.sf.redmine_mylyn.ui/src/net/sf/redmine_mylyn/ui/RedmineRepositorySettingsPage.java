@@ -3,6 +3,7 @@ package net.sf.redmine_mylyn.ui;
 import net.sf.redmine_mylyn.api.client.RedmineServerVersion;
 import net.sf.redmine_mylyn.api.client.RedmineServerVersion.Release;
 import net.sf.redmine_mylyn.api.exception.RedmineApiAuthenticationException;
+import net.sf.redmine_mylyn.core.IRedmineConstants;
 import net.sf.redmine_mylyn.core.RedmineCorePlugin;
 import net.sf.redmine_mylyn.core.RedmineStatusException;
 import net.sf.redmine_mylyn.core.client.ClientFactory;
@@ -12,9 +13,19 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.ui.wizards.AbstractRepositorySettingsPage;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Text;
 
 
 public class RedmineRepositorySettingsPage extends AbstractRepositorySettingsPage {
@@ -28,7 +39,13 @@ public class RedmineRepositorySettingsPage extends AbstractRepositorySettingsPag
 	private RedmineServerVersion requiredVersion;
 
 	private String detectedVersionString = null;
+	
+	private Text apiKeyText;
 
+	private Label apiKeyLabel;
+	
+	private Button apiKeyEnableButton;
+	
 	public RedmineRepositorySettingsPage(TaskRepository taskRepository) {
 		
 		super("Redmine Repository Settings", "Example: http://www.your-domain.de/redmine", taskRepository);
@@ -38,8 +55,7 @@ public class RedmineRepositorySettingsPage extends AbstractRepositorySettingsPag
 
 		setNeedsAnonymousLogin(false);
 		setNeedsValidation(true);
-		//TODO needs API-KEY
-		setNeedsHttpAuth(false);
+		setNeedsHttpAuth(true);
 	}
 	
 	@Override
@@ -54,14 +70,14 @@ public class RedmineRepositorySettingsPage extends AbstractRepositorySettingsPag
 	}
 	
 	@Override
-	public boolean isPageComplete() {
-		return super.isPageComplete() && checkedUrl!= null && detectedVersionString != null && checkedUrl.equals(getRepositoryUrl());
-	}
-
-	@Override
 	public void applyTo(TaskRepository repository) {
 		super.applyTo(repository);
 		repository.setVersion(detectedVersionString);
+		if(useApiKey()) {
+			repository.setProperty(IRedmineConstants.REPOSITORY_SETTING_API_KEY, apiKeyText.getText().trim());
+		} else {
+			repository.removeProperty(IRedmineConstants.REPOSITORY_SETTING_API_KEY);
+		}
 	}
 	
 	@Override
@@ -124,14 +140,106 @@ public class RedmineRepositorySettingsPage extends AbstractRepositorySettingsPag
 	}
 
 	@Override
-	protected void createAdditionalControls(Composite arg0) {
-		// TODO Auto-generated method stub
+	protected void createSettingControls(Composite parent) {
+		super.createSettingControls(parent);
 		
+		//oldApiKey
+		String apiKey = repository==null ? null : repository.getProperty(IRedmineConstants.REPOSITORY_SETTING_API_KEY);
+		boolean useApiKey = apiKey!=null && !apiKey.isEmpty();
+
+		//REPOSITORY_SETTING_API_KEY
+		apiKeyLabel = new Label(parent, SWT.NONE);
+		apiKeyLabel.setText("API-Key");
+
+		apiKeyText = new Text(parent, SWT.BORDER);
+		apiKeyText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		apiKeyText.addListener(SWT.CHANGED, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				isPageComplete();
+			}
+		});
+		
+		if(apiKey!=null) {
+			apiKeyText.setText(apiKey);
+		}
+		
+		apiKeyEnableButton = new Button(parent, SWT.CHECK);
+		apiKeyEnableButton.setText("Enable");
+		apiKeyEnableButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				setApiKeyUsage(apiKeyEnableButton.getSelection());
+				isPageComplete();
+			}
+		});
+		
+		apiKeyLabel.moveBelow(savePasswordButton);
+		apiKeyText.moveBelow(apiKeyLabel);
+		apiKeyEnableButton.moveBelow(apiKeyText);
+		
+		setApiKeyUsage(useApiKey);
+	}
+
+	@Override
+	protected void createAdditionalControls(Composite parent) {
+	}
+
+	@Override
+	public boolean isPageComplete() {
+		String errorMessage = null;
+		
+		if(isMissingApiKey()) {
+			errorMessage = "Enter a valid API-Key";
+		}
+		
+		if(isMissingApiKeyUsage()) {
+			errorMessage = "Additional HTTP-Auth needs an API-Key instead of Username and Password.";
+		}
+		
+		if(errorMessage!=null) {
+			setMessage(errorMessage, IMessageProvider.ERROR);
+			return false;
+		} else {
+			return super.isPageComplete() && checkedUrl!= null && detectedVersionString != null && checkedUrl.equals(getRepositoryUrl());
+		}
 	}
 
 	@Override
 	protected boolean isValidUrl(String arg0) {
 		return true;
+	}
+	
+	@Override
+	protected boolean isMissingCredentials() {
+		return !useApiKey() && super.isMissingCredentials();
+	}
+	
+	private boolean isMissingApiKey() {
+		return useApiKey() && apiKeyText.getText().trim().isEmpty();
+	}
+	
+	private boolean useApiKey() {
+		return apiKeyEnableButton!=null && apiKeyEnableButton.getSelection();
+	}
+	
+	protected boolean isMissingApiKeyUsage() {
+		try {
+			return !useApiKey() && getHttpAuth();
+		} catch (NullPointerException e) {
+			return false;
+		}
+	}
+
+	private void setApiKeyUsage(boolean use) {
+		Composite parent = apiKeyEnableButton.getParent();
+		
+		repositoryUserNameEditor.setEnabled(!use, parent);
+		repositoryPasswordEditor.setEnabled(!use, parent);
+		
+		apiKeyEnableButton.setSelection(use);
+		apiKeyText.setEnabled(use);
+		
 	}
 
 }
