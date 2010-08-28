@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import net.sf.redmine_mylyn.api.client.IRedmineApiErrorCollector;
+import net.sf.redmine_mylyn.api.client.IRedmineApiWebHelper;
 import net.sf.redmine_mylyn.api.client.RedmineServerVersion;
 import net.sf.redmine_mylyn.api.exception.RedmineApiErrorException;
 import net.sf.redmine_mylyn.api.exception.RedmineApiInvalidDataException;
@@ -53,7 +54,6 @@ import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.mylyn.commons.net.AbstractWebLocation;
 import org.eclipse.mylyn.commons.net.Policy;
 
 public class Api_2_7_ClientImpl extends AbstractClient {
@@ -96,14 +96,14 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	
 	private Configuration configuration;
 	
-	public Api_2_7_ClientImpl(AbstractWebLocation location) {
-		super(location);
+	public Api_2_7_ClientImpl(IRedmineApiWebHelper webHelper) {
+		super(webHelper);
 		
 		buildParser();
 	}
 
-	public Api_2_7_ClientImpl(AbstractWebLocation location, Configuration initialConfiguration) {
-		this(location);
+	public Api_2_7_ClientImpl(IRedmineApiWebHelper webHelper, Configuration initialConfiguration) {
+		this(webHelper);
 		
 		this.configuration = initialConfiguration;
 	}
@@ -263,6 +263,9 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 		
 		PostMethod method = new PostMethod("/issues.xml");
 		try {
+			//Workaround: remote method CREATE dosn't support API-Keys, we need a session
+			getAuthenticityToken(monitor);
+			
 			method.setRequestEntity(new IssueRequestEntity(issue));
 		} catch (UnsupportedEncodingException e) {
 			throw new RedmineApiErrorException("Execution of method failed - Invalid encoding {}", e, "UTF-8");
@@ -296,6 +299,9 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 		Object response = null;
 		
 		try {
+			//Workaround: remote method UPDATE dosn't support API-Keys, we need a session
+			getAuthenticityToken(monitor);
+			
 			PutMethod method = new PutMethod(String.format(URL_UPDATE_ISSUE, issue.getId()));
 			method.setRequestEntity(new IssueRequestEntity(issue, comment, timeEntry));
 			response = executeMethod(method, submitIssueParser, monitor, HttpStatus.SC_CREATED, HttpStatus.SC_UNPROCESSABLE_ENTITY);

@@ -27,5 +27,7 @@ public interface IRedmineConstants {
 
 	public final static String TASK_KEY_PREFIX_ISSUE_CF = "task.redmine.custom.";
 	public final static String TASK_KEY_PREFIX_TIMEENTRY_CF = "task.redmine.timeentry.custom.";
+	
+	public final static String REPOSITORY_SETTING_API_KEY = "API_KEY";
 
 }
