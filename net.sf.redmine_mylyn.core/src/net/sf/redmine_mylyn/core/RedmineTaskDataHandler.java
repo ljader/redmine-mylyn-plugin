@@ -250,12 +250,14 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 		createAttribute(data, RedmineAttribute.ASSIGNED_TO, cfg.getUsers().getById(project.getAssignableMemberIds()), !existingTask);
 
 		//Attributes for a new TimeEntry
-		//TODO
-		if (true /*client.supportTimeEntries() && ticket.getRight(RedmineAcl.TIMEENTRY_NEW)*/) {
-			createAttribute(data, RedmineAttribute.TIME_ENTRY_HOURS);
-			createAttribute(data, RedmineAttribute.TIME_ENTRY_ACTIVITY, cfg.getTimeEntryActivities().getAll());
-			createAttribute(data, RedmineAttribute.TIME_ENTRY_COMMENTS);
-			createCustomAttributes(data, issue, cfg.getCustomFields().getTimeEntryCustomFields(), IRedmineConstants.TASK_KEY_PREFIX_TIMEENTRY_CF, true);
+		if(existingTask) {
+			//TODO
+			if (true /*client.supportTimeEntries() && ticket.getRight(RedmineAcl.TIMEENTRY_NEW)*/) {
+				createAttribute(data, RedmineAttribute.TIME_ENTRY_HOURS);
+				createAttribute(data, RedmineAttribute.TIME_ENTRY_ACTIVITY, cfg.getTimeEntryActivities().getAll());
+				createAttribute(data, RedmineAttribute.TIME_ENTRY_COMMENTS);
+				createCustomAttributes(data, issue, cfg.getCustomFields().getTimeEntryCustomFields(), IRedmineConstants.TASK_KEY_PREFIX_TIMEENTRY_CF, true);
+			}
 		}
 
 	}
