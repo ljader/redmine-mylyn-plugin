@@ -12,6 +12,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 public interface IRedmineApiWebHelper {
 
+	public String getBasePath();
+	
 	public boolean useApiKey();
 	
 	public String getApiKey();
