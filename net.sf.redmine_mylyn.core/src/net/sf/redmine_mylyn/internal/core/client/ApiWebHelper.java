@@ -36,6 +36,16 @@ public class ApiWebHelper implements IRedmineApiWebHelper {
 	}
 	
 	@Override
+	public String getBasePath() {
+		try {
+			return new URL(location.getUrl()).getPath();
+		} catch (MalformedURLException e) {
+			//TODO ExceptionHandling
+			e.printStackTrace();
+		}
+		return "/";
+	}
+	@Override
 	public boolean useApiKey() {
 		return repository.getProperty(IRedmineConstants.REPOSITORY_SETTING_API_KEY)!=null;
 	}

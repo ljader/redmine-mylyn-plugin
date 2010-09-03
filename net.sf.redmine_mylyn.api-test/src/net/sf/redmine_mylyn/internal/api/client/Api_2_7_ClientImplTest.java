@@ -103,6 +103,10 @@ public class Api_2_7_ClientImplTest {
 		monitor = new NullProgressMonitor();
 		testee = new Api_2_7_ClientImpl(new IRedmineApiWebHelper() {
 			@Override
+			public String getBasePath() {
+				return "/";
+			}
+			@Override
 			public boolean useApiKey() {
 				return false;
 			}

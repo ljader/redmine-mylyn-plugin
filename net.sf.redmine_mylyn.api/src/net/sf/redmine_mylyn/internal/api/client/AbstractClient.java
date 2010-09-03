@@ -115,9 +115,9 @@ public abstract class AbstractClient implements IRedmineApiClient {
 			HostConfiguration hostConfiguration = webHelper.createHostConfiguration(httpClient, monitor);
 
 			//complete URL
-			String baseUrl = new URL(hostConfiguration.getHostURL()).getPath();
-			if (!method.getPath().startsWith(baseUrl)) {
-				method.setPath(baseUrl + method.getPath());
+			String basePath = webHelper.getBasePath();
+			if (!method.getPath().startsWith(basePath)) {
+				method.setPath(basePath + method.getPath());
 			}
 			
 			//Authentication
