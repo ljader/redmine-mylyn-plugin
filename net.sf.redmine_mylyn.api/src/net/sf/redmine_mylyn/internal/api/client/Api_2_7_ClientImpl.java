@@ -78,7 +78,7 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 
 	private final static String URL_UPDATE_ISSUE = "/issues/%d.xml";
 	
-	private final static String URL_GET_ATTACHMENT = "/attachment/%d/%s";
+	private final static String URL_GET_ATTACHMENT = "/mylyn/attachment/%d/%s";
 
 	private final static String URL_GET_AUTHENTICITY_TOKEN = "/mylyn/token";
 	
