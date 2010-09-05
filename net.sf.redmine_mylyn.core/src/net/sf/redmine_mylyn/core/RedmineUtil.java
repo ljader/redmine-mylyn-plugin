@@ -5,8 +5,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 
+import net.sf.redmine_mylyn.api.model.CustomField;
+
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.mylyn.commons.core.StatusHandler;
+import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 
 public class RedmineUtil {
 	
@@ -64,6 +67,27 @@ public class RedmineUtil {
 			}
 		}
 		return null;
+	}
+
+	public static String getTaskAttributeType(CustomField customField) {
+		String type = TaskAttribute.TYPE_SHORT_TEXT;
+		switch (customField.getFieldFormat()) {
+		case TEXT:
+			type = TaskAttribute.TYPE_LONG_TEXT;
+			break;
+		case LIST:
+			type = TaskAttribute.TYPE_SINGLE_SELECT;
+			break;
+		case DATE:
+			type = TaskAttribute.TYPE_DATE;
+			break;
+		case BOOL:
+			type = TaskAttribute.TYPE_BOOLEAN;
+			break;
+		default:
+			type = TaskAttribute.TYPE_SHORT_TEXT;
+		}
+		return type;
 	}
 
 }

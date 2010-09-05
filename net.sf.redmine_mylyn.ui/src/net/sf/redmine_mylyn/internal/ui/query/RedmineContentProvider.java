@@ -6,10 +6,7 @@ import java.util.List;
 import net.sf.redmine_mylyn.api.model.container.AbstractPropertyContainer;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.swt.widgets.Display;
 
 public class RedmineContentProvider implements IStructuredContentProvider {
 

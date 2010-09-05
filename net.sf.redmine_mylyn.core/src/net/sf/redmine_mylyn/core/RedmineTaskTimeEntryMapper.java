@@ -1,7 +1,6 @@
 package net.sf.redmine_mylyn.core;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
@@ -86,12 +85,11 @@ public class RedmineTaskTimeEntryMapper {
 		if (getCustomValues()!=null) {
 			for (CustomValue customValue : getCustomValues()) {
 				TaskAttribute child = taskAttribute.createMappedAttribute(IRedmineConstants.TASK_KEY_PREFIX_TIMEENTRY_CF + customValue.getCustomFieldId());
-				child.getMetaData().defaults().setType(TaskAttribute.TYPE_SHORT_TEXT);
-				child.setValue(customValue.getValue());
-
-				//Labels of CustomFields
+				
 				CustomField customField = configuration.getCustomFields().getById(customValue.getCustomFieldId());
 				if(customField!=null) {
+					child.getMetaData().defaults().setType(RedmineUtil.getTaskAttributeType(customField));
+					child.setValue(customValue.getValue());
 					child.getMetaData().setLabel(customField.getName());
 				}
 			}
@@ -186,10 +184,10 @@ public class RedmineTaskTimeEntryMapper {
 	}
 	
 	public static TaskAttribute getCommentsAttribute(TaskAttribute timeEntryAttribute) {
-		return timeEntryAttribute.getMappedAttribute(IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY_HOURS);
+		return timeEntryAttribute.getMappedAttribute(IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY_COMMENTS);
 	}
 	
-	public static Collection<TaskAttribute> getCustomAttributes(TaskAttribute timeEntryAttribute) {
+	public static List<TaskAttribute> getCustomAttributes(TaskAttribute timeEntryAttribute) {
 		ArrayList<TaskAttribute> customAttributes = new ArrayList<TaskAttribute>();
 		for(Entry<String, TaskAttribute> entry : timeEntryAttribute.getAttributes().entrySet()) {
 			if(entry.getKey().startsWith(IRedmineConstants.TASK_KEY_PREFIX_TIMEENTRY_CF)) {

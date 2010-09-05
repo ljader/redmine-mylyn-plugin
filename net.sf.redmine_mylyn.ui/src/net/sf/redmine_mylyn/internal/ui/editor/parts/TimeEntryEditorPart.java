@@ -9,9 +9,9 @@ import net.sf.redmine_mylyn.core.IRedmineConstants;
 import net.sf.redmine_mylyn.core.RedmineAttribute;
 import net.sf.redmine_mylyn.core.RedmineTaskTimeEntryMapper;
 import net.sf.redmine_mylyn.internal.ui.Images;
+import net.sf.redmine_mylyn.internal.ui.editor.helper.AttributePartLayoutHelper;
 
 import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.mylyn.internal.tasks.ui.editors.EditorUtil;
 import org.eclipse.mylyn.tasks.core.IRepositoryPerson;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskAttributeMapper;
@@ -104,7 +104,13 @@ public class TimeEntryEditorPart extends AbstractTaskEditorPart {
 	private void expandSection(final FormToolkit toolkit, final Section section) {
 		Composite composite = toolkit.createComposite(section);
 		section.setClient(composite);
-		composite.setLayout(EditorUtil.createSectionClientLayout());
+		
+		//Values from EditorUtil.createSectionClientLayout()
+		GridLayout sectionLayout = new GridLayout();
+		sectionLayout.marginHeight = 0;
+		sectionLayout.marginTop = 2;
+		sectionLayout.marginBottom = 8;
+		composite.setLayout(sectionLayout);
 
 		List<TimeEntryViewer> viewers = getTimeEntryViewers();
 		for (TimeEntryViewer viewer : viewers) {
@@ -155,13 +161,6 @@ public class TimeEntryEditorPart extends AbstractTaskEditorPart {
 		private Control createControl(final Composite composite, final FormToolkit toolkit) {
 			Color bgColor = hasIncoming ? getTaskEditorPage().getAttributeEditorToolkit().getColorIncoming() : null;
 
-//			Composite composite = toolkit.createComposite(parent);
-//			GridLayout gl = new GridLayout(6, false);
-//			composite.setLayout(gl);
-//			GridData gd = new GridData();
-//			gd.horizontalSpan = 4;
-//			composite.setLayoutData(gd);
-
 			int style = ExpandableComposite.TREE_NODE | ExpandableComposite.LEFT_TEXT_CLIENT_ALIGNMENT | ExpandableComposite.COMPACT;
 
 			timeEntryComposite = toolkit.createExpandableComposite(composite, style);
@@ -177,7 +176,7 @@ public class TimeEntryEditorPart extends AbstractTaskEditorPart {
 			final Composite detailsComposite = toolkit.createComposite(timeEntryComposite);
 			timeEntryComposite.setClient(detailsComposite);
 
-			GridLayout gl = new GridLayout(6, false);
+			GridLayout gl = new GridLayout(4, false);
 			detailsComposite.setLayout(gl);
 			GridData gd = new GridData();
 			gd.horizontalSpan = 4;
@@ -218,7 +217,8 @@ public class TimeEntryEditorPart extends AbstractTaskEditorPart {
 			rowLayout.marginLeft = 0;
 			rowLayout.marginBottom = 0;
 			rowLayout.marginTop = 0;
-			EditorUtil.center(rowLayout);
+			rowLayout.center = true;
+			
 			titleComposite.setLayout(rowLayout);
 			titleComposite.setBackground(null);
 			
@@ -296,41 +296,36 @@ public class TimeEntryEditorPart extends AbstractTaskEditorPart {
 		private void expandTimeEntry(FormToolkit toolkit, Composite composite, boolean expanded) {
 //			buttonComposite.setVisible(expanded);
 			if (expanded) {
-				// create viewer
-				
 				AttributeEditorToolkit editorToolkit = getTaskEditorPage().getAttributeEditorToolkit();
-				TaskAttribute taskAttribute = RedmineTaskTimeEntryMapper.getCommentsAttribute(attribute);
-				AbstractAttributeEditor editor = createAttributeEditor(taskAttribute);
-				if (editor != null) {
-					editor.createLabelControl(composite, toolkit);
-					editor.createControl(composite, toolkit);
-					
-//					editor.getControl().addMouseListener(new MouseAdapter() {
-//						@Override
-//						public void mouseDown(MouseEvent e) {
-//							getTaskEditorPage().selectionChanged(taskComment);
-//						}
-//					});
-					
 
-					editorToolkit.adapt(editor);
-					getTaskEditorPage().reflow();
-				}
+				AttributePartLayoutHelper layoutHelper = new AttributePartLayoutHelper(composite, toolkit);
 				
-				Collection<TaskAttribute> customAttributes = RedmineTaskTimeEntryMapper.getCustomAttributes(attribute);
-				if (customAttributes!=null) {
-					for (TaskAttribute customAttribute : customAttributes) {
-						editor = createAttributeEditor(customAttribute);
-						if (editor != null) {
-							editor.createLabelControl(composite, toolkit);
-							editor.getLabelControl().setText(editor.getLabel() + ":"); //$NON-NLS-1$
-							editor.createControl(composite, toolkit);
-							
-							editorToolkit.adapt(editor);
-							getTaskEditorPage().reflow();
-						}
+				List<TaskAttribute> attributes = new ArrayList<TaskAttribute>();
+				attributes.add(RedmineTaskTimeEntryMapper.getCommentsAttribute(attribute));
+				attributes.addAll(RedmineTaskTimeEntryMapper.getCustomAttributes(attribute));
+				
+				for (TaskAttribute taskAttribute : attributes) {
+					AbstractAttributeEditor editor = createAttributeEditor(taskAttribute);
+					if (editor != null) {
+						editor.createLabelControl(composite, toolkit);
+						editor.createControl(composite, toolkit);
+						
+						
+//						editor.getControl().addMouseListener(new MouseAdapter() {
+//							@Override
+//							public void mouseDown(MouseEvent e) {
+//								getTaskEditorPage().selectionChanged(taskComment);
+//							}
+//						});
+
+						layoutHelper.setLayoutData(editor);
+						editorToolkit.adapt(editor);
+						
+						
 					}
+					
 				}
+				getTaskEditorPage().reflow();
 				
 			} else if (!expanded /* && composite.getData(KEY_EDITOR) != null */) {
 //				// dispose viewer

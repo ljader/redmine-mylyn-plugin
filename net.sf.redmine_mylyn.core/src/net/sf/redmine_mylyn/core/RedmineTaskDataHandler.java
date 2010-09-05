@@ -311,34 +311,13 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 
 	private static TaskAttribute createAttribute(TaskData taskData, CustomField customField, String prefix) {
 		TaskAttribute attr = taskData.getRoot().createAttribute(prefix + customField.getId());
-		attr.getMetaData().setType(getTaskAttributeType(customField));
+		attr.getMetaData().setType(RedmineUtil.getTaskAttributeType(customField));
 		attr.getMetaData().setKind(TaskAttribute.KIND_DEFAULT);
 		attr.getMetaData().setLabel(customField.getName());
 		attr.getMetaData().setReadOnly(false);
 		return attr;
 	}
 	
-	private static String getTaskAttributeType(CustomField customField) {
-		String type = TaskAttribute.TYPE_SHORT_TEXT;
-		switch (customField.getFieldFormat()) {
-		case TEXT:
-			type = TaskAttribute.TYPE_LONG_TEXT;
-			break;
-		case LIST:
-			type = TaskAttribute.TYPE_SINGLE_SELECT;
-			break;
-		case DATE:
-			type = TaskAttribute.TYPE_DATE;
-			break;
-		case BOOL:
-			type = TaskAttribute.TYPE_BOOLEAN;
-			break;
-		default:
-			type = TaskAttribute.TYPE_SHORT_TEXT;
-		}
-		return type;
-	}
-
 	private static void createOperations(TaskData taskData, Issue issue, Configuration configuration) {
 		IssueStatus currentStatus = null;
 		if(issue!=null) {
