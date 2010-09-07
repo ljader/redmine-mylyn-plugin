@@ -20,6 +20,14 @@ public enum RedmineOperation {
 		this.restore = associated==false && restoreDefault;
 	}
 	
+	public String getTaskKey() {
+		return name();
+	}
+
+	public static RedmineOperation fromTaskKey(String taskKey) {
+		return Enum.valueOf(RedmineOperation.class, taskKey);
+	}
+
 	public String getInputId() {
 		return attribute.getTaskKey();
 	}

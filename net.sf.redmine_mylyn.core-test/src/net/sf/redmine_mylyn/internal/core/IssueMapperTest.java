@@ -20,6 +20,7 @@ import net.sf.redmine_mylyn.api.model.container.CustomValues;
 import net.sf.redmine_mylyn.core.IRedmineConstants;
 import net.sf.redmine_mylyn.core.RedmineAttribute;
 import net.sf.redmine_mylyn.core.RedmineCorePlugin;
+import net.sf.redmine_mylyn.core.RedmineOperation;
 import net.sf.redmine_mylyn.core.RedmineRepositoryConnector;
 import net.sf.redmine_mylyn.core.RedmineTaskAttributeMapper;
 import net.sf.redmine_mylyn.core.RedmineTaskDataHandler;
@@ -201,16 +202,12 @@ public class IssueMapperTest {
 		assertEquals(1, issue.getProjectId());
 		assertEquals(2, issue.getTrackerId());
 		assertEquals(2, issue.getStatusId());
-		//TODO change status and validate again
 		assertEquals(1, issue.getParentId());
 		//TODO change parent and validate again
 		assertEquals(5, issue.getPriorityId());
 		assertEquals(0, issue.getCategoryId());
-		assertEquals(2, issue.getAuthorId());
 		assertEquals(3, issue.getAssignedToId());
 		assertEquals(2, issue.getFixedVersionId());
-		assertEquals(new Date(1153335861000l), issue.getCreatedOn());
-		assertEquals(new Date(1153336190000l), issue.getUpdatedOn());
 		assertEquals(df.parse("2010-05-08"), issue.getStartDate());
 		assertNull(issue.getDueDate());
 		assertEquals(3.5f, issue.getEstimatedHours(), 0.0);
@@ -230,6 +227,25 @@ public class IssueMapperTest {
 		fail("Not finished yet implemented");
 	}
 
+	@Test
+	public void createIssue_statusChanged() throws Exception {
+		TaskData taskData = buildEmptyTaskData(TestData.issue2);
+		fillTaskData(taskData, TestData.issue2);
+
+		//Change Status (mark as)
+		TaskAttribute attribute = taskData.getRoot().getAttribute(TaskAttribute.OPERATION);
+		attribute.setValue(RedmineOperation.markas.getTaskKey());
+
+		attribute = taskData.getRoot().getAttribute(RedmineAttribute.STATUS_CHG.getTaskKey());
+		attribute.setValue("4");
+		
+		Issue issue = IssueMapper.createIssue(repository, taskData, null, cfg);
+		assertNotNull(issue);
+		
+		assertEquals(2, issue.getId());
+		assertEquals(4, issue.getStatusId());
+	}
+	
 	@Test
 	public void createTimeEntry() throws Exception {
 		TaskData taskData = buildEmptyTaskData(TestData.issue2);
@@ -255,6 +271,10 @@ public class IssueMapperTest {
 		TaskData taskData = new TaskData(new RedmineTaskAttributeMapper(repository, cfg), RedmineCorePlugin.REPOSITORY_KIND, repository.getUrl(), "" + issue.getId());
 	
 		Method m = RedmineTaskDataHandler.class.getDeclaredMethod("createAttributes", TaskData.class, Issue.class, Configuration.class);
+		m.setAccessible(true);
+		m.invoke(taskDataHandler, taskData, issue, cfg);
+		
+		m = RedmineTaskDataHandler.class.getDeclaredMethod("createOperations", TaskData.class, Issue.class, Configuration.class);
 		m.setAccessible(true);
 		m.invoke(taskDataHandler, taskData, issue, cfg);
 		
