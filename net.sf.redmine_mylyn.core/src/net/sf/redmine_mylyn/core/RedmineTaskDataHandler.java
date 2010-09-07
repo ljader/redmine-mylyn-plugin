@@ -318,7 +318,7 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 		return attr;
 	}
 	
-	private static void createOperations(TaskData taskData, Issue issue, Configuration configuration) {
+	private void createOperations(TaskData taskData, Issue issue, Configuration configuration) {
 		IssueStatus currentStatus = null;
 		if(issue!=null) {
 			currentStatus = configuration.getIssueStatuses().getById(issue.getStatusId());
@@ -339,8 +339,8 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 			TaskOperation.applyTo(operationAttrib, operation.toString(), null);
 		}
 
-		TaskAttribute attribute = taskData.getRoot().createAttribute(TaskAttribute.PREFIX_OPERATION + operation.toString());
-		TaskOperation.applyTo(attribute, operation.toString(), operation.getLabel(labelArgs));
+		TaskAttribute attribute = taskData.getRoot().createAttribute(TaskAttribute.PREFIX_OPERATION + operation.getTaskKey());
+		TaskOperation.applyTo(attribute, operation.getTaskKey(), operation.getLabel(labelArgs));
 		
 		if(operation.isAssociated()) {
 			attribute.getMetaData().putValue(TaskAttribute.META_ASSOCIATED_ATTRIBUTE_ID, operation.getInputId());

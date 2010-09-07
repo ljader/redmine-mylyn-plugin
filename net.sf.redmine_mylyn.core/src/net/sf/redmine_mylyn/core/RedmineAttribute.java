@@ -50,9 +50,9 @@ public enum RedmineAttribute {
 	@PropertyAccessor
 	TRACKER("Tracker:", RedmineAttribute.TASK_KEY_TRACKER, TaskAttribute.TYPE_SINGLE_SELECT, Flag.REQUIRED),
 	@PropertyAccessor
-	STATUS("Status:", TaskAttribute.STATUS, TaskAttribute.TYPE_SINGLE_SELECT, Flag.REQUIRED),
+	STATUS("Status:", TaskAttribute.STATUS, TaskAttribute.TYPE_SINGLE_SELECT, Flag.REQUIRED, Flag.HIDDEN),
 	@PropertyAccessor("statusId")
-	STATUS_CHG("Status:",  TASK_ATTRIBUTE_STATUS_CHANGE, TaskAttribute.TYPE_SINGLE_SELECT, Flag.OPERATION, Flag.HIDDEN),
+	STATUS_CHG("Status:",  TASK_ATTRIBUTE_STATUS_CHANGE, TaskAttribute.TYPE_SINGLE_SELECT, Flag.OPERATION),
 	@PropertyAccessor("parentId")
 	PARENT("Parent:",  TASK_ATTRIBUTE_PARENT, IRedmineConstants.EDITOR_TYPE_PARENTTASK),
 	COMMENT("Comment: ", TaskAttribute.COMMENT_NEW, TaskAttribute.TYPE_LONG_RICH_TEXT, Flag.HIDDEN),

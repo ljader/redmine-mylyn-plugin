@@ -61,8 +61,7 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 	private final TaskDataModelListener projectAttributeListener;
 	private final TaskDataModelListener trackerAttributeListener;
 	private final TaskDataModelListener validatorAttributeListener;
-
-	private final TaskDataModelListener modelListener;
+	private final TaskDataModelListener statusAttributeListener;
 
 	private TaskDataValidator validator;
 //	
@@ -102,8 +101,7 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 		projectAttributeListener = new ProjectTaskDataModelListener();
 		trackerAttributeListener = new TrackerTaskDataModelListener();
 		validatorAttributeListener = new ValidatorTaskDataModelListener();
-		
-		modelListener = new AttributeTaskDataModelListener();
+		statusAttributeListener = new StatusTaskDataModelListener();
 		
 		
 	}
@@ -121,8 +119,7 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 		getModel().addModelListener(projectAttributeListener);
 		getModel().addModelListener(trackerAttributeListener);
 		getModel().addModelListener(validatorAttributeListener);
-		
-		getModel().addModelListener(modelListener);
+		getModel().addModelListener(statusAttributeListener);
 
 		//TODO
 //		RedmineUiPlugin.getDefault().addAttributeChangedListener(STATUS_LISTENER);
@@ -134,7 +131,7 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 		getModel().removeModelListener(trackerAttributeListener);
 		getModel().removeModelListener(validatorAttributeListener);
 		
-		getModel().removeModelListener(modelListener);
+		getModel().removeModelListener(statusAttributeListener);
 		//TODO
 //		RedmineUiPlugin.getDefault().removeAttributeChangedListener(STATUS_LISTENER);
 		super.dispose();
@@ -358,43 +355,40 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 		return id;
 	} 
 
-	private class AttributeTaskDataModelListener extends TaskDataModelListener {
+	private class StatusTaskDataModelListener extends TaskDataModelListener {
 
 		@Override
 		public void attributeChanged(TaskDataModelEvent event) {
 			TaskAttribute changedAttribute = event.getTaskAttribute();
 			
 			if(changedAttribute.getId().equals(RedmineAttribute.STATUS_CHG.getTaskKey())) {
-				statusChanged(changedAttribute, event.getModel());
-			}
-			
-		}
-		
-		void statusChanged(TaskAttribute statusAttribute, TaskDataModel model) {
-			TaskAttribute markasOperation = model.getTaskData().getRoot().getAttribute(TaskAttribute.PREFIX_OPERATION + RedmineOperation.markas.toString());
-			if(markasOperation!=null) {
-				TaskAttribute operation = model.getTaskData().getRoot().getAttribute(TaskAttribute.OPERATION);
-				model.getTaskData().getAttributeMapper().setValue(operation, RedmineOperation.markas.toString());
-				model.attributeChanged(operation);
+				TaskDataModel model = event.getModel();
 				
-				AbstractAttributeEditor statusChgEditor = attributeEditors.get(RedmineAttribute.STATUS_CHG);
-				if(statusChgEditor!=null) {
-					Control control = statusChgEditor.getControl();
-					if(control!=null && control instanceof CCombo) {
-						Listener[] listeners = control.getListeners(SWT.Selection);
-						if(listeners!=null && listeners.length==2) {
-							Event e = new Event();
-							e.widget = control;
-							e.type = SWT.Selection;
-							/*
-							 * Excpected listeners:
-							 * 0: AttributeEditor
-							 * 1: ActionButton
-							 */
-							listeners[1].handleEvent(e);
-						}
-					}
+				TaskAttribute markasOperation = model.getTaskData().getRoot().getAttribute(TaskAttribute.PREFIX_OPERATION + RedmineOperation.markas.toString());
+				if(markasOperation!=null) {
+					TaskAttribute operation = model.getTaskData().getRoot().getAttribute(TaskAttribute.OPERATION);
+					model.getTaskData().getAttributeMapper().setValue(operation, RedmineOperation.markas.toString());
+					model.attributeChanged(operation);
 					
+					AbstractAttributeEditor statusChgEditor = attributeEditors.get(changedAttribute);
+					if(statusChgEditor!=null) {
+						Control control = statusChgEditor.getControl();
+						if(control!=null && control instanceof CCombo) {
+							Listener[] listeners = control.getListeners(SWT.Selection);
+							if(listeners!=null && listeners.length==2) {
+								Event e = new Event();
+								e.widget = control;
+								e.type = SWT.Selection;
+								/*
+								 * Excpected listeners:
+								 * 0: AttributeEditor
+								 * 1: ActionButton
+								 */
+								listeners[1].handleEvent(e);
+							}
+						}
+						
+					}
 				}
 			}
 			
