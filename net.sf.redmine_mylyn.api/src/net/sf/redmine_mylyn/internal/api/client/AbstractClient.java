@@ -5,11 +5,13 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
 
+import net.sf.redmine_mylyn.api.RedmineApiPlugin;
 import net.sf.redmine_mylyn.api.client.IRedmineApiClient;
 import net.sf.redmine_mylyn.api.client.IRedmineApiWebHelper;
 import net.sf.redmine_mylyn.api.exception.RedmineApiAuthenticationException;
 import net.sf.redmine_mylyn.api.exception.RedmineApiErrorException;
 import net.sf.redmine_mylyn.api.exception.RedmineApiHttpStatusException;
+import net.sf.redmine_mylyn.common.logging.ILogService;
 import net.sf.redmine_mylyn.internal.api.parser.IModelParser;
 
 import org.apache.commons.httpclient.Credentials;
@@ -48,7 +50,11 @@ public abstract class AbstractClient implements IRedmineApiClient {
 	
 	protected String characterEncoding;
 	
+	private ILogService log;
+	
 	public AbstractClient(IRedmineApiWebHelper webHelper) {
+		log = RedmineApiPlugin.getDefault().getLogService(AbstractClient.class);
+		
 		this.webHelper = webHelper;
 		
 		MultiThreadedHttpConnectionManager connectionManager = new MultiThreadedHttpConnectionManager();
@@ -77,7 +83,6 @@ public abstract class AbstractClient implements IRedmineApiClient {
 				if (statusHeader != null) {
 					msg += " : " + statusHeader.getValue().replace(""+HttpStatus.SC_INTERNAL_SERVER_ERROR, "").trim();
 				}
-				
 				
 				throw new RedmineApiHttpStatusException(sc, msg);
 			}
@@ -141,6 +146,7 @@ public abstract class AbstractClient implements IRedmineApiClient {
 			}
 			
 			//Perform Method
+			log.debug("Execute HTTP {0}-Method {1}", method.getName(), method.getPath());
 			int sc = webHelper.execute(httpClient, hostConfiguration, method, monitor);
 			
 			//Update incorrect credentials
@@ -151,6 +157,7 @@ public abstract class AbstractClient implements IRedmineApiClient {
 			
 			return sc;
 		} catch (RuntimeException e) {
+			e.printStackTrace();
 			throw new RedmineApiErrorException("Execution of method failed - unexpected RuntimeException", e);
 		} catch (IOException e) {
 			e.printStackTrace();
