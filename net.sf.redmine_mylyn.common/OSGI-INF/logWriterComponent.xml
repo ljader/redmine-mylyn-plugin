@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="net.sf.redmine_mylyn.common.LogWriter">
+   <implementation class="net.sf.redmine_mylyn.internal.common.logging.LogWriter"/>
+   <reference bind="setLogReaderService" cardinality="1..1" interface="org.osgi.service.log.LogReaderService" name="LogReaderService" policy="static" unbind="unsetLogReaderService"/>
+</scr:component>

@@ -110,11 +110,13 @@ Inc. in the United States, other countries, or both.
 
    <requires>
       <import plugin="org.eclipse.core.runtime" version="3.6.0" match="greaterOrEqual"/>
+      <import plugin="net.sf.redmine_mylyn.common" version="0.1.0" match="greaterOrEqual"/>
       <import plugin="javax.xml.bind" version="2.0.0" match="greaterOrEqual"/>
       <import plugin="org.json" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.apache.commons.httpclient" version="3.1.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.mylyn.commons.net" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.osgi"/>
+      <import plugin="org.eclipse.osgi.services" version="3.2.100" match="greaterOrEqual"/>
       <import plugin="org.eclipse.mylyn.tasks.core" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.mylyn.commons.core" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="net.sf.redmine_mylyn.api" version="0.1.0" match="greaterOrEqual"/>
@@ -123,6 +125,13 @@ Inc. in the United States, other countries, or both.
       <import plugin="org.eclipse.jface" version="3.6.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.forms" version="3.5.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui" version="3.6.0" match="greaterOrEqual"/>
+      <import plugin="org.slf4j.api" version="1.5.11" match="greaterOrEqual"/>
+      <import plugin="ch.qos.logback.classic" version="0.9.19" match="greaterOrEqual"/>
+      <import plugin="ch.qos.logback.core" version="0.9.19" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.equinox.log"/>
+      <import plugin="javax.servlet"/>
+      <import plugin="javax.mail.glassfish"/>
+      <import plugin="org.eclipse.net4j.jms.api"/>
    </requires>
 
    <plugin
@@ -155,6 +164,34 @@ Inc. in the United States, other countries, or both.
 
    <plugin
          id="org.json"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.sf.redmine_mylyn.common"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="ch.qos.logback.classic"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="ch.qos.logback.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.slf4j.api"
          download-size="0"
          install-size="0"
          version="0.0.0"
