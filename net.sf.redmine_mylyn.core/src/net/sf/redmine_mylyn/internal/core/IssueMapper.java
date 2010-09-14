@@ -13,6 +13,7 @@ import net.sf.redmine_mylyn.api.model.Issue;
 import net.sf.redmine_mylyn.api.model.Journal;
 import net.sf.redmine_mylyn.api.model.TimeEntry;
 import net.sf.redmine_mylyn.api.model.container.CustomValues;
+import net.sf.redmine_mylyn.common.logging.ILogService;
 import net.sf.redmine_mylyn.core.IRedmineConstants;
 import net.sf.redmine_mylyn.core.RedmineAttribute;
 import net.sf.redmine_mylyn.core.RedmineCorePlugin;
@@ -46,8 +47,8 @@ public class IssueMapper {
 					try {
 						setValue(taskAttribute, field.get(issue));
 					} catch (Exception e) {
-						IStatus status = RedmineCorePlugin.toStatus(e, "Should never happens");
-						StatusHandler.fail(status);
+						ILogService log = RedmineCorePlugin.getDefault().getLogService(IssueMapper.class);
+						log.error(e, "Reading of property {0} failed - Should never happen", redmineAttribute.name());
 					}
 				}
 			}
@@ -303,8 +304,8 @@ public class IssueMapper {
 						}
 					}
 				} catch (Exception e) {
-					IStatus status = RedmineCorePlugin.toStatus(e, "Should never happens");
-					StatusHandler.fail(status);
+					ILogService log = RedmineCorePlugin.getDefault().getLogService(IssueMapper.class);
+					log.error(e, "Setting of property {0} failed - Should never happen", redmineAttribute.name());
 				}
 			}
 		}
