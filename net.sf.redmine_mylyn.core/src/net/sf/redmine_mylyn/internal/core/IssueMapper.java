@@ -288,7 +288,10 @@ public class IssueMapper {
 					case DESCRIPTION:
 					case COMMENT: field.set(issue, taskAttribute.getValue()); break;
 					case PROGRESS:field.setInt(issue, taskAttribute.getValue().isEmpty() ? 0 : Integer.parseInt(taskAttribute.getValue())); break;
-					case ESTIMATED:field.setFloat(issue, Float.parseFloat(taskAttribute.getValue())); break;
+					case ESTIMATED:
+						if (!taskAttribute.getValue().isEmpty())
+							field.setFloat(issue, Float.parseFloat(taskAttribute.getValue()));
+						break;
 					default:
 						if(redmineAttribute.getType().equals(TaskAttribute.TYPE_SINGLE_SELECT) || redmineAttribute.getType().equals(TaskAttribute.TYPE_PERSON) || redmineAttribute==RedmineAttribute.PARENT) {
 							int idVal = RedmineUtil.parseIntegerId(taskAttribute.getValue());
