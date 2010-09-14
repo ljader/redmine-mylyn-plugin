@@ -2,6 +2,7 @@ package net.sf.redmine_mylyn.internal.api.client;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.ConnectException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Arrays;
@@ -158,8 +159,11 @@ public abstract class AbstractClient implements IRedmineApiClient {
 			
 			return sc;
 		} catch (RuntimeException e) {
-			e.printStackTrace();
+			log.error(e, "Execution of method failed - unexpected RuntimeException {0}", e.getMessage());
 			throw new RedmineApiErrorException("Execution of method failed - unexpected RuntimeException", e);
+		} catch (ConnectException e) {
+			log.info("Execution of method failed - {0}", e.getMessage());
+			throw new RedmineApiErrorException(e.getMessage(), e);
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RedmineApiErrorException("Execution of method failed", e);

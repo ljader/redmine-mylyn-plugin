@@ -292,8 +292,7 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 		try {
 			getClientManager().getClient(repository).updateConfiguration(monitor);
 		} catch (RedmineStatusException e) {
-			IStatus status = RedmineCorePlugin.toStatus(e, "Update of configuration failed");
-			throw new CoreException(status);
+			throw new CoreException(e.getStatus());
 		}
 	}
 
