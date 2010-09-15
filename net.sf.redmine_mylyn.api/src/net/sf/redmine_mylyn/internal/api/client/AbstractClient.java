@@ -2,14 +2,18 @@ package net.sf.redmine_mylyn.internal.api.client;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.ConnectException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.Arrays;
 
+import net.sf.redmine_mylyn.api.RedmineApiPlugin;
 import net.sf.redmine_mylyn.api.client.IRedmineApiClient;
 import net.sf.redmine_mylyn.api.client.IRedmineApiWebHelper;
 import net.sf.redmine_mylyn.api.exception.RedmineApiAuthenticationException;
 import net.sf.redmine_mylyn.api.exception.RedmineApiErrorException;
 import net.sf.redmine_mylyn.api.exception.RedmineApiHttpStatusException;
+import net.sf.redmine_mylyn.common.logging.ILogService;
 import net.sf.redmine_mylyn.internal.api.parser.IModelParser;
 
 import org.apache.commons.httpclient.Credentials;
@@ -40,6 +44,10 @@ public abstract class AbstractClient implements IRedmineApiClient {
 	
 	protected final static String REDMINE_REALM = "Redmine API";
 
+	public final static String REDMINE_URL_LOGIN = "/login";
+
+	public final static String REDMINE_URL_LOGIN_CALLBACK = "/login?back_url=";
+
 	protected final HttpClient httpClient;
 	
 	protected final IRedmineApiWebHelper webHelper;
@@ -48,7 +56,11 @@ public abstract class AbstractClient implements IRedmineApiClient {
 	
 	protected String characterEncoding;
 	
+	private ILogService log;
+	
 	public AbstractClient(IRedmineApiWebHelper webHelper) {
+		log = RedmineApiPlugin.getDefault().getLogService(AbstractClient.class);
+		
 		this.webHelper = webHelper;
 		
 		MultiThreadedHttpConnectionManager connectionManager = new MultiThreadedHttpConnectionManager();
@@ -58,7 +70,6 @@ public abstract class AbstractClient implements IRedmineApiClient {
 	}
 
 	protected <T extends Object> T executeMethod(HttpMethodBase method, IModelParser<T> parser, IProgressMonitor monitor) throws RedmineApiErrorException {
-//		System.out.println("EXECUTE: " + method.getPath());
 		return executeMethod(method, parser, monitor, HttpStatus.SC_OK);
 	}
 	
@@ -78,8 +89,18 @@ public abstract class AbstractClient implements IRedmineApiClient {
 					msg += " : " + statusHeader.getValue().replace(""+HttpStatus.SC_INTERNAL_SERVER_ERROR, "").trim();
 				}
 				
-				
+				log.error(msg);
 				throw new RedmineApiHttpStatusException(sc, msg);
+			}
+			
+			//HTTP-Status 302 => login page
+			if(sc==HttpStatus.SC_MOVED_TEMPORARILY) {
+				Header respHeader = method.getResponseHeader(HEADER_REDIRECT);
+				if (respHeader != null && (respHeader.getValue().endsWith(REDMINE_URL_LOGIN) || respHeader.getValue().contains(REDMINE_URL_LOGIN_CALLBACK))) {
+
+					log.error("Redmine 'REST web service' not enabled or invalid CGI-Server configuration");
+					throw new RedmineApiHttpStatusException(sc, "Redmine 'REST web service' not enabled or invalid CGI-Server configuration");
+				}		
 			}
 
 			if (parser!=null && expectedSC != null) {
@@ -92,16 +113,16 @@ public abstract class AbstractClient implements IRedmineApiClient {
 						input.close();
 					}
 				} else {
-					System.out.println(sc);
-					//TODO
-//					String msg = Messages.AbstractRedmineClient_UNEXPECTED_RESPONSE_CODE;
-//					msg = String.format(msg, sc, method.getPath(), method.getName());
-//					IStatus status = new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, msg);
-//					StatusHandler.fail(status);
-//					throw new RedmineStatusException(status);
+					Header statusHeader = method.getResponseHeader(HEADER_STATUS);
+					String value = statusHeader==null ? ""+sc : statusHeader.getValue();
+
+					log.error("Unexpected status code - {0}", value);
+					throw new RedmineApiHttpStatusException(sc, "Unexpected status code - {0}", value);
 				}
 			}
 		} catch (IOException e) {
+			//TODO
+			log.error(e, "Execution of method failed -  {0}", e.getMessage());
 			throw new RedmineApiErrorException("Execution of method failed", e);
 		} finally {
 			method.releaseConnection();
@@ -141,6 +162,9 @@ public abstract class AbstractClient implements IRedmineApiClient {
 			}
 			
 			//Perform Method
+			String query = method.getQueryString();
+			log.debug("Execute HTTP {0}-Method {1} {2}", method.getName(), method.getPath(), query==null ? null : URLDecoder.decode(query, "UTF-8"));
+			
 			int sc = webHelper.execute(httpClient, hostConfiguration, method, monitor);
 			
 			//Update incorrect credentials
@@ -151,9 +175,14 @@ public abstract class AbstractClient implements IRedmineApiClient {
 			
 			return sc;
 		} catch (RuntimeException e) {
+			log.error(e, "Execution of method failed - unexpected RuntimeException {0}", e.getMessage());
 			throw new RedmineApiErrorException("Execution of method failed - unexpected RuntimeException", e);
+		} catch (ConnectException e) {
+			log.info("Execution of method failed - {0}", e.getMessage());
+			throw new RedmineApiErrorException(e.getMessage(), e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			//TODO
+			log.error(e, "Execution of method failed -  {0}", e.getMessage());
 			throw new RedmineApiErrorException("Execution of method failed", e);
 		}
 	}

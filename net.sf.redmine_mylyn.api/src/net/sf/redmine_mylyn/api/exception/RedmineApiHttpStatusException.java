@@ -6,7 +6,7 @@ public class RedmineApiHttpStatusException extends RedmineApiRemoteException {
 
 	private int statusCode;
 	
-	public RedmineApiHttpStatusException(int statusCode, String message, String... params) {
+	public RedmineApiHttpStatusException(int statusCode, String message, Object... params) {
 		super(message, params);
 		
 		this.statusCode = statusCode;

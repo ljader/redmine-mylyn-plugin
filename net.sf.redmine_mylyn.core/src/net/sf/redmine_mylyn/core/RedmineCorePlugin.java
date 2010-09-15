@@ -1,5 +1,9 @@
 package net.sf.redmine_mylyn.core;
 
+import java.text.MessageFormat;
+
+import net.sf.redmine_mylyn.common.logging.ILogService;
+import net.sf.redmine_mylyn.common.logging.LogServiceImpl;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
@@ -63,18 +67,16 @@ public class RedmineCorePlugin extends Plugin /*implements BundleActivator*/ {
 		return stateLocation.append("repositoryClientDataCache");
 	}
 
+	public ILogService getLogService(Class<?> clazz) {
+		return LogServiceImpl.getInstance(getBundle(), clazz);
+	}
+	
 	public static IStatus toStatus(Throwable e, String message) {
 		return new Status(IStatus.ERROR, PLUGIN_ID, message, e);
 	}
 
-	public static IStatus toStatus(Throwable e, String message, String... params) {
-		for (int i = 0; i < params.length; i++) {
-			message.replace("{"+i+"}", params[i]==null ? "<NULL>" : params[i]);
-		}
-		
-		//unused placeholders
-		message = message.replaceAll("\\{\\d+\\}", "");
-		
+	public static IStatus toStatus(Throwable e, String message, Object... params) {
+		message = MessageFormat.format(message, params);
 		return toStatus(e, message);
 	}
 

@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %Bundle-Name
+Bundle-SymbolicName: net.sf.redmine_mylyn.common;singleton:=true
+Bundle-Version: 0.1.0.qualifier
+Bundle-Vendor: %Bundle-Vendor
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Activator: net.sf.redmine_mylyn.common.RedmineCommonPlugin
+Import-Package:  org.eclipse.equinox.log;version="1.0.0",
+ org.osgi.service.log;version="1.3.0"
+Export-Package: net.sf.redmine_mylyn.common.logging;x-friends:="net.sf.redmine_mylyn.api,net.sf.redmine_mylyn.core,net.sf.redmine_mylyn.ui"
+Require-Bundle: org.eclipse.core.runtime;bundle-version="3.6.0",
+ org.slf4j.api;bundle-version="1.5.11",
+ ch.qos.logback.classic;bundle-version="0.9.19",
+ ch.qos.logback.core;bundle-version="0.9.19"
+Service-Component: OSGI-INF/logServiceComponent.xml, OSGI-INF/logWriterComponent.xml
+Bundle-ActivationPolicy: lazy
