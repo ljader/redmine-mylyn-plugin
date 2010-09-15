@@ -43,7 +43,7 @@ public class Client implements IClient {
 		try {
 			apiClient.updateConfiguration(monitor);
 		} catch (RedmineApiErrorException e) {
-			throw new RedmineStatusException(e);
+			throw new RedmineStatusException(e, "Update of configuration failed - {0}", e.getMessage());
 		}
 	}
 	

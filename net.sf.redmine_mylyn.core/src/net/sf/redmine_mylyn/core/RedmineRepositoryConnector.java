@@ -9,6 +9,7 @@ import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.Issue;
 import net.sf.redmine_mylyn.api.model.IssueStatus;
 import net.sf.redmine_mylyn.api.query.Query;
+import net.sf.redmine_mylyn.common.logging.ILogService;
 import net.sf.redmine_mylyn.core.client.IClient;
 import net.sf.redmine_mylyn.internal.core.RedmineAttachmentHandler;
 import net.sf.redmine_mylyn.internal.core.RedmineTaskMapper;
@@ -45,8 +46,11 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 	
 	private ClientManager clientManager;
 	
+	private ILogService log;
+	
 	public RedmineRepositoryConnector() {
 		taskDataHandler = new RedmineTaskDataHandler(this);
+		log = RedmineCorePlugin.getDefault().getLogService(getClass());
 		
 	}
 
@@ -288,8 +292,7 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 		try {
 			getClientManager().getClient(repository).updateConfiguration(monitor);
 		} catch (RedmineStatusException e) {
-			IStatus status = RedmineCorePlugin.toStatus(e, "Update of configuration failed");
-			throw new CoreException(status);
+			throw new CoreException(e.getStatus());
 		}
 	}
 
