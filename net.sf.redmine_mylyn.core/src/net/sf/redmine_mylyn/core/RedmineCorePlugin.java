@@ -1,22 +1,14 @@
 package net.sf.redmine_mylyn.core;
 
-import net.sf.redmine_mylyn.common.logging.ILogService;
-import net.sf.redmine_mylyn.common.logging.NullLogService;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.mylyn.commons.core.StatusHandler;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
-import org.osgi.service.log.LogEntry;
-import org.osgi.service.log.LogListener;
-import org.osgi.service.log.LogReaderService;
-import org.osgi.service.log.LogService;
 
-public class RedmineCorePlugin extends Plugin implements LogListener /*implements BundleActivator*/ {
+public class RedmineCorePlugin extends Plugin /*implements BundleActivator*/ {
 
 	private static BundleContext context;
 
@@ -27,12 +19,6 @@ public class RedmineCorePlugin extends Plugin implements LogListener /*implement
 	private static RedmineCorePlugin plugin;
 	
 	private RedmineRepositoryConnector connector;
-	
-	private ServiceReference logServiceReference;
-	private LogService logService;
-	
-	private ServiceReference logReaderServiceReference;
-	private LogReaderService logReaderService;
 	
 	static BundleContext getContext() {
 		return context;
@@ -48,17 +34,6 @@ public class RedmineCorePlugin extends Plugin implements LogListener /*implement
 		
 		RedmineCorePlugin.context = bundleContext;
 		plugin = this;
-		
-		logServiceReference = context.getServiceReference(LogService.class.getName());
-		if(logServiceReference!=null) {
-			logService = (LogService)context.getService(logServiceReference);
-		}
-
-		logReaderServiceReference = context.getServiceReference(LogReaderService.class.getName());
-		if(logReaderServiceReference!=null) {
-			logReaderService = (LogReaderService)context.getService(logReaderServiceReference);
-			logReaderService.addLogListener(this);
-		}
 	}
 
 	/*
@@ -67,15 +42,6 @@ public class RedmineCorePlugin extends Plugin implements LogListener /*implement
 	 */
 	@Override
 	public void stop(BundleContext bundleContext) throws Exception {
-		if (logReaderServiceReference!=null) {
-			logReaderService.removeLogListener(this);
-			context.ungetService(logReaderServiceReference);
-		}
-
-		if (logServiceReference!=null) {
-			context.ungetService(logServiceReference);
-		}
-		
 		if(connector!=null) {
 			connector.getClientManager().writeCache();
 		}
@@ -84,20 +50,6 @@ public class RedmineCorePlugin extends Plugin implements LogListener /*implement
 		super.stop(bundleContext);
 	}
 
-	@Override
-	public void logged(LogEntry entry) {
-		int severity = entry.getLevel()==LogService.LOG_ERROR ? IStatus.ERROR : IStatus.INFO;
-		
-		IStatus status = new Status(severity, entry.getBundle().getSymbolicName(), entry.getMessage(), entry.getException());
-		if (entry.getLevel()==LogService.LOG_ERROR) {
-			StatusHandler.fail(status);
-		} else {
-			StatusHandler.log(status);
-		}
-		
-		//TODO logfile
-	}
-	
 	public static RedmineCorePlugin getDefault() {
 		return plugin;
 	}
@@ -111,13 +63,6 @@ public class RedmineCorePlugin extends Plugin implements LogListener /*implement
 		return stateLocation.append("repositoryClientDataCache");
 	}
 
-	public ILogService getLogService(Class<?> clazz) {
-		if (logService!=null) {
-			return new net.sf.redmine_mylyn.common.logging.LogServiceOsgiImpl(logService);
-		}
-		return new NullLogService();
-	}
-	
 	public static IStatus toStatus(Throwable e, String message) {
 		return new Status(IStatus.ERROR, PLUGIN_ID, message, e);
 	}
