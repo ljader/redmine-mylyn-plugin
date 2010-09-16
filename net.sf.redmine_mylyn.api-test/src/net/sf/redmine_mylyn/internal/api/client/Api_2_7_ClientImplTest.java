@@ -426,7 +426,11 @@ public class Api_2_7_ClientImplTest {
 						}
 
 						//Repsonse Header
-						respStream.write(responseHeader.getBytes());
+						if(request.contains("/mylyn/token")) {
+							respStream.write(RESPONSE_HEADER_OK.getBytes());
+						} else {
+							respStream.write(responseHeader.getBytes());
+						}
 
 						//Repsonse Body
 						InputStream responseStream = getClass().getResourceAsStream(responseResourcePath);
