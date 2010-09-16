@@ -31,8 +31,8 @@ public class RedmineApiPlugin extends Plugin {
 		return plugin;
 	}
 
-	public ILogService getLogService(Class<?> clazz) {
-		return LogServiceImpl.getInstance(getBundle(), clazz);
+	public static ILogService getLogService(Class<?> clazz) {
+		return plugin==null ? LogServiceImpl.getInstance() : LogServiceImpl.getInstance(plugin.getBundle(), clazz);
 	}
 
 }

@@ -59,7 +59,7 @@ public abstract class AbstractClient implements IRedmineApiClient {
 	private ILogService log;
 	
 	public AbstractClient(IRedmineApiWebHelper webHelper) {
-		log = RedmineApiPlugin.getDefault().getLogService(AbstractClient.class);
+		log = RedmineApiPlugin.getLogService(AbstractClient.class);
 		
 		this.webHelper = webHelper;
 		
