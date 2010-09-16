@@ -304,7 +304,7 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 			
 			PutMethod method = new PutMethod(String.format(URL_UPDATE_ISSUE, issue.getId()));
 			method.setRequestEntity(new IssueRequestEntity(issue, comment, timeEntry));
-			response = executeMethod(method, submitIssueParser, monitor, HttpStatus.SC_CREATED, HttpStatus.SC_UNPROCESSABLE_ENTITY);
+			response = executeMethod(method, submitIssueParser, monitor, HttpStatus.SC_OK, HttpStatus.SC_UNPROCESSABLE_ENTITY);
 		} catch (UnsupportedEncodingException e) {
 			throw new RedmineApiErrorException("Execution of method failed - Invalid encoding {}", e, "UTF-8");
 		} finally {
