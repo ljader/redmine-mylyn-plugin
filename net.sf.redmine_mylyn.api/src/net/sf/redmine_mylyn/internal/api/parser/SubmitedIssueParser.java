@@ -35,6 +35,10 @@ public class SubmitedIssueParser implements IModelParser<Object> {
 	
 	@Override
 	public Object parseResponse(InputStream input, int sc) throws RedmineApiErrorException {
+		if(sc==HttpStatus.SC_OK) {
+			return null;
+		}
+		
 		try {
 			JaxbParser<?> parser = successParser;
 			if (sc==HttpStatus.SC_UNPROCESSABLE_ENTITY) {

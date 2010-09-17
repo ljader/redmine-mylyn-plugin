@@ -286,7 +286,7 @@ public class Api_2_7_ClientImplTest {
 	@Test
 	public void testUpdateIssue() throws Exception {
 		server.responseHeader = RESPONSE_HEADER_OK;
-		server.responseResourcePath = RESOURCE_FILE_SUBMIT_NEW;
+		server.responseResourcePath = null;
 		
 		testee.updateIssue(TestData.issue2, "noContent", TestData.issue2.getTimeEntries().getAll().get(0), errorCollector, monitor);
 		assertEquals(0, errorCollector.lst.size());
@@ -433,16 +433,18 @@ public class Api_2_7_ClientImplTest {
 						}
 
 						//Repsonse Body
-						InputStream responseStream = getClass().getResourceAsStream(responseResourcePath);
-						if(responseStream!=null) {
-							try {
-								int read = -1;
-								byte[] buffer = new byte[4096];
-								while((read=responseStream.read(buffer, 0, 4096))>-1) {
-									respStream.write(buffer, 0, read);
+						if(responseResourcePath!=null) {
+							InputStream responseStream = getClass().getResourceAsStream(responseResourcePath);
+							if(responseStream!=null) {
+								try {
+									int read = -1;
+									byte[] buffer = new byte[4096];
+									while((read=responseStream.read(buffer, 0, 4096))>-1) {
+										respStream.write(buffer, 0, read);
+									}
+								} finally {
+									responseStream.close();
 								}
-							} finally {
-								responseStream.close();
 							}
 						}
 						
