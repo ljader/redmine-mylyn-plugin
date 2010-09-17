@@ -24,14 +24,6 @@ public class LogWriter implements LogListener {
 	
 	protected ILoggerFactory loggerFactory;
 
-	public LogWriter() {
-		loggerFactory = LoggerFactory.getILoggerFactory();
-		
-		if(loggerFactory instanceof LoggerContext) {
-			configureLogback((LoggerContext)loggerFactory);
-		}
-	}
-	
 	public synchronized void setLogReaderService(LogReaderService logReaderService) {
 		this.logReaderService = logReaderService;
 		logReaderService.addLogListener(this);
@@ -44,23 +36,26 @@ public class LogWriter implements LogListener {
 		}
 	}
 
-	private void configureLogback(LoggerContext ctx) {
-		IPath path = RedmineCommonPlugin.getDefault().getLogFilePath();
+	private void configureLogback() {
+		loggerFactory = LoggerFactory.getILoggerFactory();
 		
-		
-		try {
-			JoranConfigurator configurator = new JoranConfigurator();
-			configurator.setContext(ctx);
+		if (loggerFactory instanceof LoggerContext) {
+			LoggerContext ctx = (LoggerContext)loggerFactory;
+			IPath path = RedmineCommonPlugin.getDefault().getLogFilePath();
 			
-			ctx.reset();
-			ctx.putProperty("rmc.logfile", path.toString());
-			
-			configurator.doConfigure(getClass().getResourceAsStream("/logback.xml"));
-		} catch (JoranException e) {
-			ILogService logService = LogServiceImpl.getInstance(RedmineCommonPlugin.getDefault().getBundle(), LogWriter.class);
-			logService.error(e, "Logback configuration failed");
+			try {
+				JoranConfigurator configurator = new JoranConfigurator();
+				configurator.setContext(ctx);
+				
+				ctx.reset();
+				ctx.putProperty("rmc.logfile", path.toString());
+				
+				configurator.doConfigure(getClass().getResourceAsStream("/logback.xml"));
+			} catch (JoranException e) {
+				ILogService logService = LogServiceImpl.getInstance(RedmineCommonPlugin.getDefault().getBundle(), LogWriter.class);
+				logService.error(e, "Logback configuration failed");
+			}
 		}
-		
 	}
 	
 	@Override
@@ -71,6 +66,10 @@ public class LogWriter implements LogListener {
 	}
 	
 	private void writeLog(LogEntry entry) {
+		if(loggerFactory==null) {
+			configureLogback();
+		}
+		
 		String loggerName = null;
 		if(entry instanceof ExtendedLogEntry) {
 			loggerName = ((ExtendedLogEntry)entry).getLoggerName();

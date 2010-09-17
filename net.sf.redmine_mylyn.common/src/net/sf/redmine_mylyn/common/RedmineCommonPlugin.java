@@ -1,7 +1,9 @@
 package net.sf.redmine_mylyn.common;
 
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
 public class RedmineCommonPlugin extends Plugin {
@@ -12,8 +14,14 @@ public class RedmineCommonPlugin extends Plugin {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-
+		
 		plugin = this;
+
+		Bundle logBundle = Platform.getBundle("org.eclipse.equinox.log");
+		if (logBundle.getState()==Bundle.RESOLVED) {
+			logBundle.start();
+		}
+
 	}
 
 	@Override
