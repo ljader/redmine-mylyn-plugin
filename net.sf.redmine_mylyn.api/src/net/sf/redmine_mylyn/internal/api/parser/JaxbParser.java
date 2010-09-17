@@ -52,7 +52,7 @@ public class JaxbParser<T extends Object> {
 			
 			return clazz.cast(obj);
 			
-		} catch (Exception e) {
+		} catch (JAXBException e) {
 			throw new RedmineApiErrorException("Parsing of InputStream failed", e);
 		}
 	}

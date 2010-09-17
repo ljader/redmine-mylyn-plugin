@@ -163,7 +163,11 @@ public abstract class AbstractClient implements IRedmineApiClient {
 			
 			//Perform Method
 			String query = method.getQueryString();
-			log.debug("Execute HTTP {0}-Method {1} {2}", method.getName(), method.getPath(), query==null ? null : URLDecoder.decode(query, "UTF-8"));
+			if(query==null) {
+				log.debug("Execute HTTP {0}-Method {1}", method.getName(), method.getPath());
+			} else {
+				log.debug("Execute HTTP {0}-Method {1} {2}", method.getName(), method.getPath(), URLDecoder.decode(query, "UTF-8"));
+			}
 			
 			int sc = webHelper.execute(httpClient, hostConfiguration, method, monitor);
 			
