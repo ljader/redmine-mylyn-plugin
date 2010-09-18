@@ -8,7 +8,7 @@ import java.util.EnumSet;
 import net.sf.redmine_mylyn.api.model.Issue;
 
 public enum RedmineApiIssueProperty {
-	SUBJECT, DESCRIPTION, ASSIGNED_TO, CATEGORY, DONE_RATIO, DUE_DATE, ESTIMATED_HOURS, FIXED_VERSION, PARENT, PRIORITY, PROJECT, START_DATE, STATUS, TRACKER;
+	SUBJECT, DESCRIPTION, ASSIGNED_TO, CATEGORY, DONE_RATIO, DUE_DATE, ESTIMATED_HOURS, FIXED_VERSION, PARENT("parent_issue_id"), PRIORITY, PROJECT, START_DATE, STATUS, TRACKER;
 	
 	private static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 	
@@ -17,6 +17,13 @@ public enum RedmineApiIssueProperty {
 	private static EnumSet<RedmineApiIssueProperty> DATE = EnumSet.of(START_DATE, DUE_DATE);
 	
 	private String submitKey;
+	
+	private RedmineApiIssueProperty() {
+	}
+	
+	private RedmineApiIssueProperty(String submitKey) {
+		this.submitKey = submitKey;
+	}
 	
 	public String getSubmitKey() {
 		if (submitKey==null) {
