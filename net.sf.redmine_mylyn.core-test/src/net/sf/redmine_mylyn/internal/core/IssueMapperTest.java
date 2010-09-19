@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -15,6 +16,7 @@ import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.CustomValue;
 import net.sf.redmine_mylyn.api.model.Issue;
 import net.sf.redmine_mylyn.api.model.Journal;
+import net.sf.redmine_mylyn.api.model.Settings;
 import net.sf.redmine_mylyn.api.model.TimeEntry;
 import net.sf.redmine_mylyn.api.model.container.CustomValues;
 import net.sf.redmine_mylyn.core.IRedmineConstants;
@@ -158,6 +160,21 @@ public class IssueMapperTest {
 		fail("Not finished yet implemented");
 	}
 
+	@Test
+	public void testUpdateTaskData_withoutProgress() throws Exception {
+		Field f = Settings.class.getDeclaredField("useIssueDoneRatio");
+		f.setAccessible(true);
+		f.setBoolean(cfg.getSettings(), false);
+		
+		Issue issue = TestData.issue2;
+		TaskData taskData = buildEmptyTaskData(issue);
+		
+		TaskAttribute root = taskData.getRoot();
+		IssueMapper.updateTaskData(repository, taskData, cfg, issue);
+
+		assertEquals("", root.getAttribute(RedmineAttribute.PROGRESS.getTaskKey()).getValue());
+	}
+	
 	@Test
 	public void testUpdateTaskData_empty() throws Exception{
 		Issue issue = new Issue();

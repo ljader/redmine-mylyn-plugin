@@ -19,8 +19,8 @@ import net.sf.redmine_mylyn.core.RedmineAttribute;
 import net.sf.redmine_mylyn.core.RedmineCorePlugin;
 import net.sf.redmine_mylyn.core.RedmineOperation;
 import net.sf.redmine_mylyn.core.RedmineRepositoryConnector;
-import net.sf.redmine_mylyn.core.RedmineUtil;
 import net.sf.redmine_mylyn.core.RedmineTaskTimeEntryMapper;
+import net.sf.redmine_mylyn.core.RedmineUtil;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
@@ -47,8 +47,10 @@ public class IssueMapper {
 					try {
 						setValue(taskAttribute, field.get(issue));
 					} catch (Exception e) {
+						IStatus status = RedmineCorePlugin.toStatus(e, "Reading of property {0} failed - Should never happen", redmineAttribute.name());
 						ILogService log = RedmineCorePlugin.getDefault().getLogService(IssueMapper.class);
-						log.error(e, "Reading of property {0} failed - Should never happen", redmineAttribute.name());
+						log.error(e, status.getMessage());
+						throw new CoreException(status);
 					}
 				}
 			}
@@ -251,6 +253,8 @@ public class IssueMapper {
 	private static void setValue(TaskAttribute attribute, String value) {
 		if(value==null) {
 			attribute.setValue("");
+		} else if(attribute.getMetaData().getType()==null) {
+			attribute.setValue(value);
 		} else if(attribute.getMetaData().getType().equals(TaskAttribute.TYPE_BOOLEAN)) {
 			attribute.setValue(RedmineUtil.parseBoolean(value).toString());
 		} else if(attribute.getMetaData().getType().equals(TaskAttribute.TYPE_DATE) || attribute.getMetaData().getType().equals(TaskAttribute.TYPE_DATETIME)) {
@@ -270,14 +274,16 @@ public class IssueMapper {
 	}
 	
 	private static void setValue(TaskAttribute attribute, int value) {
-		if((attribute.getMetaData().getType().equals(TaskAttribute.TYPE_SINGLE_SELECT) || attribute.getId().equals(RedmineAttribute.PARENT.getTaskKey())) && value<1) {
+		if (attribute.getId().equals(RedmineAttribute.PROGRESS.getTaskKey()) && attribute.getMetaData().getType()==null) {
+			attribute.setValue("");
+		} else if((attribute.getMetaData().getType()!=null && attribute.getMetaData().getType().equals(TaskAttribute.TYPE_SINGLE_SELECT) || attribute.getId().equals(RedmineAttribute.PARENT.getTaskKey())) && value<1) {
 			attribute.setValue("");
 		} else {
 			attribute.setValue(""+value);
 		}
 	}
 	
-	private static void setProperty(RedmineAttribute redmineAttribute, TaskAttribute root, Issue issue) {
+	private static void setProperty(RedmineAttribute redmineAttribute, TaskAttribute root, Issue issue) throws CoreException {
 		Field field = redmineAttribute.getAttributeField();
 		if(!redmineAttribute.isReadOnly() && field!=null) {
 			TaskAttribute taskAttribute = root.getAttribute(redmineAttribute.getTaskKey());
@@ -307,8 +313,10 @@ public class IssueMapper {
 						}
 					}
 				} catch (Exception e) {
+					IStatus status = RedmineCorePlugin.toStatus(e, "Reading of property {0} failed - Should never happen", redmineAttribute.name());
 					ILogService log = RedmineCorePlugin.getDefault().getLogService(IssueMapper.class);
-					log.error(e, "Setting of property {0} failed - Should never happen", redmineAttribute.name());
+					log.error(e, status.getMessage());
+					throw new CoreException(status);
 				}
 			}
 		}
