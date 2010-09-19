@@ -10,8 +10,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXSource;
 
+import net.sf.redmine_mylyn.api.RedmineApiPlugin;
 import net.sf.redmine_mylyn.api.exception.RedmineApiErrorException;
 import net.sf.redmine_mylyn.api.exception.RedmineApiRemoteException;
+import net.sf.redmine_mylyn.common.logging.ILogService;
 
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -31,6 +33,8 @@ public class JaxbParser<T extends Object> {
 	
 	protected SAXParserFactory parserFactory;
 	
+	private ILogService log;
+	
 	JaxbParser(Class<T> modelClass) {
 		this(modelClass, new Class<?>[0]);
 	}
@@ -42,6 +46,8 @@ public class JaxbParser<T extends Object> {
 		
 		parserFactory = SAXParserFactory.newInstance();
 		parserFactory.setNamespaceAware(true);
+		
+		log = RedmineApiPlugin.getLogService(JaxbParser.class);
 	}
 	
 	public T parseInputStream(InputStream stream) throws RedmineApiErrorException {
@@ -52,9 +58,13 @@ public class JaxbParser<T extends Object> {
 			return parseInputStream(source);
 			
 		} catch (ParserConfigurationException e) {
-			throw new RedmineApiErrorException("Parsing of InputStream failed (Configuration error)- {0}", e.getMessage(), e);
+			RedmineApiErrorException exc = new RedmineApiErrorException("Parsing of InputStream failed (Configuration error)- {0}", e.getMessage(), e);
+			log.error(e, exc.getMessage());
+			throw exc;
 		} catch (SAXException e) {
-			throw new RedmineApiErrorException("Parsing of InputStream failed - {0}", e.getMessage(), e);
+			RedmineApiErrorException exc = new RedmineApiErrorException("Parsing of InputStream failed - {0}", e.getMessage(), e);
+			log.error(e, exc.getMessage());
+			throw exc;
 		}
 	}
 	public T parseInputStream(SAXSource source) throws RedmineApiErrorException {
@@ -65,10 +75,14 @@ public class JaxbParser<T extends Object> {
 			return clazz.cast(obj);
 			
 		} catch (JAXBException e) {
+			e.printStackTrace();
 			if (e.getLinkedException() instanceof RedmineApiRemoteException) {
 				throw (RedmineApiRemoteException)e.getLinkedException();
 			}
-			throw new RedmineApiErrorException("Parsing of InputStream failed", e);
+
+			RedmineApiErrorException exc = new RedmineApiErrorException("Parsing of InputStream failed", e);
+			log.error(e, exc.getMessage());
+			throw exc;
 		}
 	}
 	
