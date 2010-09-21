@@ -1,5 +1,6 @@
 package net.sf.redmine_mylyn.core;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Set;
@@ -24,6 +25,7 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.mylyn.commons.core.StatusHandler;
 import org.eclipse.mylyn.commons.net.Policy;
+import org.eclipse.mylyn.internal.tasks.core.TaskTask;
 import org.eclipse.mylyn.tasks.core.AbstractRepositoryConnector;
 import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
 import org.eclipse.mylyn.tasks.core.ITask;
@@ -195,6 +197,23 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 	}
 	
 	@Override
+	public boolean canSynchronizeTask(TaskRepository taskRepository, ITask task) {
+		//WORKAROUND: http://sourceforge.net/tracker/index.php?func=detail&aid=3069723&group_id=228995&atid=1075435
+		if (!task.getConnectorKind().equals("redmine")) {
+			if(task instanceof TaskTask) {
+				try {
+					Field f = TaskTask.class.getDeclaredField("connectorKind");
+					f.setAccessible(true);
+					f.set(task, RedmineCorePlugin.REPOSITORY_KIND);
+				} catch (Exception e) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+	
+	@Override
 	public IStatus performQuery(TaskRepository repository, IRepositoryQuery repositoryQuery, TaskDataCollector collector, ISynchronizationSession session, IProgressMonitor monitor) {
 		
 		try {
@@ -217,6 +236,7 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 
 				//TODO mark only new or changed taks partial
 				taskData.setPartial(true);
+				
 				collector.accept(taskData);
 			}
 			
