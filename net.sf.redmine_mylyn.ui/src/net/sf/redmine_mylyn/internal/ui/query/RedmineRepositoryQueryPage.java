@@ -264,20 +264,10 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 		if (visible) {
 			Display.getDefault().asyncExec(new Runnable() {
 				public void run() {
-					//TODO async initial ???
-//					if (data == null) {
-//						if (getControl() != null && !getControl().isDisposed()) {
-						RedmineRepositoryQueryPage.this.updateAttributesFromRepository(false);
-//						}
-//					}
-	
-					if (RedmineRepositoryQueryPage.this.query != null && RedmineRepositoryQueryPage.this.query.getUrl() != null) {
-						RedmineRepositoryQueryPage.this.restoreQuery(RedmineRepositoryQueryPage.this.query);
-					} else {
-						//TODO check
-//						projectViewer.setSelection(new StructuredSelection(PROJECT_SELECT_TITLE));
-//						storedQueryViewer.setInput(new String[]{QUERY_SELECT_TITLE});
-//						storedQueryViewer.setSelection(new StructuredSelection(QUERY_SELECT_TITLE));
+					updateAttributesFromRepository(false);
+
+					if (query != null && query.getUrl() != null) {
+						restoreQuery(RedmineRepositoryQueryPage.this.query);
 					}
 				}
 			});
@@ -285,34 +275,32 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 	}
 
 	private void updateAttributesFromRepository(final boolean force) {
-
-		if (force /*|| !client.hasAttributes()*/) {
-			try {
-				IRunnableWithProgress runnable = new IRunnableWithProgress() {
-					public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-						try {
-							RedmineRepositoryQueryPage.this.connector.updateRepositoryConfiguration(getTaskRepository(), monitor);
-						} catch (CoreException e) {
-							StatusHandler.log(e.getStatus());
-							throw new InvocationTargetException(e, e.getMessage());
+		try {
+			IRunnableWithProgress runnable = new IRunnableWithProgress() {
+				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+					try {
+						if (force || connector.isRepositoryConfigurationStale(getTaskRepository(), monitor)) {
+							connector.updateRepositoryConfiguration(getTaskRepository(), monitor);
 						}
+					} catch (CoreException e) {
+						throw new InvocationTargetException(e, "Updating of attributes failed");
 					}
-				};
-	
-				if (getContainer() != null) {
-					getContainer().run(true, true, runnable);
-				} else if (getSearchContainer() != null) {
-					getSearchContainer().getRunnableContext().run(true, true, runnable);
-				} else {
-					IProgressService service = PlatformUI.getWorkbench().getProgressService();
-					service.busyCursorWhile(runnable);
 				}
-			} catch (InvocationTargetException e) {
-				setErrorMessage(e.getMessage());
-				return;
-			} catch (InterruptedException e) {
-				return;
+			};
+
+			if (getContainer() != null) {
+				getContainer().run(true, true, runnable);
+			} else if (getSearchContainer() != null) {
+				getSearchContainer().getRunnableContext().run(true, true, runnable);
+			} else {
+				IProgressService service = PlatformUI.getWorkbench().getProgressService();
+				service.busyCursorWhile(runnable);
 			}
+		} catch (InvocationTargetException e) {
+			setErrorMessage(e.getMessage());
+			return;
+		} catch (InterruptedException e) {
+			return;
 		}
 
 //		/* Projects */
