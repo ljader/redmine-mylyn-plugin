@@ -28,6 +28,7 @@ import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StructuredViewer;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.mylyn.commons.core.StatusHandler;
 import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
@@ -241,6 +242,20 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 				}
 			}
 		});
+
+		/* Move button into buttonbar */
+		if(getContainer() instanceof WizardDialog) {
+			WizardDialog dialog = (WizardDialog)getContainer();
+
+			if(dialog.buttonBar instanceof Composite) {
+				Composite buttonBar = (Composite)dialog.buttonBar;
+				((GridLayout) buttonBar.getLayout()).numColumns++;
+				
+				updateButton.setParent(buttonBar);
+				updateButton.moveAbove(buttonBar.getChildren()[buttonBar.getChildren().length-2]);
+			}
+		}
+
 	}
 
 	@Override
