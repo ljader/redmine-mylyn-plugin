@@ -369,7 +369,7 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 			parts[3] = new FilePart("attachments[1][file]", new AttachmentPartSource(attachment, content), attachment.getContentType(), characterEncoding);
 			method.setRequestEntity(new MultipartRequestEntity(parts, method.getParams()));
 			
-			response = executeMethod(method, submitIssueParser, monitor, HttpStatus.SC_CREATED, HttpStatus.SC_UNPROCESSABLE_ENTITY);
+			response = executeMethod(method, submitIssueParser, monitor, HttpStatus.SC_OK, HttpStatus.SC_UNPROCESSABLE_ENTITY);
 		} finally {
 			if(monitor.isCanceled()) {
 				throw new OperationCanceledException();
