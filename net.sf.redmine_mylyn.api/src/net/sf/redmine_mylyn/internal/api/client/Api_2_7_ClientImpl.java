@@ -366,7 +366,12 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 				((StringPart)parts[i]).setContentType(null);
 			}
 			
-			parts[3] = new FilePart("attachments[1][file]", new AttachmentPartSource(attachment, content), attachment.getContentType(), characterEncoding);
+			parts[3] = new FilePart("attachments[1][file]", new AttachmentPartSource(attachment, content), attachment.getContentType(), null) {
+				//Workaround: avoid 'Content-Type image/png; charset=iso8859-1'
+				public String getCharSet() {
+					return null;
+				};
+			};
 			method.setRequestEntity(new MultipartRequestEntity(parts, method.getParams()));
 			
 			response = executeMethod(method, submitIssueParser, monitor, HttpStatus.SC_OK, HttpStatus.SC_UNPROCESSABLE_ENTITY);
