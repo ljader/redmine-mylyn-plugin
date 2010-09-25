@@ -54,7 +54,7 @@ public abstract class AbstractClient implements IRedmineApiClient {
 	
 	protected URL url;
 	
-	protected String characterEncoding;
+	protected String characterEncoding = "UTF-8";
 	
 	private ILogService log;
 	
