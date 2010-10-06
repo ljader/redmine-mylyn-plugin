@@ -3,15 +3,19 @@ package net.sf.redmine_mylyn.internal.ui.query;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import net.sf.redmine_mylyn.api.exception.RedmineApiErrorException;
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.CustomField;
 import net.sf.redmine_mylyn.api.model.Project;
+import net.sf.redmine_mylyn.api.model.Tracker;
+import net.sf.redmine_mylyn.api.query.CompareOperator;
 import net.sf.redmine_mylyn.api.query.IQueryField;
 import net.sf.redmine_mylyn.api.query.Query;
 import net.sf.redmine_mylyn.api.query.QueryField;
@@ -25,7 +29,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ListViewer;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -43,11 +51,16 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.IProgressService;
 
@@ -128,8 +141,18 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 		LayoutHelper.placeListElements(itemComposite, 4, queryStructuredViewer, searchOperators);
 
 		/* Project-Listener */
-		queryStructuredViewer.get(QueryField.PROJECT).addSelectionChangedListener(new ProjectSelectionListener(this));
-		searchOperators.get(QueryField.PROJECT).addSelectionChangedListener(new ProjectOperatorSelectionListener(this));
+		ProjectSelectionListener projectListener = new ProjectSelectionListener(this);
+		queryStructuredViewer.get(QueryField.PROJECT).addSelectionChangedListener(projectListener);
+		searchOperators.get(QueryField.PROJECT).addSelectionChangedListener(projectListener);
+
+		ISelectionChangedListener listener = new ISelectionChangedListener() {
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				switchOperatorState();
+			}
+		};
+		queryStructuredViewer.get(QueryField.TRACKER).addSelectionChangedListener(listener);
+		searchOperators.get(QueryField.TRACKER).addSelectionChangedListener(listener);
 
 		/* Configure Scroll-Composite */
 		pageScroll.setContent(pageComposite);
@@ -160,10 +183,9 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 
 	private void createItemGroup(Composite parent) {
 		
-		for (QueryField queryField : QueryField.ORDERED) {
-			Control control = createInputControl(parent, queryField, queryField);
-			ComboViewer combo = createOperatorComboViewer(parent, queryField, queryField);
-			combo.addSelectionChangedListener(new CompareOperatorSelectionListener(control));
+		for (final QueryField queryField : QueryField.ORDERED) {
+			createInputControl(parent, queryField, queryField);
+			createOperatorComboViewer(parent, queryField, queryField);
 		}
 	}
 	
@@ -173,9 +195,8 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 			if(!customField.isFilter() || queryField==null)
 				continue;
 
-			Control control = createInputControl(parent, queryField, customField);
-			ComboViewer combo = createOperatorComboViewer(parent, queryField, customField);
-			combo.addSelectionChangedListener(new CompareOperatorSelectionListener(control));
+			createInputControl(parent, queryField, customField);
+			createOperatorComboViewer(parent, queryField, customField);
 			
 			customFields.add(customField);
 		}
@@ -211,7 +232,7 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 		return control;
 	}
 
-	private ComboViewer createOperatorComboViewer(Composite parent, QueryField definition, IQueryField queryField) {
+	private ComboViewer createOperatorComboViewer(Composite parent, QueryField definition, final IQueryField queryField) {
 		ComboViewer combo = new ComboViewer(parent, SWT.READ_ONLY | SWT.DROP_DOWN);
 
 		String defaultValue = definition.isRequired() ? null : "Disabled";
@@ -220,8 +241,39 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 		combo.setInput(definition.getCompareOperators());
 		combo.setSelection(new StructuredSelection(combo.getElementAt(0)));
 		
+		combo.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				setQueryFieldValueControlEnabled(queryField);
+			}
+		});
+		
 		searchOperators.put(queryField, combo);
 		return combo;
+	}
+	
+	private void setQueryFieldEnabled(IQueryField queryField, boolean enabled){
+		searchOperators.get(queryField).getControl().setEnabled(enabled);
+		setQueryFieldValueControlEnabled(queryField);
+	}
+	
+	private void setQueryFieldValueControlEnabled(IQueryField queryField) {
+		ComboViewer comboViewer = searchOperators.get(queryField);
+		boolean enabled = comboViewer.getControl().isEnabled();
+
+		Control corresponding = queryText.get(queryField);
+		if(corresponding==null) {
+			corresponding = queryStructuredViewer.get(queryField).getControl();
+		}
+		
+		if (enabled && comboViewer.getSelection() instanceof IStructuredSelection) {
+			IStructuredSelection selection = (IStructuredSelection)comboViewer.getSelection();
+
+			Object selected = selection.getFirstElement();
+			corresponding.setEnabled(selected instanceof CompareOperator && ((CompareOperator)selected).isValueBased());
+		} else {
+			corresponding.setEnabled(false);
+		}
 	}
 	
 	protected void createUpdateButton(final Composite parent) {
@@ -400,6 +452,71 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 		}
 	}
 	
+	HashSet<Integer> abc(Project project) {
+		HashSet<Integer> collectedCustomFieldIds = null;
+		
+		if(project!=null) {
+			ISelection selection = searchOperators.get(QueryField.TRACKER).getSelection();
+			if(selection!=null && !selection.isEmpty()) {
+				Object operator = ((StructuredSelection)selection).getFirstElement();
+				selection = queryStructuredViewer.get(QueryField.TRACKER).getSelection();
+				
+				collectedCustomFieldIds = new HashSet<Integer>();
+				
+				//Collect CustomFields for the selected Project and all selected Trackers
+				if(operator==CompareOperator.IS) {
+					if (selection!=null && !selection.isEmpty()) {
+						for (Object o : ((StructuredSelection)selection).toList()) {
+							if(o instanceof Tracker) {
+								for (int cfId :  project.getCustomFieldIdsByTrackerId(((Tracker)o).getId())) {
+									collectedCustomFieldIds.add(cfId);
+								}
+							}
+						}
+					}
+				}
+				
+				//Collect CustomFields for the selected Project
+				else { 
+					for(int trackerId : project.getTrackerIds()) {
+						for(int cfId : project.getCustomFieldIdsByTrackerId(trackerId)) {
+							collectedCustomFieldIds.add(cfId);
+						}
+					}
+					
+					//...excepting CutomFields for all selected Trackers
+					if (operator==CompareOperator.IS_NOT && selection!=null && !selection.isEmpty()) {
+						for (Object o : ((StructuredSelection)selection).toList()) {
+							if(o instanceof Tracker) {
+								int[] toRemove = project.getCustomFieldIdsByTrackerId(((Tracker)o).getId());
+								for (int i : toRemove) {
+									collectedCustomFieldIds.remove(i);
+								}
+							}
+						}
+					}
+					
+				}
+				
+			}
+		}
+		
+		return collectedCustomFieldIds;
+	}
+	
+	Project getSelectedProject() {
+		ISelection selection = searchOperators.get(QueryField.PROJECT).getSelection();
+		if(selection!=null && !selection.isEmpty() && ((StructuredSelection)selection).getFirstElement()==CompareOperator.IS) {
+			
+			selection = queryStructuredViewer.get(QueryField.PROJECT).getSelection();
+			if(selection instanceof StructuredSelection && !selection.isEmpty()) {
+				return (Project)((StructuredSelection)selection).getFirstElement();
+			}
+			
+		}
+		return null;
+	}
+	
 	private void restoreQuery(IRepositoryQuery repositoryQuery) {
 		titleText.setText(repositoryQuery.getSummary());
 		Query query = null;
@@ -437,42 +554,53 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 	 * Deselect / clear all Settings / Attributes
 	 */
 	void clearSettings() {
-		clearListSettings(searchOperators, queryStructuredViewer);
-		clearTextSettings(searchOperators, queryText);
+//		clearListSettings(searchOperators, queryStructuredViewer);
+//		clearTextSettings(searchOperators, queryText);
 	}
 	
-	private void clearListSettings(Map<IQueryField, ComboViewer> operatorCombo, Map<IQueryField, StructuredViewer> valueViewer) {
-		for (Entry<IQueryField, StructuredViewer> entry : valueViewer.entrySet()) {
-			if(entry.getKey()!=QueryField.PROJECT) {
-				entry.getValue().setSelection(new StructuredSelection());
-				entry.getValue().getControl().setEnabled(false);
-				ComboViewer operator = operatorCombo.get(entry.getKey());
-				operator.setSelection(new StructuredSelection(operator.getElementAt(0)));
-			}
-		}
-	}
-
-	private void clearTextSettings(Map<IQueryField, ComboViewer> operators, Map<IQueryField, Text> textValues) {
-		for (Entry<IQueryField, Text> entry : textValues.entrySet()) {
-			if (entry.getValue().getEditable()) {
-				entry.getValue().setText("");
-			}
-			entry.getValue().setEnabled(false);
-			ComboViewer operator = operators.get(entry.getKey());
-			operator.setSelection(new StructuredSelection(operator.getElementAt(0)));
-		}
-	}
+//	private void clearListSettings(Map<IQueryField, ComboViewer> operatorCombo, Map<IQueryField, StructuredViewer> valueViewer) {
+//		for (Entry<IQueryField, StructuredViewer> entry : valueViewer.entrySet()) {
+//			if(entry.getKey()!=QueryField.PROJECT) {
+//				if(!operatorCombo.get(entry.getKey()).getControl().isEnabled()) {
+//					entry.getValue().getControl().setEnabled(false);
+//				} else {
+//					//TODO nur wenn valuebased
+//					entry.getValue().getControl().setEnabled(true);
+//				}
+//			}
+//		}
+//	}
+//
+//	private void clearTextSettings(Map<IQueryField, ComboViewer> operators, Map<IQueryField, Text> textValues) {
+//		for (Entry<IQueryField, Text> entry : textValues.entrySet()) {
+//			if(!operators.get(entry.getKey()).getControl().isEnabled()) {
+//				entry.getValue().setEnabled(false);
+//			} else {
+//				//TODO nur wenn valuebased
+//				entry.getValue().setEnabled(true);
+//			}
+//		}
+//	}
 	
-	void switchOperatorState(boolean state, boolean crossProjectOnly) {
-		List<Entry<IQueryField, ComboViewer>> operatorViewer = new ArrayList<Entry<IQueryField, ComboViewer>>();
-		operatorViewer.addAll(searchOperators.entrySet());
+	void switchOperatorState() {
+		Project project = getSelectedProject();
+		boolean enabled = project!=null;
+		Set<Integer> matchingCustomFieldIds = enabled ? abc(project) : null;
 		
-		for (Entry<IQueryField, ComboViewer> entry : operatorViewer) {
-			if(state) {
-				entry.getValue().getControl().setEnabled(true);
-			} else if (!(crossProjectOnly && entry.getKey().isCrossProjectUsable())) {
-				entry.getValue().getControl().setEnabled(false);
+		for (Entry<IQueryField, ComboViewer> entry : searchOperators.entrySet()) {
+			IQueryField queryField = entry.getKey();
+			Control control = entry.getValue().getControl();
+			
+			if(enabled) {
+				if(queryField instanceof CustomField) {
+					control.setEnabled(queryField.isCrossProjectUsable() || (matchingCustomFieldIds!=null && matchingCustomFieldIds.contains(((CustomField) queryField).getId())));
+				} else {
+					control.setEnabled(true);
+				}
+			} else {
+				control.setEnabled(queryField.isCrossProjectUsable());
 			}
+			setQueryFieldValueControlEnabled(queryField);
 		}
 		
 	}
