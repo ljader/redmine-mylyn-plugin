@@ -1,10 +1,14 @@
 package net.sf.redmine_mylyn.internal.ui.query;
 
 import net.sf.redmine_mylyn.api.model.Project;
+import net.sf.redmine_mylyn.api.query.CompareOperator;
+import net.sf.redmine_mylyn.api.query.QueryField;
 
+import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 
 class ProjectSelectionListener implements ISelectionChangedListener {
 		private final RedmineRepositoryQueryPage page;
@@ -14,26 +18,25 @@ class ProjectSelectionListener implements ISelectionChangedListener {
 		}
 
 		public void selectionChanged(SelectionChangedEvent event) {
-			if (!event.getSelection().isEmpty() && event.getSelection() instanceof IStructuredSelection) {
+			if(event.getSelection() instanceof IStructuredSelection) {
+				IStructuredSelection selection = (IStructuredSelection)event.getSelection();
 				
-				Object selected = ((IStructuredSelection)event.getSelection()).getFirstElement();
-				if (selected instanceof Project) {
-
-					page.clearSettings();
-//					switchOperatorState(true, false);
-					page.updateProjectAttributes((Project)selected);
-//					RedmineRepositoryQueryPage.this.updateCustomFieldFilter(project.getName());
+				
+				if ( event.getSource() instanceof ComboViewer && !(selection.getFirstElement() instanceof CompareOperator)) {
+					page.queryStructuredViewer.get(QueryField.PROJECT).setSelection(new StructuredSelection());
 				} else {
+					
+					page.switchOperatorState();
 					page.clearSettings();
-//					switchOperatorState(false, true);
-					page.updateProjectAttributes(null);
-//					RedmineRepositoryQueryPage.this.updateCustomFieldFilter(DATA_KEY_VALUE_CROSS_PROJECT);
+					
+					Object selected = selection.getFirstElement();
+					if (selected instanceof Project) {
+						page.updateProjectAttributes((Project)selected);
+					} else {
+						page.updateProjectAttributes(null);
+					}
 				}
-
-				//TODO
-//				if (RedmineQueryPage.this.getContainer()!=null) {
-//					RedmineQueryPage.this.getContainer().updateButtons();
-//				}
+				
 			}
 		}
 	}
