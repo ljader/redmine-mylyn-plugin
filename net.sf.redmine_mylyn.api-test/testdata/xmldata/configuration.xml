@@ -1,0 +1,409 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<configuration xmlns="http://redmin-mylyncon.sf.net/api">
+
+	<issueStatuses>
+		<issueStatus id="1">
+			<name>New</name>
+			<position>1</position>
+			<isClosed>false</isClosed>
+			<isDefault>true</isDefault>
+		</issueStatus>
+		<issueStatus id="2">
+			<name>Assigned</name>
+			<position>2</position>
+			<isClosed>false</isClosed>
+			<isDefault>false</isDefault>
+		</issueStatus>
+		<issueStatus id="3">
+			<name>Resolved</name>
+			<position>6</position>
+			<isClosed>false</isClosed>
+			<isDefault>false</isDefault>
+		</issueStatus>
+		<issueStatus id="4">
+			<name>Feedback</name>
+			<position>5</position>
+			<isClosed>false</isClosed>
+			<isDefault>false</isDefault>
+		</issueStatus>
+		<issueStatus id="5">
+			<name>Closed</name>
+			<position>4</position>
+			<isClosed>true</isClosed>
+			<isDefault>true</isDefault>
+		</issueStatus>
+		<issueStatus id="6">
+			<name>Rejected</name>
+			<position>3</position>
+			<isClosed>true</isClosed>
+			<isDefault>false</isDefault>
+		</issueStatus>
+	</issueStatuses>
+
+	<issueCategories>
+		<issueCategory id="1">
+			<name>Printing</name>
+		</issueCategory>
+		<issueCategory id="2">
+			<name>Recipes</name>
+		</issueCategory>
+		<issueCategory id="3">
+			<name>Stock management</name>
+		</issueCategory>
+		<issueCategory id="4">
+			<name>Printing</name>
+		</issueCategory>
+	</issueCategories>
+
+	<issuePriorities>
+		<issuePriority id="8">
+			<name>Immediate</name>
+			<position>5</position>
+			<isDefault>false</isDefault>
+		</issuePriority>
+		<issuePriority id="4">
+			<name>Low</name>
+			<position>1</position>
+			<isDefault>false</isDefault>
+		</issuePriority>
+		<issuePriority id="6">
+			<name>High</name>
+			<position>2</position>
+			<isDefault>false</isDefault>
+		</issuePriority>
+		<issuePriority id="5">
+			<name>Normal</name>
+			<position>3</position>
+			<isDefault>true</isDefault>
+		</issuePriority>
+		<issuePriority id="7">
+			<name>Urgent</name>
+			<position>4</position>
+			<isDefault>false</isDefault>
+		</issuePriority>
+	</issuePriorities>
+
+	<customFields>
+		<customField id="1">
+			<name>Database</name>
+			<type>IssueCustomField</type>
+			<fieldFormat>list</fieldFormat>
+			<minLength>0</minLength>
+			<maxLength>0</maxLength>
+			<regexp />
+			<possibleValues>
+				<possibleValue>MySQL</possibleValue>
+				<possibleValue>PostgreSQL</possibleValue>
+				<possibleValue>Oracle</possibleValue>
+			</possibleValues>
+			<defaultValue />
+			<isRequired>false</isRequired>
+			<isFilter>true</isFilter>
+			<isForAll>true</isForAll>
+		</customField>
+		<customField id="2">
+			<name>Searchable field</name>
+			<type>IssueCustomField</type>
+			<fieldFormat>string</fieldFormat>
+			<minLength>1</minLength>
+			<maxLength>100</maxLength>
+			<regexp>^.*$</regexp>
+			<possibleValues>
+			</possibleValues>
+			<defaultValue>Default string</defaultValue>
+			<isRequired>false</isRequired>
+			<isFilter>false</isFilter>
+			<isForAll>true</isForAll>
+		</customField>
+		<!-- ProjectCustomField + UserCustomField will not used
+		<customField id="3">
+			<name>Development status</name>
+			<type>ProjectCustomField</type>
+			<fieldFormat>list</fieldFormat>
+			<minLength>0</minLength>
+			<maxLength>0</maxLength>
+			<regexp />
+			<possibleValues>
+				<possibleValue>Stable</possibleValue>
+				<possibleValue>Beta</possibleValue>
+				<possibleValue>Alpha</possibleValue>
+				<possibleValue>Planning</possibleValue>
+			</possibleValues>
+			<defaultValue />
+			<isRequired>false</isRequired>
+			<isFilter>true</isFilter>
+			<isForAll>false</isForAll>
+		</customField>
+		<customField id="4">
+			<name>Phone number</name>
+			<type>UserCustomField</type>
+			<fieldFormat>string</fieldFormat>
+			<minLength>0</minLength>
+			<maxLength>0</maxLength>
+			<regexp />
+			<possibleValues>
+			</possibleValues>
+			<defaultValue />
+			<isRequired>false</isRequired>
+			<isFilter>false</isFilter>
+			<isForAll>false</isForAll>
+		</customField>
+		<customField id="5">
+			<name>Money</name>
+			<type>UserCustomField</type>
+			<fieldFormat>float</fieldFormat>
+			<minLength>0</minLength>
+			<maxLength>0</maxLength>
+			<regexp />
+			<possibleValues>
+			</possibleValues>
+			<defaultValue />
+			<isRequired>false</isRequired>
+			<isFilter>false</isFilter>
+			<isForAll>false</isForAll>
+		</customField>
+		 -->
+		<customField id="6">
+			<name>Float field</name>
+			<type>IssueCustomField</type>
+			<fieldFormat>float</fieldFormat>
+			<minLength>0</minLength>
+			<maxLength>0</maxLength>
+			<regexp />
+			<possibleValues>
+			</possibleValues>
+			<defaultValue />
+			<isRequired>false</isRequired>
+			<isFilter>false</isFilter>
+			<isForAll>true</isForAll>
+		</customField>
+		<customField id="7">
+			<name>Billable</name>
+			<type>TimeEntryCustomField</type>
+			<fieldFormat>bool</fieldFormat>
+			<minLength>0</minLength>
+			<maxLength>0</maxLength>
+			<regexp />
+			<possibleValues>
+			</possibleValues>
+			<defaultValue />
+			<isRequired>false</isRequired>
+			<isFilter>true</isFilter>
+			<isForAll>false</isForAll>
+		</customField>
+		<customField id="8">
+			<name>Custom date</name>
+			<type>IssueCustomField</type>
+			<fieldFormat>date</fieldFormat>
+			<minLength>0</minLength>
+			<maxLength>0</maxLength>
+			<regexp />
+			<possibleValues>
+			</possibleValues>
+			<defaultValue />
+			<isRequired>false</isRequired>
+			<isFilter>false</isFilter>
+			<isForAll>true</isForAll>
+		</customField>
+		<customField id="9">
+			<name>Project 1 cf</name>
+			<type>IssueCustomField</type>
+			<fieldFormat>date</fieldFormat>
+			<minLength>0</minLength>
+			<maxLength>0</maxLength>
+			<regexp />
+			<possibleValues>
+			</possibleValues>
+			<defaultValue />
+			<isRequired>false</isRequired>
+			<isFilter>true</isFilter>
+			<isForAll>false</isForAll>
+		</customField>
+	</customFields>
+
+	<trackers>
+		<tracker id="1">
+			<name>Bug</name>
+			<position>1</position>
+		</tracker>
+		<tracker id="2">
+			<name>Feature request</name>
+			<position>3</position>
+		</tracker>
+		<tracker id="3">
+			<name>Support request</name>
+			<position>2</position>
+		</tracker>
+	</trackers>
+
+	<users>
+		<user id="1">
+			<name>redMine Admin</name>
+			<login>admin</login>
+			<firstname>redMine</firstname>
+			<lastname>Admin</lastname>
+			<mail>admin@somenet.foo</mail>
+		</user>
+		<user id="2">
+			<name>John Smith</name>
+			<login>jsmith</login>
+			<firstname>John</firstname>
+			<lastname>Smith</lastname>
+			<mail>jsmith@somenet.foo</mail>
+		</user>
+		<user id="3">
+			<name>Dave Lopper</name>
+			<login>dlopper</login>
+			<firstname>Dave</firstname>
+			<lastname>Lopper</lastname>
+			<mail>dlopper@somenet.foo</mail>
+		</user>
+		<user id="4">
+			<name>Robert Hill</name>
+			<login>rhill</login>
+			<firstname>Robert</firstname>
+			<lastname>Hill</lastname>
+			<mail>rhill@somenet.foo</mail>
+		</user>
+		<user id="5">
+			<name>Dave2 Lopper2</name>
+			<login>dlopper2</login>
+			<firstname>Dave2</firstname>
+			<lastname>Lopper2</lastname>
+			<mail>dlopper2@somenet.foo</mail>
+		</user>
+		<user id="6">
+			<name>Anonymous</name>
+			<login />
+			<firstname />
+			<lastname>Anonymous</lastname>
+			<mail />
+		</user>
+		<user id="7">
+			<name>Some One</name>
+			<login>someone</login>
+			<firstname>Some</firstname>
+			<lastname>One</lastname>
+			<mail>someone@foo.bar</mail>
+		</user>
+		<user id="8">
+			<name>User Misc</name>
+			<login>miscuser8</login>
+			<firstname>User</firstname>
+			<lastname>Misc</lastname>
+			<mail>miscuser8@foo.bar</mail>
+		</user>
+		<user id="9">
+			<name>User Misc</name>
+			<login>miscuser9</login>
+			<firstname>User</firstname>
+			<lastname>Misc</lastname>
+			<mail>miscuser9@foo.bar</mail>
+		</user>
+	</users>
+
+	<timeEntryActivities>
+		<timeEntryActivity id="9">
+			<name>Design</name>
+			<position>1</position>
+			<isDefault>false</isDefault>
+		</timeEntryActivity>
+		<timeEntryActivity id="10">
+			<name>Development</name>
+			<position>2</position>
+			<isDefault>true</isDefault>
+		</timeEntryActivity>
+		<timeEntryActivity id="11">
+			<name>QA</name>
+			<position>3</position>
+			<isDefault>false</isDefault>
+		</timeEntryActivity>
+	</timeEntryActivities>
+
+	<queries>
+		<query id="1">
+			<name>Multiple custom fields query</name>
+		</query>
+		<query id="5">
+			<name>Open issues by priority and tracker</name>
+		</query>
+		<query id="9">
+			<name>Open issues grouped by list custom field</name>
+		</query>
+		<query id="6">
+			<name>Open issues grouped by tracker</name>
+		</query>
+		<query id="4">
+			<name>Public query for all projects</name>
+		</query>
+	</queries>
+
+	<projects>
+		<project id="1" newIssueAllowed="true" moveIssueAllowed="true">
+			<name>eCookbook</name>
+			<identifier>ecookbook</identifier>
+			<trackers>1 2 3</trackers>
+			<versions>1 2 3 4 6 7</versions>
+			<members>
+				<member userId="2" assignable="false" />
+				<member userId="3" assignable="true" />
+			</members>
+			<issueCategories>1 2</issueCategories>
+			<issueCustomFields>
+				<issueCustomFieldsByTracker trackerId="1">1 2 6</issueCustomFieldsByTracker>
+				<issueCustomFieldsByTracker trackerId="2">6</issueCustomFieldsByTracker>
+				<issueCustomFieldsByTracker trackerId="3">2 6</issueCustomFieldsByTracker>
+			</issueCustomFields>
+		</project>
+		<project id="3" newIssueAllowed="true" moveIssueAllowed="false">
+			<name>eCookbook Subproject 1</name>
+			<identifier>subproject1</identifier>
+			<trackers>2 3</trackers>
+			<versions>4 6 7</versions>
+			<members>
+			</members>
+			<issueCategories />
+			<issueCustomFields>
+				<issueCustomFieldsByTracker trackerId="2">6</issueCustomFieldsByTracker>
+				<issueCustomFieldsByTracker trackerId="3">2 6</issueCustomFieldsByTracker>
+			</issueCustomFields>
+		</project>
+	</projects>
+
+	<versions>
+		<version id="1">
+			<name>0.1</name>
+			<status>closed</status>
+		</version>
+		<version id="2">
+			<name>1.0</name>
+			<status>locked</status>
+		</version>
+		<version id="3">
+			<name>2.0</name>
+			<status>open</status>
+		</version>
+		<version id="4">
+			<name>2.0</name>
+			<status>open</status>
+		</version>
+		<version id="5">
+			<name>Alpha</name>
+			<status>open</status>
+		</version>
+		<version id="6">
+			<name>Private Version of public subproject</name>
+			<status>open</status>
+		</version>
+		<version id="7">
+			<name>Systemwide visible version</name>
+			<status>open</status>
+		</version>
+	</versions>
+	
+	<settings>
+		<useIssueDoneRatio>false</useIssueDoneRatio>
+		<maxPerPage>100</maxPerPage>
+	</settings>
+	
+</configuration>
