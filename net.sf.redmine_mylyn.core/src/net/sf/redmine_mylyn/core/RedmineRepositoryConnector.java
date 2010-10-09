@@ -200,7 +200,7 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 	@Override
 	public boolean canSynchronizeTask(TaskRepository taskRepository, ITask task) {
 		//WORKAROUND: http://sourceforge.net/tracker/index.php?func=detail&aid=3069723&group_id=228995&atid=1075435
-		if (!task.getConnectorKind().equals("redmine")) {
+		if (task.getConnectorKind().equals("redmine")) {
 			if(task instanceof TaskTask) {
 				try {
 					Field f = TaskTask.class.getDeclaredField("connectorKind");
