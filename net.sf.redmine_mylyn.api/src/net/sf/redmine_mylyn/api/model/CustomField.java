@@ -14,7 +14,17 @@ import net.sf.redmine_mylyn.api.query.QueryField;
 import net.sf.redmine_mylyn.api.query.QueryFilter;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name="customField")
+@XmlType(name="customField", propOrder={
+		"type", 
+		"fieldFormat", 
+		"minLength", 
+		"maxLength", 
+		"regexp", 
+		"possibleValues", 
+		"defaultValue", 
+		"isRequired", 
+		"isFilter", 
+		"isForAll"})
 public class CustomField extends Property implements IQueryField {
 	
 	private static final long serialVersionUID = 1L;

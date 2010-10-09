@@ -67,6 +67,7 @@ public class JaxbParser<T extends Object> {
 			throw exc;
 		}
 	}
+	
 	public T parseInputStream(SAXSource source) throws RedmineApiErrorException {
 		try {
 			Unmarshaller unmarshaller = getUnmarshaller();
@@ -90,7 +91,6 @@ public class JaxbParser<T extends Object> {
 		if (ctx==null) {
 			ctx = JAXBContext.newInstance(clazz);
 		}
-		
 		return ctx.createUnmarshaller();
 	}
 

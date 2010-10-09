@@ -16,7 +16,13 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import net.sf.redmine_mylyn.internal.api.parser.adapter.CFbyTrackerAdapter;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name="project")
+@XmlType(name="project", propOrder={
+		"identifier", 
+		"trackerIds", 
+		"versionIds", 
+		"members", 
+		"issueCategoryIds", 
+		"customFieldIdsByTrackerId"})
 public class Project extends Property {
 
 	private static final long serialVersionUID = 1L;
