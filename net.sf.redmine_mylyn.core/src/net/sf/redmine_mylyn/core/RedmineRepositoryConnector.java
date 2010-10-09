@@ -59,7 +59,8 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 	public synchronized ClientManager getClientManager() {
 		if (clientManager == null) {
 			IPath path = RedmineCorePlugin.getDefault().getRepostioryAttributeCachePath();
-			clientManager = new ClientManager(locationFactory, path.toFile());
+			IPath path2 = RedmineCorePlugin.getDefault().getRepostioryAttributeCachePath2();
+			clientManager = new ClientManager(locationFactory, path.toFile(), path2.toFile());
 		}
 		return clientManager;
 	}

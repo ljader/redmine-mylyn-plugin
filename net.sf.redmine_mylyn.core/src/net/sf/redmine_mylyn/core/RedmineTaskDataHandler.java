@@ -101,7 +101,7 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 			
 			return initializeNewTaskData(issue, repository, taskData, monitor);
 		} catch (RuntimeException e) {
-			IStatus status = new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, "Initialization of task failed. The provided data are insufficient.");
+			IStatus status = new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, "Initialization of task failed. The provided data are insufficient.", e);
 			StatusHandler.log(status);
 			throw new CoreException(status);
 		}
