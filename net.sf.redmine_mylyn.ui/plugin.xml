@@ -21,5 +21,30 @@
             id="net.sf.redmine_mylyn.ui.pageFactory">
       </pageFactory>
    </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="popup:org.eclipse.mylyn.tasks.ui.menu.task.mark?after=group.taskStatus">
+         <dynamic
+               class="net.sf.redmine_mylyn.internal.ui.action.RedmineStatusTaskListContributionItem"
+               id="net.sf.redmine_mylyn.ui.action.statuscontribution">
+            <visibleWhen
+                  checkEnabled="false">
+               <iterate
+                     operator="and">
+                  <and>
+                     <adapt
+                           type="org.eclipse.mylyn.tasks.core.ITask">
+                        <test
+                              property="org.eclipse.mylyn.task.connectorKind"
+                              value="redmineV2">
+                        </test>
+                     </adapt>
+                  </and>
+               </iterate>
+            </visibleWhen>
+         </dynamic>
+      </menuContribution>
+   </extension>
 
 </plugin>
