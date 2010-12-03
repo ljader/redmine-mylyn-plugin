@@ -302,24 +302,6 @@
 		</user>
 	</users>
 
-	<timeEntryActivities>
-		<timeEntryActivity id="9">
-			<name>Design</name>
-			<position>1</position>
-			<isDefault>false</isDefault>
-		</timeEntryActivity>
-		<timeEntryActivity id="10">
-			<name>Development</name>
-			<position>2</position>
-			<isDefault>true</isDefault>
-		</timeEntryActivity>
-		<timeEntryActivity id="11">
-			<name>QA</name>
-			<position>3</position>
-			<isDefault>false</isDefault>
-		</timeEntryActivity>
-	</timeEntryActivities>
-
 	<queries>
 		<query id="1">
 			<name>Multiple custom fields query</name>
@@ -354,6 +336,23 @@
 				<issueCustomFieldsByTracker trackerId="2">6</issueCustomFieldsByTracker>
 				<issueCustomFieldsByTracker trackerId="3">2 6</issueCustomFieldsByTracker>
 			</issueCustomFields>
+			<timeEntryActivities>
+				<timeEntryActivity id="9">
+					<name>Design</name>
+					<position>1</position>
+					<isDefault>false</isDefault>
+				</timeEntryActivity>
+				<timeEntryActivity id="10">
+					<name>Development</name>
+					<position>2</position>
+					<isDefault>true</isDefault>
+				</timeEntryActivity>
+				<timeEntryActivity id="11">
+					<name>QA</name>
+					<position>3</position>
+					<isDefault>false</isDefault>
+				</timeEntryActivity>
+			</timeEntryActivities>
 		</project>
 		<project id="3" newIssueAllowed="true" moveIssueAllowed="false">
 			<name>eCookbook Subproject 1</name>
@@ -367,6 +366,7 @@
 				<issueCustomFieldsByTracker trackerId="2">6</issueCustomFieldsByTracker>
 				<issueCustomFieldsByTracker trackerId="3">2 6</issueCustomFieldsByTracker>
 			</issueCustomFields>
+			<timeEntryActivities />
 		</project>
 	</projects>
 

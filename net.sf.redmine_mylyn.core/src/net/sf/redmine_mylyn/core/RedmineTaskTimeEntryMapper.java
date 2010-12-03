@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.CustomField;
 import net.sf.redmine_mylyn.api.model.CustomValue;
+import net.sf.redmine_mylyn.api.model.Project;
 import net.sf.redmine_mylyn.api.model.TimeEntryActivity;
 
 import org.eclipse.core.runtime.Assert;
@@ -45,6 +46,10 @@ public class RedmineTaskTimeEntryMapper {
 		
 		TaskData taskData = taskAttribute.getTaskData();
 		TaskAttributeMapper mapper = taskData.getAttributeMapper();
+		
+		String projectVal = taskData.getRoot().getAttribute(RedmineAttribute.PROJECT.getTaskKey()).getValue();
+		Project project = configuration.getProjects().getById(RedmineUtil.parseIntegerId(projectVal));
+		
 		taskAttribute.getMetaData().defaults().setType(IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY);
 		if (getTimeEntryId() > 0) {
 			mapper.setIntegerValue(taskAttribute, getTimeEntryId());
@@ -62,9 +67,11 @@ public class RedmineTaskTimeEntryMapper {
 			mapper.setIntegerValue(child, getActivityId());
 
 			//Option for ActivityId
-			TimeEntryActivity activity = configuration.getTimeEntryActivities().getById(getActivityId());
-			if (activity!=null) {
-				child.putOption(""+activity.getId(), activity.getName());
+			if(project!=null) {
+				TimeEntryActivity activity = project.getTimeEntryActivities().getById(getActivityId());
+				if (activity!=null) {
+					child.putOption(""+activity.getId(), activity.getName());
+				}
 			}
 		}
 		if (getUser() != null) {
