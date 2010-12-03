@@ -23,7 +23,6 @@ import net.sf.redmine_mylyn.api.model.container.IssuePriorities;
 import net.sf.redmine_mylyn.api.model.container.IssueStatuses;
 import net.sf.redmine_mylyn.api.model.container.Projects;
 import net.sf.redmine_mylyn.api.model.container.Queries;
-import net.sf.redmine_mylyn.api.model.container.TimeEntryActivities;
 import net.sf.redmine_mylyn.api.model.container.Trackers;
 import net.sf.redmine_mylyn.api.model.container.Users;
 import net.sf.redmine_mylyn.api.model.container.Versions;
@@ -49,8 +48,6 @@ public class Configuration implements Serializable {
 
 	@XmlElement(name="users")
 	private Users user;
-	
-	private TimeEntryActivities timeEntryActivities;
 	
 	private Queries queries;
 
@@ -134,14 +131,7 @@ public class Configuration implements Serializable {
 		}
 		return user;
 	}
-	
-	public TimeEntryActivities getTimeEntryActivities() {
-		if(timeEntryActivities==null) {
-			timeEntryActivities = new TimeEntryActivities();
-		}
-		return timeEntryActivities;
-	}
-	
+		
 	public Queries getQueries() {
 		if(queries==null) {
 			queries = new Queries();

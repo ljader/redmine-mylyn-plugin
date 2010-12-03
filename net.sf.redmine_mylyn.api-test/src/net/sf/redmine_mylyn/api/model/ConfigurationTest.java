@@ -14,7 +14,6 @@ import net.sf.redmine_mylyn.internal.api.IssuePriorityValidator;
 import net.sf.redmine_mylyn.internal.api.IssueStatusValidator;
 import net.sf.redmine_mylyn.internal.api.ProjectValidator;
 import net.sf.redmine_mylyn.internal.api.QueryValidator;
-import net.sf.redmine_mylyn.internal.api.TimeEntryActivityValidator;
 import net.sf.redmine_mylyn.internal.api.TrackerValidator;
 import net.sf.redmine_mylyn.internal.api.UserValidator;
 import net.sf.redmine_mylyn.internal.api.VersionValidator;
@@ -65,8 +64,6 @@ public class ConfigurationTest {
 		assertEquals(TrackerValidator.COUNT, configuration.getTrackers().getAll().size());
 		
 		assertEquals(UserValidator.COUNT, configuration.getUsers().getAll().size());
-		
-		assertEquals(TimeEntryActivityValidator.COUNT, configuration.getTimeEntryActivities().getAll().size());
 		
 		assertEquals(QueryValidator.COUNT, configuration.getQueries().getAll().size());
 		

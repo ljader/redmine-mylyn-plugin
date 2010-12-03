@@ -13,6 +13,7 @@ import javax.xml.bind.annotation.XmlList;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import net.sf.redmine_mylyn.api.model.container.TimeEntryActivities;
 import net.sf.redmine_mylyn.internal.api.parser.adapter.CFbyTrackerAdapter;
 
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -22,7 +23,8 @@ import net.sf.redmine_mylyn.internal.api.parser.adapter.CFbyTrackerAdapter;
 		"versionIds", 
 		"members", 
 		"issueCategoryIds", 
-		"customFieldIdsByTrackerId"})
+		"customFieldIdsByTrackerId",
+		"timeEntryActivities"})
 public class Project extends Property {
 
 	private static final long serialVersionUID = 1L;
@@ -55,6 +57,9 @@ public class Project extends Property {
 	@XmlJavaTypeAdapter(CFbyTrackerAdapter.class)
 	public Map<Integer, int[]> customFieldIdsByTrackerId;
 
+	@XmlElement(name="timeEntryActivities")
+	private TimeEntryActivities timeEntryActivities;
+	
 	public boolean isNewIssueAllowed() {
 		return newIssueAllowed;
 	}
@@ -104,6 +109,17 @@ public class Project extends Property {
 
 	public void setMembers(List<Member> members) {
 		this.members = members;
+	}
+
+	public TimeEntryActivities getTimeEntryActivities() {
+		if(timeEntryActivities==null) {
+			timeEntryActivities = new TimeEntryActivities();
+		}
+		return timeEntryActivities;
+	}
+
+	public void setTimeEntryActivities(TimeEntryActivities timeEntryActivities) {
+		this.timeEntryActivities = timeEntryActivities;
 	}
 
 	public int[] getIssueCategoryIds() {
