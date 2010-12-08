@@ -15,6 +15,7 @@ import net.sf.redmine_mylyn.api.exception.RedmineApiErrorException;
 import net.sf.redmine_mylyn.api.exception.RedmineApiRemoteException;
 import net.sf.redmine_mylyn.common.logging.ILogService;
 
+import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.XMLFilterImpl;
@@ -98,6 +99,21 @@ public class JaxbParser<T extends Object> {
 		
 		RedminePluginFilter() throws SAXException, ParserConfigurationException {
 			super(parserFactory.newSAXParser().getXMLReader());
+		}
+		
+		@Override
+		public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
+			int idx = atts.getIndex("authenticated");
+			if(idx>0) {
+				boolean authenticated = Boolean.parseBoolean(atts.getValue(idx));
+				if(authenticated) {
+					String authenticatedAs = atts.getValue(atts.getIndex("authenticatedAs"));
+					log.debug("AUTHENTICATED AS {0}", authenticatedAs);
+				} else {
+					log.debug("NOT AUTHENTICATED");
+				}
+			}
+			super.startElement(uri, localName, qName, atts);
 		}
 		
 		@Override

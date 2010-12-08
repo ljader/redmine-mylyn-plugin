@@ -6,7 +6,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXSource;
 
+import net.sf.redmine_mylyn.api.RedmineApiPlugin;
 import net.sf.redmine_mylyn.api.exception.RedmineApiErrorException;
+import net.sf.redmine_mylyn.common.logging.ILogService;
 import net.sf.redmine_mylyn.internal.api.parser.adapter.type.PartialIssueType;
 import net.sf.redmine_mylyn.internal.api.parser.adapter.type.SubmitError;
 
@@ -24,13 +26,17 @@ public class SubmitedIssueParser implements IModelParser<Object> {
 	protected JaxbParser<SubmitError> errorParser;
 	
 	protected SAXParserFactory parserFactory;
-	
+
+	private ILogService log;
+
 	public SubmitedIssueParser() {
 		errorParser = new JaxbParser<SubmitError>(SubmitError.class);
 		successParser = new JaxbParser<PartialIssueType>(PartialIssueType.class);
 
 		parserFactory = SAXParserFactory.newInstance();
 		parserFactory.setNamespaceAware(false);
+
+		log = RedmineApiPlugin.getLogService(SubmitedIssueParser.class);
 	}
 	
 	@Override
@@ -62,9 +68,20 @@ public class SubmitedIssueParser implements IModelParser<Object> {
 		
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
+			int idx = atts.getIndex("authenticated");
+			if(idx>0) {
+				boolean authenticated = Boolean.parseBoolean(atts.getValue(idx));
+				if(authenticated) {
+					String authenticatedAs = atts.getValue(atts.getIndex("authenticatedAs"));
+					log.debug("AUTHENTICATED AS {0}", authenticatedAs);
+				} else {
+					log.debug("NOT AUTHENTICATED");
+				}
+			}
+
 			super.startElement(FAKE_NS, localName, qName, atts);
 		}
-		
+
 	}
 }
 
