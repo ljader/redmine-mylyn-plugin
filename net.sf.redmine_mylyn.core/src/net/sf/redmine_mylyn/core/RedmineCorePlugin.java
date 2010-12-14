@@ -67,6 +67,11 @@ public class RedmineCorePlugin extends Plugin /*implements BundleActivator*/ {
 		return stateLocation.append("repositoryClientDataCache");
 	}
 
+	public IPath getRepostioryAttributeCachePath2() {
+		IPath stateLocation = Platform.getStateLocation(getBundle());
+		return stateLocation.append("repositoryClientDataCache.zip");
+	}
+	
 	public ILogService getLogService(Class<?> clazz) {
 		return LogServiceImpl.getInstance(getBundle(), clazz);
 	}

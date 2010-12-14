@@ -3,10 +3,12 @@
   <tracker id="1">
     <name>Bug</name>
     <position>1</position>
+    <issueCustomFields>1 2 6</issueCustomFields>
   </tracker>
   <tracker id="2">
     <name>Feature request</name>
     <position>3</position>
+    <issueCustomFields>2 6</issueCustomFields>
   </tracker>
   <tracker id="3">
     <name>Support request</name>

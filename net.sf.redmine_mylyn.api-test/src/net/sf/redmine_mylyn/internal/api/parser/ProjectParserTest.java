@@ -37,6 +37,7 @@ public class ProjectParserTest {
 		assertEquals(ProjectValidator.COUNT, ct.getAll().size());
 		
 		ProjectValidator.validate1(ct.getById(1));
+		ProjectValidator.validate3(ct.getById(3));
 	}
 
 }

@@ -3,6 +3,7 @@ package net.sf.redmine_mylyn.internal.api;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.Arrays;
 import java.util.List;
 
 import net.sf.redmine_mylyn.api.model.Tracker;
@@ -18,6 +19,8 @@ public class TrackerValidator {
 		assertNotNull(obj);
 		assertEquals(2, obj.getId());
 		assertEquals("Feature request", obj.getName());
+		
+		assertEquals("[2, 6]", Arrays.toString(obj.getIssueCustomFields()));
 	}
 
 	public static void validateOrder(Trackers ct) {

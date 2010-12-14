@@ -44,7 +44,7 @@
     <issueRelation id="2">
       <issueFromId>2</issueFromId>
       <issueToId>3</issueToId>
-      <type>relates</type>
+      <relationType>relates</relationType>
     </issueRelation>
   </issueRelations>
   <timeEntries viewAllowed="true" newAllowed="false">

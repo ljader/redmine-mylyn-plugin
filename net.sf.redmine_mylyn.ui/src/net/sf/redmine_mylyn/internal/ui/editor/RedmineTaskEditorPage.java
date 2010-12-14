@@ -17,6 +17,7 @@ import net.sf.redmine_mylyn.core.RedmineAttribute;
 import net.sf.redmine_mylyn.core.RedmineCorePlugin;
 import net.sf.redmine_mylyn.core.RedmineOperation;
 import net.sf.redmine_mylyn.core.RedmineRepositoryConnector;
+import net.sf.redmine_mylyn.internal.IRedmineAttributeChangedListener;
 import net.sf.redmine_mylyn.internal.ui.editor.TaskDataValidator.ErrorMessageCollector;
 import net.sf.redmine_mylyn.internal.ui.editor.helper.AttributePartLayoutHelper;
 import net.sf.redmine_mylyn.internal.ui.editor.parts.NewTimeEntryEditorPart;
@@ -28,6 +29,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.mylyn.commons.core.StatusHandler;
+import org.eclipse.mylyn.tasks.core.ITask;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskDataModel;
 import org.eclipse.mylyn.tasks.core.data.TaskDataModelEvent;
@@ -54,9 +56,9 @@ import org.eclipse.ui.IEditorSite;
 
 public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 
+	public final static String ID = "net.sf.redmine_mylyn.ui.editor.page";
 
-//	private final IRedmineAttributeChangedListener STATUS_LISTENER;
-	
+	private final IRedmineAttributeChangedListener taskListAttributeListener;
 
 	private final TaskDataModelListener projectAttributeListener;
 	private final TaskDataModelListener trackerAttributeListener;
@@ -76,27 +78,27 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 	Map<String, CustomField> customFields = new HashMap<String, CustomField>();
 	
 	public RedmineTaskEditorPage(TaskEditor editor) {
-		super(editor, RedmineCorePlugin.REPOSITORY_KIND);
+		super(editor, ID, "label", RedmineCorePlugin.REPOSITORY_KIND);
 
 		setNeedsPrivateSection(true);
 		setNeedsSubmitButton(true);
 		
-//		STATUS_LISTENER = new IRedmineAttributeChangedListener() {
-//			public void attributeChanged(ITask task, TaskAttribute attribute) {
-//				if(getTask()==task) {
-//					if(attribute.getId().equals(RedmineAttribute.STATUS_CHG.getTaskKey())) {
-//						TaskDataModel model = getModel();
-//						TaskAttribute modelAttribute = model.getTaskData().getRoot().getAttribute(attribute.getId());
-//						
-//						if(!modelAttribute.getValue().equals(attribute.getValue())) {
-//							modelAttribute.setValue(attribute.getValue());
-//							model.attributeChanged(modelAttribute);
-//							
-//						}
-//					}
-//				}
-//			}
-//		};
+		taskListAttributeListener = new IRedmineAttributeChangedListener() {
+			public void attributeChanged(ITask task, TaskAttribute attribute) {
+				if(getTask()==task) {
+					if(attribute.getId().equals(RedmineAttribute.STATUS_CHG.getTaskKey())) {
+						TaskDataModel model = getModel();
+						TaskAttribute modelAttribute = model.getTaskData().getRoot().getAttribute(attribute.getId());
+						
+						if(!modelAttribute.getValue().equals(attribute.getValue())) {
+							modelAttribute.setValue(attribute.getValue());
+							model.attributeChanged(modelAttribute);
+							
+						}
+					}
+				}
+			}
+		};
 	
 		projectAttributeListener = new ProjectTaskDataModelListener();
 		trackerAttributeListener = new TrackerTaskDataModelListener();
@@ -115,14 +117,12 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 		cfg = connector.getRepositoryConfiguration(getTaskRepository());
 		validator = new TaskDataValidator(cfg);
 		
-		
 		getModel().addModelListener(projectAttributeListener);
 		getModel().addModelListener(trackerAttributeListener);
 		getModel().addModelListener(validatorAttributeListener);
 		getModel().addModelListener(statusAttributeListener);
 
-		//TODO
-//		RedmineUiPlugin.getDefault().addAttributeChangedListener(STATUS_LISTENER);
+		RedmineUiPlugin.getDefault().addAttributeChangedListener(taskListAttributeListener);
 	}
 	
 	@Override
@@ -130,10 +130,10 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 		getModel().removeModelListener(projectAttributeListener);
 		getModel().removeModelListener(trackerAttributeListener);
 		getModel().removeModelListener(validatorAttributeListener);
-		
 		getModel().removeModelListener(statusAttributeListener);
-		//TODO
-//		RedmineUiPlugin.getDefault().removeAttributeChangedListener(STATUS_LISTENER);
+
+		RedmineUiPlugin.getDefault().removeAttributeChangedListener(taskListAttributeListener);
+		
 		super.dispose();
 	}
 	
