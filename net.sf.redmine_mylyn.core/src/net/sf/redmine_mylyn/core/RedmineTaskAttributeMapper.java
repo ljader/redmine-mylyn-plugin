@@ -29,4 +29,18 @@ public class RedmineTaskAttributeMapper extends TaskAttributeMapper {
 		super.setRepositoryPerson(taskAttribute, person);
 	}
 
+	@Override
+	public IRepositoryPerson getRepositoryPerson(TaskAttribute taskAttribute) {
+		IRepositoryPerson person =  super.getRepositoryPerson(taskAttribute);
+		
+		if (configuration!=null || person.getPersonId()!=null) {
+			User user = configuration.getUsers().getById(RedmineUtil.parseIntegerId(person.getPersonId()));
+			if(user!=null) {
+				person.setName(user.getName());
+			}
+		}
+		
+		return person;
+	}
+
 }

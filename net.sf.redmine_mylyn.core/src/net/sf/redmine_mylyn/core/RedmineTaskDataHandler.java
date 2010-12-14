@@ -101,7 +101,7 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 			
 			return initializeNewTaskData(issue, repository, taskData, monitor);
 		} catch (RuntimeException e) {
-			IStatus status = new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, "Initialization of task failed. The provided data are insufficient.");
+			IStatus status = new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, "Initialization of task failed. The provided data are insufficient.", e);
 			StatusHandler.log(status);
 			throw new CoreException(status);
 		}
@@ -254,7 +254,7 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 			//TODO
 			if (true /*client.supportTimeEntries() && ticket.getRight(RedmineAcl.TIMEENTRY_NEW)*/) {
 				createAttribute(data, RedmineAttribute.TIME_ENTRY_HOURS);
-				createAttribute(data, RedmineAttribute.TIME_ENTRY_ACTIVITY, cfg.getTimeEntryActivities().getAll());
+				createAttribute(data, RedmineAttribute.TIME_ENTRY_ACTIVITY, project.getTimeEntryActivities().getAll());
 				createAttribute(data, RedmineAttribute.TIME_ENTRY_COMMENTS);
 				createCustomAttributes(data, issue, cfg.getCustomFields().getTimeEntryCustomFields(), IRedmineConstants.TASK_KEY_PREFIX_TIMEENTRY_CF, true);
 			}

@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 
 import net.sf.redmine_mylyn.api.model.Project;
+import net.sf.redmine_mylyn.api.model.container.TimeEntryActivities;
 
 public class ProjectValidator {
 
@@ -53,6 +54,25 @@ public class ProjectValidator {
 		assertEquals("[1, 2, 6]", Arrays.toString(obj.getCustomFieldIdsByTrackerId().get(1)));
 		assertEquals("[6]", Arrays.toString(obj.getCustomFieldIdsByTrackerId().get(2)));
 		assertEquals("[2, 6]", Arrays.toString(obj.getCustomFieldIdsByTrackerId(3)));
+		
+		TimeEntryActivities ct = obj.getTimeEntryActivities();
+		assertNotNull(ct);
+		assertEquals(TimeEntryActivityValidator.COUNT, ct.getAll().size());
+		
+		TimeEntryActivityValidator.validate11(ct.getById(11));
+		TimeEntryActivityValidator.validateOrder(ct);
+		TimeEntryActivityValidator.validateDefault(ct.getDefault());
+
+	}
+	
+	
+	public static void validate3(Project obj) {
+		assertNotNull(obj);
+
+		TimeEntryActivities ct = obj.getTimeEntryActivities();
+		assertNotNull(ct);
+		assertNotNull(ct.getAll());
+		assertEquals(0, ct.getAll().size());
 	}
 
 }

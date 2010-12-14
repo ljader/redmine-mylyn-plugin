@@ -40,7 +40,6 @@ import net.sf.redmine_mylyn.internal.api.PartialIssueValidator;
 import net.sf.redmine_mylyn.internal.api.ProjectValidator;
 import net.sf.redmine_mylyn.internal.api.QueryValidator;
 import net.sf.redmine_mylyn.internal.api.ServerVersionValidator;
-import net.sf.redmine_mylyn.internal.api.TimeEntryActivityValidator;
 import net.sf.redmine_mylyn.internal.api.TrackerValidator;
 import net.sf.redmine_mylyn.internal.api.UserValidator;
 import net.sf.redmine_mylyn.internal.api.VersionValidator;
@@ -181,9 +180,6 @@ public class Api_2_7_ClientImplTest {
 		assertNotNull(configuration.getUsers());
 		assertEquals(0, configuration.getUsers().getAll().size());
 		
-		assertNotNull(configuration.getTimeEntryActivities());
-		assertEquals(0, configuration.getTimeEntryActivities().getAll().size());
-		
 		assertNotNull(configuration.getQueries());
 		assertEquals(0, configuration.getQueries().getAll().size());
 		
@@ -214,9 +210,6 @@ public class Api_2_7_ClientImplTest {
 
 		assertNotNull(configuration.getUsers());
 		assertEquals(UserValidator.COUNT, configuration.getUsers().getAll().size());
-
-		assertNotNull(configuration.getTimeEntryActivities());
-		assertEquals(TimeEntryActivityValidator.COUNT, configuration.getTimeEntryActivities().getAll().size());
 
 		assertNotNull(configuration.getQueries());
 		assertEquals(QueryValidator.COUNT, configuration.getQueries().getAll().size());

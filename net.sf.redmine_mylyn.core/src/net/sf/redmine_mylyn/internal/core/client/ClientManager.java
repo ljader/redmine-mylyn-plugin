@@ -6,10 +6,12 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.core.RedmineCorePlugin;
@@ -26,6 +28,8 @@ import org.eclipse.mylyn.tasks.core.TaskRepositoryLocationFactory;
 
 public class ClientManager implements IRepositoryListener {
 
+	private final static char[] ILLEGAL_ZIP_ENTRY_CHARS = "/*\\".toCharArray();
+	
 	private Map<String, IClient> clientByUrl = new HashMap<String, IClient>();
 
 	private Map<String, Configuration> confByUrl = new HashMap<String, Configuration>();
@@ -34,10 +38,12 @@ public class ClientManager implements IRepositoryListener {
 	
 	private final File cacheFile;
 	
-	public ClientManager(TaskRepositoryLocationFactory locationFactory, File cacheFile) {
+	private final File zipedCacheFile;
+	
+	public ClientManager(TaskRepositoryLocationFactory locationFactory, File cacheFile, File zipedCacheFile) {
 		this.locationFactory = locationFactory;
 		this.cacheFile = cacheFile;
-		
+		this.zipedCacheFile = zipedCacheFile;
 		readCache();
 	}
 	
@@ -97,56 +103,97 @@ public class ClientManager implements IRepositoryListener {
 	}
 
 	private void readCache() {
-		if (cacheFile==null) {
-			return;
+		if (zipedCacheFile!=null && zipedCacheFile.exists()) {
+			FileInputStream fileInput = null;
+			try {
+				try {
+					fileInput = new FileInputStream(zipedCacheFile);
+					
+					ZipInputStream zip = new ZipInputStream(fileInput) {
+						public void close() throws IOException {};
+					};
+					
+					ZipEntry zipEntry;
+					while((zipEntry=zip.getNextEntry())!=null) {
+						String name = zipEntry.getName();
+						name = name.substring(0, name.length()-4); //.xml
+						for (char chr : ILLEGAL_ZIP_ENTRY_CHARS) {
+							name = name.replace("0x"+Integer.toHexString(chr), ""+chr);
+						}
+						
+						confByUrl.put(name, Configuration.fromStream(zip));
+						zip.closeEntry();
+					}
+				} finally {
+					if(fileInput!=null) {
+						fileInput.close();
+					}
+				}
+			} catch (Exception e) {
+				IStatus status = new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, "The Redmine respository data cache could not be read", e);
+				RedmineCorePlugin.getDefault().getLog().log(status);
+
+				confByUrl.clear();
+			}
+			
 		}
 		
-		ObjectInputStream in = null;
-		try {
-			 in = new ObjectInputStream(new FileInputStream(cacheFile));
-			 for(int count=in.readInt();count>0;count--) {
-				 confByUrl.put(in.readObject().toString(), (Configuration)in.readObject());
-			 }
-		} catch (Throwable e) {
-			StatusHandler.log(new Status(IStatus.WARNING, RedmineCorePlugin.PLUGIN_ID,
-					"The Redmine respository data cache could not be read", e));
-		} finally {
-			if (in != null) {
-				try {
-					in.close();
-				} catch (IOException e) {
-					//do nothing
+		if (confByUrl.isEmpty() && cacheFile!=null && cacheFile.exists()) {
+			//DEPRECATED
+			ObjectInputStream in = null;
+			try {
+				in = new ObjectInputStream(new FileInputStream(cacheFile));
+				for(int count=in.readInt();count>0;count--) {
+					confByUrl.put(in.readObject().toString(), (Configuration)in.readObject());
+				}
+			} catch (Throwable e) {
+				StatusHandler.log(new Status(IStatus.WARNING, RedmineCorePlugin.PLUGIN_ID,
+						"The Redmine respository data cache could not be read", e));
+			} finally {
+				if (in != null) {
+					try {
+						in.close();
+					} catch (IOException e) {
+						//do nothing
+					}
 				}
 			}
 		}
+		
 	}
 	
-	//TODO als xml abspeichern
 	public void writeCache() {
-		if (cacheFile==null) {
-			return;
-		}
-
-		ObjectOutputStream out = null;
-		try {
-			out = new ObjectOutputStream(new FileOutputStream(cacheFile));
-			
-			out.writeInt(confByUrl.size());
-			for(Entry<String, Configuration>  entry : confByUrl.entrySet()) {
-				out.writeObject(entry.getKey());
-				out.writeObject(entry.getValue());
+		if (zipedCacheFile!=null) {
+			if(zipedCacheFile.exists()) {
+				zipedCacheFile.delete();
 			}
 			
-			out.flush();
-		} catch (Throwable e) {
-			StatusHandler.log(new Status(IStatus.WARNING, RedmineCorePlugin.PLUGIN_ID,
-					"The Redmine respository data cache could not be written", e));
-		} finally {
-			if (out != null) {
+			ZipOutputStream zip = null;
+			try {
 				try {
-					out.close();
-				} catch (IOException e1) {
-					//do nothing
+					zip = new ZipOutputStream(new FileOutputStream(zipedCacheFile));
+					
+					for(Entry<String, Configuration>  entry : confByUrl.entrySet()) {
+						String name = entry.getKey();
+						for (char chr : ILLEGAL_ZIP_ENTRY_CHARS) {
+							name = name.replace(""+chr, "0x"+Integer.toHexString(chr));
+						}
+						zip.putNextEntry(new ZipEntry(name + ".xml"));
+						entry.getValue().write(zip);
+						zip.closeEntry();
+					}
+					
+				} finally {
+					if(zip!=null) {
+						zip.close();
+					}
+				}
+			} catch (Exception e) {
+				IStatus status = new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, "The Redmine respository data cache could not be written", e);
+				RedmineCorePlugin.getDefault().getLog().log(status);
+				
+				if(zipedCacheFile.exists()) {
+					zipedCacheFile.delete();
 				}
 			}
 		}
