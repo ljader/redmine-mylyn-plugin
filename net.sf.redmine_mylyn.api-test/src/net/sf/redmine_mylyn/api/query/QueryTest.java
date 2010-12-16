@@ -117,6 +117,48 @@ public class QueryTest {
 	}
 
 	@Test
+	public void testIntegratedToUrl_NegateedSingleProject() throws Exception {
+		testee.addFilter(PROJECT, IS_NOT, "2");
+		testee.addFilter(TRACKER, IS_NOT, "1");
+		testee.addFilter(TRACKER, IS_NOT, "3");
+		testee.addFilter(STATUS, OPEN);
+		
+		String enc = "UTF-8";
+		StringBuilder expected = new StringBuilder();
+		expected.append("?fields[]=").append(URLEncoder.encode("project_id", enc));
+		expected.append("&operators[project_id]=").append(URLEncoder.encode("!", enc));
+		expected.append("&values[project_id][]=").append(URLEncoder.encode("2", enc));
+		expected.append("&fields[]=").append(URLEncoder.encode("tracker_id", enc));
+		expected.append("&operators[tracker_id]=").append(URLEncoder.encode("!", enc));
+		expected.append("&values[tracker_id][]=").append(URLEncoder.encode("1", enc));
+		expected.append("&values[tracker_id][]=").append(URLEncoder.encode("3", enc));
+		expected.append("&fields[]=").append(URLEncoder.encode("status_id", enc));
+		expected.append("&operators[status_id]=").append(URLEncoder.encode("o", enc));
+		expected.append("&values[status_id][]=").append(URLEncoder.encode("", enc));
+		
+		assertEquals(expected.toString(), testee.toUrl(enc));
+	}
+	
+	@Test
+	public void testIntegratedToUrl_MultipleProjects() throws Exception {
+		testee.addFilter(PROJECT, IS, "1");
+		testee.addFilter(PROJECT, IS, "3");
+		testee.addFilter(STATUS, OPEN);
+		
+		String enc = "UTF-8";
+		StringBuilder expected = new StringBuilder();
+		expected.append("?fields[]=").append(URLEncoder.encode("project_id", enc));
+		expected.append("&operators[project_id]=").append(URLEncoder.encode("=", enc));
+		expected.append("&values[project_id][]=").append(URLEncoder.encode("1", enc));
+		expected.append("&values[project_id][]=").append(URLEncoder.encode("3", enc));
+		expected.append("&fields[]=").append(URLEncoder.encode("status_id", enc));
+		expected.append("&operators[status_id]=").append(URLEncoder.encode("o", enc));
+		expected.append("&values[status_id][]=").append(URLEncoder.encode("", enc));
+		
+		assertEquals(expected.toString(), testee.toUrl(enc));
+	}
+	
+	@Test
 	public void testIntegratedFromUrl() throws Exception {
 		String enc = "UTF-8";
 		StringBuilder url = new StringBuilder();
@@ -143,6 +185,41 @@ public class QueryTest {
 		expected.add(new NameValuePair("values[status_id][]", ""));
 		
 		assertEquals(expected, query.getParams());
-}
+	}
+	
+	@Test
+	public void testIntegratedFromUrl_MultipleProjects() throws Exception {
+		String enc = "UTF-8";
+		StringBuilder url = new StringBuilder();
+		url.append("?fields[]=").append(URLEncoder.encode("project_id", enc));
+		url.append("&operators[project_id]=").append(URLEncoder.encode("=", enc));
+		url.append("&values[project_id][]=").append(URLEncoder.encode("1", enc));
+		url.append("&values[project_id][]=").append(URLEncoder.encode("3", enc));
+		url.append("&fields[]=").append(URLEncoder.encode("tracker_id", enc));
+		url.append("&operators[tracker_id]=").append(URLEncoder.encode("!", enc));
+		url.append("&values[tracker_id][]=").append(URLEncoder.encode("1", enc));
+		url.append("&values[tracker_id][]=").append(URLEncoder.encode("3", enc));
+		url.append("&fields[]=").append(URLEncoder.encode("status_id", enc));
+		url.append("&operators[status_id]=").append(URLEncoder.encode("o", enc));
+		url.append("&values[status_id][]=").append(URLEncoder.encode("", enc));
+		
+		Query query = Query.fromUrl(url.toString(), enc, TestData.cfg);
+		assertNotNull(query);
+		
+		ArrayList<NameValuePair> expected = new ArrayList<NameValuePair>();
+		expected.add(new NameValuePair("fields[]", "project_id"));
+		expected.add(new NameValuePair("operators[project_id]", "="));
+		expected.add(new NameValuePair("values[project_id][]", "1"));
+		expected.add(new NameValuePair("values[project_id][]", "3"));
+		expected.add(new NameValuePair("fields[]", "tracker_id"));
+		expected.add(new NameValuePair("operators[tracker_id]", "!"));
+		expected.add(new NameValuePair("values[tracker_id][]", "1"));
+		expected.add(new NameValuePair("values[tracker_id][]", "3"));
+		expected.add(new NameValuePair("fields[]", "status_id"));
+		expected.add(new NameValuePair("operators[status_id]", "o"));
+		expected.add(new NameValuePair("values[status_id][]", ""));
+		
+		assertEquals(expected, query.getParams());
+	}
 	
 }

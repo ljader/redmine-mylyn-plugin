@@ -13,6 +13,7 @@ import static net.sf.redmine_mylyn.api.query.QueryField.DATE_START;
 import static net.sf.redmine_mylyn.api.query.QueryField.DONE_RATIO;
 import static net.sf.redmine_mylyn.api.query.QueryField.STATUS;
 import static net.sf.redmine_mylyn.api.query.QueryField.TRACKER;
+import static net.sf.redmine_mylyn.api.query.QueryField.PROJECT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.*;
@@ -140,6 +141,52 @@ public class QueryFilterTest {
 		assertEquals("t", params.get(1).getValue());
 		assertEquals("values[start_date][]", params.get(2).getName());
 		assertEquals("", params.get(2).getValue());
+	}
+	
+	@Test
+	public void testAppendParamsProject() throws Exception {
+		testee = new QueryFilter(PROJECT);
+
+		testee.setOperator(IS);
+		testee.appendParams(params);
+		assertEquals(0, params.size());
+		
+		//ProjectBased
+		testee.addValue("3");
+		testee.appendParams(params);
+		assertEquals(1, params.size());
+		assertEquals("project_id", params.get(0).getName());
+		assertEquals("3", params.get(0).getValue());
+		
+		//MultipleProjects
+		testee.setOperator(IS);
+		params.clear();
+		testee.addValue("1");
+		testee.addValue("3");
+		testee.appendParams(params);
+		assertEquals(4, params.size());
+		assertEquals("fields[]", params.get(0).getName());
+		assertEquals("project_id", params.get(0).getValue());
+		assertEquals("operators[project_id]", params.get(1).getName());
+		assertEquals("=", params.get(1).getValue());
+		assertEquals("values[project_id][]", params.get(2).getName());
+		assertEquals("1", params.get(2).getValue());
+		assertEquals("values[project_id][]", params.get(3).getName());
+		assertEquals("3", params.get(3).getValue());
+
+		//MultipleProjects - Single - Negate
+		testee.setOperator(IS_NOT);
+		params.clear();
+		testee.addValue("3");
+		testee.appendParams(params);
+		assertEquals(3, params.size());
+		assertEquals("fields[]", params.get(0).getName());
+		assertEquals("project_id", params.get(0).getValue());
+		assertEquals("operators[project_id]", params.get(1).getName());
+		assertEquals("!", params.get(1).getValue());
+		assertEquals("values[project_id][]", params.get(2).getName());
+		assertEquals("3", params.get(2).getValue());
+		
 	}
 	
 	@Test

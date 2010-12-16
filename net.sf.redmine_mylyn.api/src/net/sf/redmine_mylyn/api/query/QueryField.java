@@ -16,7 +16,7 @@ public enum QueryField implements IQueryField {
 	BOOLEAN_TYPE("BOOLEAN_BASED", CompareOperator.IS, CompareOperator.IS_NOT),
 	
 	//TODO not tested
-	PROJECT("project_id", CompareOperator.IS),
+	PROJECT("project_id", CompareOperator.IS, CompareOperator.IS_NOT),
 
 	STATUS("status_id", CompareOperator.OPEN, CompareOperator.IS, CompareOperator.IS_NOT, CompareOperator.CLOSED, CompareOperator.ALL),
 	PRIORITY("priority_id", CompareOperator.IS, CompareOperator.IS_NOT),
