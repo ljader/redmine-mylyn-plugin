@@ -2,6 +2,7 @@ package net.sf.redmine_mylyn.internal.ui.query;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -71,7 +72,7 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 	private static final String DESCRIPTION = "Only predefined filters are supported.";
 
 	private static final String OPERATOR_BOOLEAN_TRUE = "true";
-
+	
 	private IRepositoryQuery query;
 
 	private Text titleText;
@@ -204,15 +205,6 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 	
 	private Control createInputControl(Composite parent, QueryField definition, IQueryField queryField) {
 		Control control = null;
-		if(definition==QueryField.PROJECT) {
-			ListViewer list = new ListViewer(parent, SWT.BORDER | SWT.SINGLE | SWT.V_SCROLL);
-			list.setLabelProvider(new RedmineLabelProvider());
-			list.setContentProvider(new RedmineContentProvider());
-			list.getControl().setEnabled(false);
-			
-			control = list.getControl();
-			queryStructuredViewer.put(queryField, list);
-		} else 
 		if (definition.isListType()) {
 			ListViewer list = new ListViewer(parent, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
 			list.setLabelProvider(new RedmineLabelProvider());
@@ -384,7 +376,9 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 		
 		/* AssignedTo */
 		viewer = queryStructuredViewer.get(QueryField.ASSIGNED_TO);
-		viewer.setInput(project==null ? null : configuration.getUsers().getById(project.getAssignableMemberIds()));
+		viewer.setInput(project==null 
+				? configuration.getUsers().getAll() 
+				: configuration.getUsers().getById(project.getAssignableMemberIds()));
 
 		/* Version */
 		viewer = queryStructuredViewer.get(QueryField.FIXED_VERSION);
@@ -392,7 +386,9 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 		
 		/* Tracker */
 		viewer = queryStructuredViewer.get(QueryField.TRACKER);
-		viewer.setInput(project==null ? null : configuration.getTrackers().getById(project.getTrackerIds()));
+		viewer.setInput(project==null 
+				? configuration.getTrackers().getAll() 
+				: configuration.getTrackers().getById(project.getTrackerIds()));
 		
 		/* Category */
 		viewer = queryStructuredViewer.get(QueryField.CATEGORY);
@@ -452,67 +448,131 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 		}
 	}
 	
-	HashSet<Integer> abc(Project project) {
-		HashSet<Integer> collectedCustomFieldIds = null;
+//	HashSet<Integer> abc(Project project) {
+//		HashSet<Integer> collectedCustomFieldIds = null;
+//		
+//		if(project!=null) {
+//			ISelection selection = searchOperators.get(QueryField.TRACKER).getSelection();
+//			if(selection!=null && !selection.isEmpty()) {
+//				Object operator = ((StructuredSelection)selection).getFirstElement();
+//				selection = queryStructuredViewer.get(QueryField.TRACKER).getSelection();
+//				
+//				collectedCustomFieldIds = new HashSet<Integer>();
+//				
+//				//Collect CustomFields for the selected Project and all selected Trackers
+//				if(operator==CompareOperator.IS) {
+//					if (selection!=null && !selection.isEmpty()) {
+//						for (Object o : ((StructuredSelection)selection).toList()) {
+//							if(o instanceof Tracker) {
+//								for (int cfId :  project.getCustomFieldIdsByTrackerId(((Tracker)o).getId())) {
+//									collectedCustomFieldIds.add(cfId);
+//								}
+//							}
+//						}
+//					}
+//				}
+//				
+//				//Collect CustomFields for the selected Project
+//				else { 
+//					for(int trackerId : project.getTrackerIds()) {
+//						int[] cfIds = project.getCustomFieldIdsByTrackerId(trackerId);
+//						if (cfIds!=null) {
+//							for(int cfId : cfIds) {
+//								collectedCustomFieldIds.add(cfId);
+//							}
+//						}
+//					}
+//					
+//					//...excepting CutomFields for all selected Trackers
+//					if (operator==CompareOperator.IS_NOT && selection!=null && !selection.isEmpty()) {
+//						for (Object o : ((StructuredSelection)selection).toList()) {
+//							if(o instanceof Tracker) {
+//								int[] toRemove = project.getCustomFieldIdsByTrackerId(((Tracker)o).getId());
+//								for (int i : toRemove) {
+//									collectedCustomFieldIds.remove(i);
+//								}
+//							}
+//						}
+//					}
+//					
+//				}
+//				
+//			}
+//		}
+//		
+//		return collectedCustomFieldIds;
+//	}
+	
+	HashSet<Integer> findAvailableCustomFields(Project project) {
 		
-		if(project!=null) {
-			ISelection selection = searchOperators.get(QueryField.TRACKER).getSelection();
-			if(selection!=null && !selection.isEmpty()) {
-				Object operator = ((StructuredSelection)selection).getFirstElement();
-				selection = queryStructuredViewer.get(QueryField.TRACKER).getSelection();
-				
-				collectedCustomFieldIds = new HashSet<Integer>();
-				
-				//Collect CustomFields for the selected Project and all selected Trackers
-				if(operator==CompareOperator.IS) {
-					if (selection!=null && !selection.isEmpty()) {
-						for (Object o : ((StructuredSelection)selection).toList()) {
-							if(o instanceof Tracker) {
-								for (int cfId :  project.getCustomFieldIdsByTrackerId(((Tracker)o).getId())) {
-									collectedCustomFieldIds.add(cfId);
-								}
-							}
-						}
+		List<Tracker> availableTrackerList = project==null 
+			? configuration.getTrackers().getAll() 
+			: configuration.getTrackers().getById(project.getTrackerIds());
+			
+		CompareOperator op = getSelectedOperator(QueryField.TRACKER);
+		StructuredSelection selection = (StructuredSelection)queryStructuredViewer.get(QueryField.TRACKER).getSelection();
+
+		//Find related Trackers - Negate Tracker-Selection if necessary
+		List<Tracker> selTrackerList = null;
+		if(op==null || op==CompareOperator.IS_NOT && selection.isEmpty()) {
+			selTrackerList = availableTrackerList;
+		} else {
+			selTrackerList = new ArrayList<Tracker>();
+			if (op==CompareOperator.IS_NOT) {
+				selTrackerList.addAll(availableTrackerList);
+				for (Object selected : selection.toList()) {
+					selTrackerList.remove(selected);
+				}
+			} else {
+				for (Object selected : selection.toList()) {
+					selTrackerList.add((Tracker)selected);
+				}
+			}
+		} 
+		
+		HashSet<Integer> collectedCustomFieldIds = new HashSet<Integer>();
+		if (project==null) {
+			for (Tracker tracker : selTrackerList) {
+				for (Integer cfId : tracker.getIssueCustomFields()) {
+					CustomField cf  = configuration.getCustomFields().getById(cfId);
+					if(cf.isCrossProjectUsable()) {
+						collectedCustomFieldIds.add(cfId);
 					}
 				}
-				
-				//Collect CustomFields for the selected Project
-				else { 
-					for(int trackerId : project.getTrackerIds()) {
-						for(int cfId : project.getCustomFieldIdsByTrackerId(trackerId)) {
-							collectedCustomFieldIds.add(cfId);
-						}
+			}
+		} else {
+			for (Tracker tracker : selTrackerList) {
+				int[] cfIds = project.getCustomFieldIdsByTrackerId(tracker.getId());
+				if (cfIds!=null) {
+					for(int cfId : cfIds) {
+						collectedCustomFieldIds.add(cfId);
 					}
-					
-					//...excepting CutomFields for all selected Trackers
-					if (operator==CompareOperator.IS_NOT && selection!=null && !selection.isEmpty()) {
-						for (Object o : ((StructuredSelection)selection).toList()) {
-							if(o instanceof Tracker) {
-								int[] toRemove = project.getCustomFieldIdsByTrackerId(((Tracker)o).getId());
-								for (int i : toRemove) {
-									collectedCustomFieldIds.remove(i);
-								}
-							}
-						}
-					}
-					
 				}
-				
 			}
 		}
 		
 		return collectedCustomFieldIds;
 	}
 	
-	Project getSelectedProject() {
-		ISelection selection = searchOperators.get(QueryField.PROJECT).getSelection();
-		if(selection!=null && !selection.isEmpty() && ((StructuredSelection)selection).getFirstElement()==CompareOperator.IS) {
-			
-			selection = queryStructuredViewer.get(QueryField.PROJECT).getSelection();
-			if(selection instanceof StructuredSelection && !selection.isEmpty()) {
-				return (Project)((StructuredSelection)selection).getFirstElement();
+	CompareOperator getSelectedOperator(IQueryField queryField) {
+		ISelection selection = searchOperators.get(queryField).getSelection();
+		if(selection!=null && !selection.isEmpty() && selection instanceof StructuredSelection) {
+			Object selected = ((StructuredSelection)selection).getFirstElement();
+			if(selected instanceof CompareOperator) {
+				return (CompareOperator)selected;
 			}
-			
+		}
+		return null;
+	}
+	
+	Project getSelectedProject() {
+		if(getSelectedOperator(QueryField.PROJECT)==CompareOperator.IS) {
+			if(queryStructuredViewer.get(QueryField.PROJECT).getSelection() instanceof StructuredSelection) {
+				IStructuredSelection selection = (StructuredSelection)queryStructuredViewer.get(QueryField.PROJECT).getSelection();
+				if(selection.size()==1) {
+					return (Project)((StructuredSelection)selection).getFirstElement();
+				}
+			}
 		}
 		return null;
 	}
@@ -585,22 +645,17 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 	void switchOperatorState() {
 		Project project = getSelectedProject();
 		boolean enabled = project!=null;
-		Set<Integer> matchingCustomFieldIds = enabled ? abc(project) : null;
+		Set<Integer> matchingCustomFieldIds = findAvailableCustomFields(project);
 		
 		for (Entry<IQueryField, ComboViewer> entry : searchOperators.entrySet()) {
 			IQueryField queryField = entry.getKey();
 			Control control = entry.getValue().getControl();
 			
-			if(enabled) {
-				if(queryField instanceof CustomField) {
-					control.setEnabled(queryField.isCrossProjectUsable() || (matchingCustomFieldIds!=null && matchingCustomFieldIds.contains(((CustomField) queryField).getId())));
-				} else {
-					control.setEnabled(true);
-				}
+			if(queryField instanceof CustomField) {
+				control.setEnabled(matchingCustomFieldIds.contains(((CustomField)queryField).getId()));
 			} else {
-				control.setEnabled(queryField.isCrossProjectUsable());
+				control.setEnabled(enabled || queryField.isCrossProjectUsable());
 			}
-			setQueryFieldValueControlEnabled(queryField);
 		}
 		
 	}
@@ -619,16 +674,6 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 		return (titleText != null && titleText.getText().length() > 0);
 	}
 
-//	private RedmineTicketAttribute getFirstSelectedEntry(Viewer viewer) {
-//		if (!viewer.getSelection().isEmpty() && viewer.getSelection() instanceof StructuredSelection) {
-//			Object selected = ((IStructuredSelection)viewer.getSelection()).getFirstElement();
-//			if (selected instanceof RedmineTicketAttribute) {
-//				return (RedmineTicketAttribute) selected;
-//			}
-//		}
-//		return null;
-//	}
-	
 	@Override
 	public void applyTo(IRepositoryQuery repositoryQuery) {
 		repositoryQuery.setSummary(getQueryTitle());
