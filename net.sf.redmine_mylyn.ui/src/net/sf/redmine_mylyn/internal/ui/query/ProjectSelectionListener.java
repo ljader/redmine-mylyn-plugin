@@ -11,32 +11,27 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 
 class ProjectSelectionListener implements ISelectionChangedListener {
-		private final RedmineRepositoryQueryPage page;
-		
-		ProjectSelectionListener(RedmineRepositoryQueryPage page) {
-			this.page = page;
-		}
+	private final RedmineRepositoryQueryPage page;
 
-		public void selectionChanged(SelectionChangedEvent event) {
-			if(event.getSelection() instanceof IStructuredSelection) {
-				IStructuredSelection selection = (IStructuredSelection)event.getSelection();
-				
-				
-				if ( event.getSource() instanceof ComboViewer && !(selection.getFirstElement() instanceof CompareOperator)) {
-					page.queryStructuredViewer.get(QueryField.PROJECT).setSelection(new StructuredSelection());
+	ProjectSelectionListener(RedmineRepositoryQueryPage page) {
+		this.page = page;
+	}
+
+	public void selectionChanged(SelectionChangedEvent event) {
+		if (event.getSelection() instanceof IStructuredSelection) {
+			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+
+			if (event.getSource() instanceof ComboViewer && !(selection.getFirstElement() instanceof CompareOperator)) {
+				page.queryStructuredViewer.get(QueryField.PROJECT).setSelection(new StructuredSelection());
+			} else {
+				page.switchOperatorState();
+				page.clearSettings();
+				if (selection.size()==1 && selection.getFirstElement() instanceof Project) {
+					page.updateProjectAttributes((Project) selection.getFirstElement());
 				} else {
-					
-					page.switchOperatorState();
-					page.clearSettings();
-					
-					Object selected = selection.getFirstElement();
-					if (selected instanceof Project) {
-						page.updateProjectAttributes((Project)selected);
-					} else {
-						page.updateProjectAttributes(null);
-					}
+					page.updateProjectAttributes(null);
 				}
-				
 			}
 		}
 	}
+}
