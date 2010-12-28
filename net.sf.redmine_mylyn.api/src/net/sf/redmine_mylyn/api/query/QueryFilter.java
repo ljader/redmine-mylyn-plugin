@@ -73,10 +73,11 @@ public class QueryFilter {
 					return;
 				}
 				
-				if(definition.isDateType() && values.size()>1 || (Integer.parseInt(values.get(0)) < 1)) {
+				//Must be: Single Value >= 0 ???
+				if(definition.isDateType() && (values.size()>1 || (Integer.parseInt(values.get(0)) < 0))) {
 					return;
 				}
-				
+				//Must be: Single Value 0 or 1
 				if(definition==QueryField.BOOLEAN_TYPE) {
 					int v =  Integer.parseInt(values.get(0));
 					if(v<0 || v>1) {
@@ -84,6 +85,7 @@ public class QueryFilter {
 					}
 				}
 				
+				//Must be: Single Value 0-100
 				if(definition==QueryField.DONE_RATIO) {
 					int v =  Integer.parseInt(values.get(0));
 					if(v<0 || v>100) {
@@ -92,7 +94,7 @@ public class QueryFilter {
 				}
 			}
 		} catch (NumberFormatException e) {
-			throw new RedmineApiErrorException("Invalid Integer-Value `{}` for Query-Field `{}`", e, ""+values.get(0), queryField.getQueryValue());
+			throw new RedmineApiErrorException("Invalid Integer-Value `{0}` for Query-Field `{1}`", e, ""+values.get(0), queryField.getQueryValue());
 		}
 		
 		if(queryField==QueryField.PROJECT && values.size()==1 && operator==CompareOperator.IS) {

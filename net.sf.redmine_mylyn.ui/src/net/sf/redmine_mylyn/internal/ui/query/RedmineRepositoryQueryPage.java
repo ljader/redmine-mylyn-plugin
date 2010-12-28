@@ -2,7 +2,6 @@ package net.sf.redmine_mylyn.internal.ui.query;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -52,16 +51,11 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.IProgressService;
 
@@ -244,11 +238,6 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 		return combo;
 	}
 	
-	private void setQueryFieldEnabled(IQueryField queryField, boolean enabled){
-		searchOperators.get(queryField).getControl().setEnabled(enabled);
-		setQueryFieldValueControlEnabled(queryField);
-	}
-	
 	private void setQueryFieldValueControlEnabled(IQueryField queryField) {
 		ComboViewer comboViewer = searchOperators.get(queryField);
 		boolean enabled = comboViewer.getControl().isEnabled();
@@ -371,7 +360,8 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 		
 	}
 
-	void updateProjectAttributes(Project project) {
+	void updateProjectAttributes() {
+		Project project = getSelectedProject();
 		StructuredViewer viewer;
 		
 		/* AssignedTo */
@@ -448,61 +438,6 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 		}
 	}
 	
-//	HashSet<Integer> abc(Project project) {
-//		HashSet<Integer> collectedCustomFieldIds = null;
-//		
-//		if(project!=null) {
-//			ISelection selection = searchOperators.get(QueryField.TRACKER).getSelection();
-//			if(selection!=null && !selection.isEmpty()) {
-//				Object operator = ((StructuredSelection)selection).getFirstElement();
-//				selection = queryStructuredViewer.get(QueryField.TRACKER).getSelection();
-//				
-//				collectedCustomFieldIds = new HashSet<Integer>();
-//				
-//				//Collect CustomFields for the selected Project and all selected Trackers
-//				if(operator==CompareOperator.IS) {
-//					if (selection!=null && !selection.isEmpty()) {
-//						for (Object o : ((StructuredSelection)selection).toList()) {
-//							if(o instanceof Tracker) {
-//								for (int cfId :  project.getCustomFieldIdsByTrackerId(((Tracker)o).getId())) {
-//									collectedCustomFieldIds.add(cfId);
-//								}
-//							}
-//						}
-//					}
-//				}
-//				
-//				//Collect CustomFields for the selected Project
-//				else { 
-//					for(int trackerId : project.getTrackerIds()) {
-//						int[] cfIds = project.getCustomFieldIdsByTrackerId(trackerId);
-//						if (cfIds!=null) {
-//							for(int cfId : cfIds) {
-//								collectedCustomFieldIds.add(cfId);
-//							}
-//						}
-//					}
-//					
-//					//...excepting CutomFields for all selected Trackers
-//					if (operator==CompareOperator.IS_NOT && selection!=null && !selection.isEmpty()) {
-//						for (Object o : ((StructuredSelection)selection).toList()) {
-//							if(o instanceof Tracker) {
-//								int[] toRemove = project.getCustomFieldIdsByTrackerId(((Tracker)o).getId());
-//								for (int i : toRemove) {
-//									collectedCustomFieldIds.remove(i);
-//								}
-//							}
-//						}
-//					}
-//					
-//				}
-//				
-//			}
-//		}
-//		
-//		return collectedCustomFieldIds;
-//	}
-	
 	HashSet<Integer> findAvailableCustomFields(Project project) {
 		
 		List<Tracker> availableTrackerList = project==null 
@@ -528,7 +463,7 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 					selTrackerList.add((Tracker)selected);
 				}
 			}
-		} 
+		}
 		
 		HashSet<Integer> collectedCustomFieldIds = new HashSet<Integer>();
 		if (project==null) {
@@ -604,44 +539,16 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 //			storedQuery = queryData.getQuery(sqId);
 //		}
 		
+		//TODO PRÜFEN oben steht NOTE... - evtl innnerhalb von restoreStructuredQueryPart extra behandeln
+		switchOperatorState();
+		updateProjectAttributes();
+		
 		QueryBuilder.restoreTextQueryPart(query, configuration, searchOperators, queryText);
 		QueryBuilder.restoreStructuredQueryPart(query, configuration, searchOperators, queryStructuredViewer);
 		
 		getContainer().updateButtons();
 	}
-	
-	/**
-	 * Deselect / clear all Settings / Attributes
-	 */
-	void clearSettings() {
-//		clearListSettings(searchOperators, queryStructuredViewer);
-//		clearTextSettings(searchOperators, queryText);
-	}
-	
-//	private void clearListSettings(Map<IQueryField, ComboViewer> operatorCombo, Map<IQueryField, StructuredViewer> valueViewer) {
-//		for (Entry<IQueryField, StructuredViewer> entry : valueViewer.entrySet()) {
-//			if(entry.getKey()!=QueryField.PROJECT) {
-//				if(!operatorCombo.get(entry.getKey()).getControl().isEnabled()) {
-//					entry.getValue().getControl().setEnabled(false);
-//				} else {
-//					//TODO nur wenn valuebased
-//					entry.getValue().getControl().setEnabled(true);
-//				}
-//			}
-//		}
-//	}
-//
-//	private void clearTextSettings(Map<IQueryField, ComboViewer> operators, Map<IQueryField, Text> textValues) {
-//		for (Entry<IQueryField, Text> entry : textValues.entrySet()) {
-//			if(!operators.get(entry.getKey()).getControl().isEnabled()) {
-//				entry.getValue().setEnabled(false);
-//			} else {
-//				//TODO nur wenn valuebased
-//				entry.getValue().setEnabled(true);
-//			}
-//		}
-//	}
-	
+		
 	void switchOperatorState() {
 		Project project = getSelectedProject();
 		boolean enabled = project!=null;
