@@ -88,6 +88,10 @@ public enum QueryField implements IQueryField {
 	public boolean isListType() {
 		return LIST_TYPES.contains(this);
 	}
+	
+	public boolean isBooleanType() {
+		return this==BOOLEAN_TYPE;
+	}
 
 	public boolean isRequired() {
 		return REQUIRED.contains(this);
