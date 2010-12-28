@@ -1,6 +1,5 @@
 package net.sf.redmine_mylyn.internal.ui.query;
 
-import net.sf.redmine_mylyn.api.model.Project;
 import net.sf.redmine_mylyn.api.query.CompareOperator;
 import net.sf.redmine_mylyn.api.query.QueryField;
 
@@ -25,12 +24,7 @@ class ProjectSelectionListener implements ISelectionChangedListener {
 				page.queryStructuredViewer.get(QueryField.PROJECT).setSelection(new StructuredSelection());
 			} else {
 				page.switchOperatorState();
-				page.clearSettings();
-				if (selection.size()==1 && selection.getFirstElement() instanceof Project) {
-					page.updateProjectAttributes((Project) selection.getFirstElement());
-				} else {
-					page.updateProjectAttributes(null);
-				}
+				page.updateProjectAttributes();
 			}
 		}
 	}
