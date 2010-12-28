@@ -65,8 +65,6 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 	
 	private static final String DESCRIPTION = "Only predefined filters are supported.";
 
-	private static final String OPERATOR_BOOLEAN_TRUE = "true";
-	
 	private IRepositoryQuery query;
 
 	private Text titleText;
@@ -213,8 +211,12 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 			
 			control = text;
 			queryText.put(queryField, text);
+
+			if (definition.isBooleanType()) {
+				text.setText("yes");
+				text.setEditable(false);
+			}
 		}
-		
 		return control;
 	}
 
