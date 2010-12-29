@@ -214,6 +214,9 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 		} else {
 			Text text = new Text(parent, SWT.BORDER);
 			text.setEnabled(false);
+			if(definition.getValidator()!=null) {
+				text.addListener(SWT.Verify, new TextVerifyListener(definition.getValidator()));
+			}
 			
 			control = text;
 			queryText.put(queryField, text);
@@ -404,15 +407,8 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 		}
 		Assert.isTrue(oldComposites.size()==2);
 
-		/* Remove old CustomFields */
-		for(CustomField customField : customFields) {
-//				queryStructuredViewer.remove(queryField);
-//				queryStructuredViewer.remove(queryField);
-//				searchOperators.remove(queryField);
-		}
-		customFields.clear();
-		
 		/* Create new/updated CustomFields */
+		customFields.clear();
 		createCustomItemGroup(itemComposite);
 		
 

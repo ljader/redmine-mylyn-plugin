@@ -176,9 +176,9 @@ public class CustomField extends Property implements IQueryField {
 			case BOOL: return QueryField.BOOLEAN_TYPE;
 			case DATE: return QueryField.DATE_TYPE;
 			case STRING:
-			case TEXT:
-			case INT:
-			case FLOAT: return QueryField.TEXT_TYPE;
+			case TEXT: return QueryField.TEXT_TYPE;
+			case INT: return QueryField.INT_TYPE;
+			case FLOAT: return QueryField.FLOAT_TYPE;
 			}
 		}
 		return null;
