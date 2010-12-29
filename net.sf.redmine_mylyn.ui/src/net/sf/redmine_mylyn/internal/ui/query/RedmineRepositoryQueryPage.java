@@ -66,7 +66,7 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 	private static final String DESCRIPTION = "Only predefined filters are supported.";
 
 	private IRepositoryQuery query;
-
+	
 	private Text titleText;
 
 	private final RedmineRepositoryConnector connector;
@@ -198,9 +198,15 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 	private Control createInputControl(Composite parent, QueryField definition, IQueryField queryField) {
 		Control control = null;
 		if (definition.isListType()) {
+			
+			String constrArg = null;
+			if(definition.isPersonType()) {
+				constrArg = QueryField.VALUE_PERSON_ME;
+			}
+			
 			ListViewer list = new ListViewer(parent, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
-			list.setLabelProvider(new RedmineLabelProvider());
-			list.setContentProvider(new RedmineContentProvider());
+			list.setLabelProvider(new RedmineLabelProvider(constrArg));
+			list.setContentProvider(new RedmineContentProvider(constrArg));
 			list.getControl().setEnabled(false);
 			
 			control = list.getControl();
