@@ -15,6 +15,10 @@ public class RedmineUtil {
 	
 	private final static SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 	
+	public static boolean isInteger(String  val) {
+		return val.matches("^\\d+$");
+	}
+	
 	public static int parseIntegerId(String intVal) {
 		if(intVal!=null && !intVal.isEmpty()) {
 			try {

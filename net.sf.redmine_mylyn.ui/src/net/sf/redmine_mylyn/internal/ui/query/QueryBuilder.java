@@ -129,11 +129,15 @@ public class QueryBuilder {
 				
 				List<String> filterValues = queryFilter.getValues();
 				if(queryField instanceof QueryField) {
-					List<Property> properties = new ArrayList<Property>(filterValues.size());
+					List<Object> properties = new ArrayList<Object>(filterValues.size());
 					for(String value : filterValues) {
-						Property property = queryFieldValue2Property(RedmineUtil.parseIntegerId(value), (QueryField)queryField, configuration);
-						if(property!=null) {
-							properties.add(property);
+						if(RedmineUtil.isInteger(value)) {
+							Property property = queryFieldValue2Property(RedmineUtil.parseIntegerId(value), (QueryField)queryField, configuration);
+							if(property!=null) {
+								properties.add(property);
+							}
+						} else {
+							properties.add(value);
 						}
 						viewer.setSelection(new StructuredSelection(properties));
 					}

@@ -5,7 +5,7 @@ import java.util.EnumSet;
 import java.util.List;
 
 public enum QueryField implements IQueryField {
-
+	
 	LIST_TYPE("LIST_BASED", CompareOperator.IS, CompareOperator.IS_NOT, CompareOperator.NONE, CompareOperator.ALL),
 	TEXT_TYPE("TEXT_BASED", CompareOperator.IS, CompareOperator.IS_NOT, CompareOperator.CONTAINS, CompareOperator.CONTAINS_NOT),
 	DATE_TYPE("DATE_BASED", CompareOperator.DAY_AGO_MORE_THEN,
@@ -53,8 +53,11 @@ public enum QueryField implements IQueryField {
 	final static EnumSet<QueryField> CROSS_PROJECT = EnumSet.complementOf(EnumSet.of(FIXED_VERSION, CATEGORY));
 	final static EnumSet<QueryField> LIST_TYPES = EnumSet.of(PROJECT, TRACKER, STATUS, PRIORITY, FIXED_VERSION, ASSIGNED_TO, AUTHOR, CATEGORY, LIST_TYPE);
 	final static EnumSet<QueryField> DATE_TYPES = EnumSet.of(DATE_CREATED, DATE_UPDATED, DATE_START, DATE_DUE, DATE_TYPE);
+	final static EnumSet<QueryField> PERSON_TYPES = EnumSet.of(AUTHOR, ASSIGNED_TO);
 
 	public final static EnumSet<QueryField> ORDERED = EnumSet.of(SUBJECT, DATE_CREATED, DATE_UPDATED, DATE_START, DATE_DUE, DONE_RATIO, PROJECT, TRACKER, STATUS, PRIORITY, FIXED_VERSION, ASSIGNED_TO, AUTHOR, CATEGORY);
+
+	public final static String VALUE_PERSON_ME = "me";
 
 	private final String fieldName;
 	
@@ -93,6 +96,10 @@ public enum QueryField implements IQueryField {
 		return this==BOOLEAN_TYPE;
 	}
 
+	public boolean isPersonType() {
+		return PERSON_TYPES.contains(this);
+	}
+	
 	public boolean isRequired() {
 		return REQUIRED.contains(this);
 	}
