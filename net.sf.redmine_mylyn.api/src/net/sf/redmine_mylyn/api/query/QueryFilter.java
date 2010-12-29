@@ -68,6 +68,8 @@ public class QueryFilter {
 		}
 		
 		try {
+			//TODO check tests 
+			//TODO use QueryField.IValidator
 			if(operator.isValueBased()) {
 				if(values.size()<1) {
 					return;

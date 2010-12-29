@@ -8,7 +8,10 @@ public enum QueryField implements IQueryField {
 	
 	LIST_TYPE("LIST_BASED", CompareOperator.IS, CompareOperator.IS_NOT, CompareOperator.NONE, CompareOperator.ALL),
 	TEXT_TYPE("TEXT_BASED", CompareOperator.IS, CompareOperator.IS_NOT, CompareOperator.CONTAINS, CompareOperator.CONTAINS_NOT),
-	DATE_TYPE("DATE_BASED", CompareOperator.DAY_AGO_MORE_THEN,
+	INT_TYPE("TEXT_BASED", new IntegerValidator(), CompareOperator.IS, CompareOperator.IS_NOT, CompareOperator.CONTAINS, CompareOperator.CONTAINS_NOT),
+	FLOAT_TYPE("TEXT_BASED", new FloatValidator(), CompareOperator.IS, CompareOperator.IS_NOT, CompareOperator.CONTAINS, CompareOperator.CONTAINS_NOT),
+	DATE_TYPE("DATE_BASED", new DateValidator(), 
+			CompareOperator.DAY_AGO_MORE_THEN,
 			CompareOperator.DAY_AGO_LESS_THEN, CompareOperator.DAY_AGO,
 			CompareOperator.TODAY, CompareOperator.CURRENT_WEEK,
 			CompareOperator.DAY_LATER, CompareOperator.DAY_LATER_LESS_THEN,
@@ -30,23 +33,27 @@ public enum QueryField implements IQueryField {
 			CompareOperator.ALL, 
 			CompareOperator.NONE),
 	SUBJECT("subject",CompareOperator.CONTAINS, CompareOperator.CONTAINS_NOT),
-	DATE_CREATED("created_on", CompareOperator.DAY_AGO_MORE_THEN, 
+	DATE_CREATED("created_on", new DateValidator(),
+			CompareOperator.DAY_AGO_MORE_THEN, 
 			CompareOperator.DAY_AGO_LESS_THEN, CompareOperator.DAY_AGO,
 			CompareOperator.TODAY, CompareOperator.CURRENT_WEEK),
-	DATE_UPDATED("updated_on", CompareOperator.DAY_AGO_MORE_THEN,
+	DATE_UPDATED("updated_on", new DateValidator(),
+			CompareOperator.DAY_AGO_MORE_THEN,
 			CompareOperator.DAY_AGO_LESS_THEN, CompareOperator.DAY_AGO,
 			CompareOperator.TODAY, CompareOperator.CURRENT_WEEK),
-	DATE_START("start_date", CompareOperator.DAY_AGO_MORE_THEN,
+	DATE_START("start_date", new DateValidator(),
+			CompareOperator.DAY_AGO_MORE_THEN,
 			CompareOperator.DAY_AGO_LESS_THEN, CompareOperator.DAY_AGO,
 			CompareOperator.TODAY, CompareOperator.CURRENT_WEEK,
 			CompareOperator.DAY_LATER, CompareOperator.DAY_LATER_LESS_THEN,
 			CompareOperator.DAY_LATER_MORE_THEN),
-	DATE_DUE("start_date",CompareOperator.DAY_AGO_MORE_THEN,
+	DATE_DUE("start_date",new DateValidator(),
+			CompareOperator.DAY_AGO_MORE_THEN,
 			CompareOperator.DAY_AGO_LESS_THEN, CompareOperator.DAY_AGO,
 			CompareOperator.TODAY, CompareOperator.CURRENT_WEEK,
 			CompareOperator.DAY_LATER, CompareOperator.DAY_LATER_LESS_THEN,
 			CompareOperator.DAY_LATER_MORE_THEN),
-	DONE_RATIO("done_ratio",CompareOperator.GTE, CompareOperator.LTE);
+	DONE_RATIO("done_ratio", new DoneRatioValidator(), CompareOperator.GTE, CompareOperator.LTE);
 
 	final static EnumSet<QueryField> ABSTRACT = EnumSet.of(BOOLEAN_TYPE, LIST_TYPE, TEXT_TYPE, DATE_TYPE);
 	final static EnumSet<QueryField> REQUIRED = EnumSet.of(STATUS);
@@ -63,15 +70,22 @@ public enum QueryField implements IQueryField {
 	
 	private final List<CompareOperator> operators;
 	
+	private final IValidator validator;
+	
 	QueryField(String fieldName, CompareOperator... operators) {
+		this(fieldName, null, operators);
+	}
+
+	QueryField(String fieldName, IValidator validator, CompareOperator... operators) {
 		this.fieldName = fieldName;
+		this.validator = validator;
 		
 		this.operators = new ArrayList<CompareOperator>(operators.length);
 		for (CompareOperator compareOperator : operators) {
 			this.operators.add(compareOperator);
 		}
 	}
-
+	
 	boolean containsOperator(CompareOperator operator) {
 		return operators.contains(operator);
 	}
@@ -104,6 +118,10 @@ public enum QueryField implements IQueryField {
 		return REQUIRED.contains(this);
 	}
 	
+	public IValidator getValidator() {
+		return validator;
+	}
+	
 	@Override
 	public String getLabel() {
 		return fieldName;
@@ -121,5 +139,57 @@ public enum QueryField implements IQueryField {
 			}
 		}
 		return null;
+	}
+	
+	public static interface IValidator {
+		public boolean isValid(String value);
+	}
+	
+	static class IntegerValidator implements IValidator {
+		@Override
+		public boolean isValid(String value) {
+			try {
+				Integer.parseInt(value);
+				return true;
+			} catch (NumberFormatException e) {
+				return false;
+			}
+		}
+	}
+
+	static class FloatValidator implements IValidator {
+		@Override
+		public boolean isValid(String value) {
+			try {
+				Float.parseFloat(value);
+				return true;
+			} catch (NumberFormatException e) {
+				return false;
+			}
+		}
+	}
+	
+	static class DoneRatioValidator implements IValidator {
+		@Override
+		public boolean isValid(String value) {
+			try {
+				int val = Integer.parseInt(value);
+				return 0 <= val && val <= 100;
+			} catch (NumberFormatException e) {
+				return false;
+			}
+		}
+	}
+	
+	static class DateValidator implements IValidator {
+		@Override
+		public boolean isValid(String value) {
+			try {
+				int val = Integer.parseInt(value);
+				return 0 <= val;
+			} catch (NumberFormatException e) {
+				return false;
+			}
+		}
 	}
 }
