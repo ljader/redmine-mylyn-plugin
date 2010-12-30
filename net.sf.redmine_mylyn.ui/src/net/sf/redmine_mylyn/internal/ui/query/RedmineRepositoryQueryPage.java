@@ -310,6 +310,10 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 				public void run() {
 					updateAttributesFromRepository(false);
 
+					//Init QueryPage with default state
+					switchOperatorState();
+					updateProjectAttributes();
+
 					if (query != null && query.getUrl() != null) {
 						restoreQuery(RedmineRepositoryQueryPage.this.query);
 					}
@@ -542,10 +546,6 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 //		if(sqId>0) {
 //			storedQuery = queryData.getQuery(sqId);
 //		}
-		
-		//TODO PRÜFEN oben steht NOTE... - evtl innnerhalb von restoreStructuredQueryPart extra behandeln
-		switchOperatorState();
-		updateProjectAttributes();
 		
 		QueryBuilder.restoreTextQueryPart(query, configuration, searchOperators, queryText);
 		QueryBuilder.restoreStructuredQueryPart(query, configuration, searchOperators, queryStructuredViewer);

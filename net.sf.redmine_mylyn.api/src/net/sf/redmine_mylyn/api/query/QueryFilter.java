@@ -70,6 +70,7 @@ public class QueryFilter {
 		try {
 			//TODO check tests 
 			//TODO use QueryField.IValidator
+			//TODO skip empty values???
 			if(operator.isValueBased()) {
 				if(values.size()<1) {
 					return;
