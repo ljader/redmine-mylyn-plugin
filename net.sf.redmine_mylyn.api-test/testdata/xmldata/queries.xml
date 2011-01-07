@@ -2,6 +2,7 @@
 <queries api="2.7.0.trunk" xmlns="http://redmin-mylyncon.sf.net/api">
   <query id="1">
     <name>Multiple custom fields query</name>
+    <projectId>1</projectId>
   </query>
   <query id="5">
     <name>Open issues by priority and tracker</name>
