@@ -37,6 +37,7 @@ public class QueryParserTest {
 		assertEquals(QueryValidator.COUNT, ct.getAll().size());
 		
 		QueryValidator.validate9(ct.getById(9));
+		QueryValidator.validate1(ct.getById(1));
 	}
 
 }
