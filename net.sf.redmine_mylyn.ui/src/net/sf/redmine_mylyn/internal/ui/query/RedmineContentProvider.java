@@ -5,8 +5,10 @@ import java.util.List;
 
 import net.sf.redmine_mylyn.api.model.container.AbstractPropertyContainer;
 
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.swt.widgets.Display;
 
 public class RedmineContentProvider implements IStructuredContentProvider {
 
@@ -45,42 +47,20 @@ public class RedmineContentProvider implements IStructuredContentProvider {
 	public void dispose() {
 	}
 
-	//TODO
 	public void inputChanged(final Viewer viewer, Object oldInput, Object newInput) {
-//		if (oldInput==null || newInput==null) {
-//			return;
-//		}
-//
-//		IStructuredSelection selection = (IStructuredSelection)viewer.getSelection();
-//		Object o = selection.getFirstElement();
-//		
-//		if (o instanceof RedmineTicketAttribute) {
-//			if (o instanceof RedmineStoredQuery || o instanceof RedmineProject) {
-//				selectLastOrDefault(viewer, o);
-//			} else {
-//				reselect(viewer, selection);
-//			}
-//		} else if (o instanceof String) {
-//			reselect(viewer, selection);
-//		} else if (title!=null) {
-//			selectLastOrDefault(viewer, title);
-//		}
-//		
+		if (oldInput==null || newInput==null || !viewer.getControl().isEnabled()) {
+			return;
+		}
+
+		if(!viewer.getSelection().isEmpty()) {
+			final ISelection selection = viewer.getSelection();
+			
+			Display.getCurrent().asyncExec(new Runnable() {
+				public void run() {
+					viewer.setSelection(selection, true);
+				}
+			});
+		}
 	}
 	
-//	private void selectLastOrDefault(final Viewer viewer, final Object item) {
-//		Display.getCurrent().asyncExec(new Runnable() {
-//			public void run() {
-//				viewer.setSelection(new StructuredSelection(item), true);
-//			}
-//		});
-//	}
-//
-//	private void reselect(final Viewer viewer, final IStructuredSelection selection) {
-//		Display.getCurrent().asyncExec(new Runnable() {
-//			public void run() {
-//				viewer.setSelection(selection, true);
-//			}
-//		});
-//	}
 }
