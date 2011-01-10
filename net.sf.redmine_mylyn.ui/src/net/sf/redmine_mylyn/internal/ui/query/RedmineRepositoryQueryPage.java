@@ -1,6 +1,5 @@
 package net.sf.redmine_mylyn.internal.ui.query;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,11 +22,7 @@ import net.sf.redmine_mylyn.core.RedmineCorePlugin;
 import net.sf.redmine_mylyn.core.RedmineRepositoryConnector;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -36,42 +31,30 @@ import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StructuredViewer;
-import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.mylyn.commons.core.StatusHandler;
 import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
-import org.eclipse.mylyn.tasks.ui.TasksUi;
-import org.eclipse.mylyn.tasks.ui.wizards.AbstractRepositoryQueryPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.progress.IProgressService;
 
-public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
+public class RedmineRepositoryQueryPage extends AbstractRedmineRepositoryQueryPage {
 
-	private static final String TITLE = "Enter query parameters";
+	private static final String TITLE = "Create a new query";
 	
-	private static final String DESCRIPTION = "Only predefined filters are supported.";
+	private static final String DESCRIPTION = "Enter the query parameters.";
 
-	private IRepositoryQuery query;
+	private final Configuration configuration;
 	
 	private Text titleText;
-
-	private final RedmineRepositoryConnector connector;
-	
-	private final Configuration configuration;
 
 	protected ScrolledComposite pageScroll;
 	protected Composite pageComposite;
@@ -84,17 +67,13 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 	
 	protected final List<CustomField> customFields;
 	
-	protected Button updateButton;
+	private boolean initialized;
 
-	public RedmineRepositoryQueryPage(TaskRepository repository, IRepositoryQuery query) {
-		super(TITLE, repository, query);
+	public RedmineRepositoryQueryPage(TaskRepository repository, IRepositoryQuery query, RedmineRepositoryConnector connector, Configuration configuration) {
+		super(TITLE, repository, query, connector, configuration);
 
-		this.query=query;
+		this.configuration = getConfiguration();
 		
-		connector = (RedmineRepositoryConnector) TasksUi.getRepositoryManager().getRepositoryConnector(RedmineCorePlugin.REPOSITORY_KIND);
-		configuration = connector.getRepositoryConfiguration(repository);
-		Assert.isNotNull(configuration);
-
 		setTitle(TITLE);
 		setDescription(DESCRIPTION);
 
@@ -116,7 +95,6 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 		 * 
 		 * TOP   : Title
 		 * MIDDLE: Items
-		 * BOTTOM: Update-Button 
 		 */
 		createTitleGroup(pageComposite);
 
@@ -124,8 +102,6 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 		itemComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		itemComposite.setLayout(new GridLayout(1, false));
 		
-		createUpdateButton(pageComposite);
-
 		/* Create and layout items */
 		createItemGroup(itemComposite);
 		createCustomItemGroup(itemComposite);
@@ -183,7 +159,7 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 	}
 	
 	private void createCustomItemGroup(Composite parent) {
-		for (CustomField customField : configuration.getCustomFields().getIssueCustomFields()) {
+		for (CustomField customField : getConfiguration().getCustomFields().getIssueCustomFields()) {
 			QueryField queryField = customField.getQueryField();
 			if(!customField.isFilter() || queryField==null)
 				continue;
@@ -268,104 +244,43 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 		}
 	}
 	
-	protected void createUpdateButton(final Composite parent) {
-		updateButton = new Button(parent, SWT.PUSH);
-		updateButton.setText("Update Attributes from Repository");
-		updateButton.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
-		updateButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				if (getTaskRepository() != null) {
-					updateAttributesFromRepository(true);
-				} else {
-					MessageDialog
-							.openInformation(Display.getCurrent()
-									.getActiveShell(),
-									"Update Attributes Failed",
-									"No repository available, please add one using the Task Repositories view.");
-				}
-			}
-		});
-
-		/* Move button into buttonbar */
-		if(getContainer() instanceof WizardDialog) {
-			WizardDialog dialog = (WizardDialog)getContainer();
-
-			if(dialog.buttonBar instanceof Composite) {
-				Composite buttonBar = (Composite)dialog.buttonBar;
-				((GridLayout) buttonBar.getLayout()).numColumns++;
-				
-				updateButton.setParent(buttonBar);
-				updateButton.moveAbove(buttonBar.getChildren()[buttonBar.getChildren().length-2]);
-			}
-		}
-
-	}
-
 	@Override
 	public void setVisible(boolean visible) {
 		super.setVisible(visible);
-		if (visible) {
+		if (visible && !initialized) {
+			initialized = true;
+			
 			Display.getDefault().asyncExec(new Runnable() {
 				public void run() {
-					updateAttributesFromRepository(false);
-
+					updateRepositoryConfiguration(false);
+					
 					//Init QueryPage with default state
 					switchOperatorState();
 					updateProjectAttributes();
 
-					if (query != null && query.getUrl() != null) {
-						restoreQuery(RedmineRepositoryQueryPage.this.query);
-					}
+					restoreQuery();
 				}
 			});
 		}
 	}
 
-	private void updateAttributesFromRepository(final boolean force) {
-		try {
-			IRunnableWithProgress runnable = new IRunnableWithProgress() {
-				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-					try {
-						if (force || connector.isRepositoryConfigurationStale(getTaskRepository(), monitor)) {
-							connector.updateRepositoryConfiguration(getTaskRepository(), monitor);
-						}
-					} catch (CoreException e) {
-						throw new InvocationTargetException(e, "Updating of attributes failed");
-					}
-				}
-			};
-
-			if (getContainer() != null) {
-				getContainer().run(true, true, runnable);
-			} else if (getSearchContainer() != null) {
-				getSearchContainer().getRunnableContext().run(true, true, runnable);
-			} else {
-				IProgressService service = PlatformUI.getWorkbench().getProgressService();
-				service.busyCursorWhile(runnable);
-			}
-		} catch (InvocationTargetException e) {
-			setErrorMessage(e.getMessage());
-			return;
-		} catch (InterruptedException e) {
-			return;
-		}
-
-//		/* Projects */
+	@Override
+	protected void configurationChanged() {
+		/* Projects */
 		StructuredViewer viewer = queryStructuredViewer.get(QueryField.PROJECT);
-		viewer.setInput(configuration.getProjects());
+		viewer.setInput(getConfiguration().getProjects());
 
 		/* Status */
 		viewer = queryStructuredViewer.get(QueryField.STATUS);
-		viewer.setInput(configuration.getIssueStatuses());
+		viewer.setInput(getConfiguration().getIssueStatuses());
 		
 		/* Priority */
 		viewer = queryStructuredViewer.get(QueryField.PRIORITY);
-		viewer.setInput(configuration.getIssuePriorities());
+		viewer.setInput(getConfiguration().getIssuePriorities());
 
 		/* Author */
 		viewer = queryStructuredViewer.get(QueryField.AUTHOR);
-		viewer.setInput(configuration.getUsers());
+		viewer.setInput(getConfiguration().getUsers());
 		
 		/* CustomFields */
 		updateCustomItemGroup();
@@ -432,7 +347,7 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 
 	}
 	
-	void updateCustomItemOptions() {
+	private void updateCustomItemOptions() {
 		for (CustomField customField : configuration.getCustomFields().getIssueCustomFields()) {
 			QueryField queryField = customField.getQueryField();
 			if(!customField.isFilter() || queryField==null || !queryField.isListType())
@@ -446,7 +361,7 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 		}
 	}
 	
-	HashSet<Integer> findAvailableCustomFields(Project project) {
+	private HashSet<Integer> findAvailableCustomFields(Project project) {
 		
 		List<Tracker> availableTrackerList = project==null 
 			? configuration.getTrackers().getAll() 
@@ -497,7 +412,7 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 		return collectedCustomFieldIds;
 	}
 	
-	CompareOperator getSelectedOperator(IQueryField queryField) {
+	private CompareOperator getSelectedOperator(IQueryField queryField) {
 		ISelection selection = searchOperators.get(queryField).getSelection();
 		if(selection!=null && !selection.isEmpty() && selection instanceof StructuredSelection) {
 			Object selected = ((StructuredSelection)selection).getFirstElement();
@@ -508,7 +423,7 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 		return null;
 	}
 	
-	Project getSelectedProject() {
+	private Project getSelectedProject() {
 		if(getSelectedOperator(QueryField.PROJECT)==CompareOperator.IS) {
 			if(queryStructuredViewer.get(QueryField.PROJECT).getSelection() instanceof StructuredSelection) {
 				IStructuredSelection selection = (StructuredSelection)queryStructuredViewer.get(QueryField.PROJECT).getSelection();
@@ -520,35 +435,14 @@ public class RedmineRepositoryQueryPage extends AbstractRepositoryQueryPage {
 		return null;
 	}
 	
-	private void restoreQuery(IRepositoryQuery repositoryQuery) {
-		titleText.setText(repositoryQuery.getSummary());
-		Query query = null;
-		
-		try {
-			query = Query.fromUrl(repositoryQuery.getUrl(), getTaskRepository().getCharacterEncoding(), configuration);
-		} catch (RedmineApiErrorException e) {
-			//TODO PluginId
-			IStatus status = RedmineCorePlugin.toStatus(e, "Restore of Query failed");
-			StatusHandler.log(status);
-			setErrorMessage(status.getMessage());
-		}
+	private void restoreQuery() {
+		Query query = getRedmineQuery();
+		if(query!=null) {
+			titleText.setText(getQuery().getSummary());
 
-//		//NOTE : Don't call updateProjectAttributes() - projectViewer's SeletionListener call this method !!!
-//		//Project-Query
-//		projectViewer.setSelection(new StructuredSelection(projectData.getProject()));
-//		search.setProjectId(projectData.getProject().getValue());
-//
-//		//Check StoredQuery usage
-//		String sqIdVal = query.getAttribute(RedmineSearch.STORED_QUERY_ID);
-//		int sqId = (sqIdVal==null || !sqIdVal.matches("^\\d+$")) ? 0 : Integer.parseInt(sqIdVal);
-//		search.setStoredQueryId(sqId);
-//		RedmineStoredQuery storedQuery = null;
-//		if(sqId>0) {
-//			storedQuery = queryData.getQuery(sqId);
-//		}
-		
-		QueryBuilder.restoreTextQueryPart(query, configuration, searchOperators, queryText);
-		QueryBuilder.restoreStructuredQueryPart(query, configuration, searchOperators, queryStructuredViewer);
+			QueryBuilder.restoreTextQueryPart(query, configuration, searchOperators, queryText);
+			QueryBuilder.restoreStructuredQueryPart(query, configuration, searchOperators, queryStructuredViewer);
+		}
 		
 		getContainer().updateButtons();
 	}

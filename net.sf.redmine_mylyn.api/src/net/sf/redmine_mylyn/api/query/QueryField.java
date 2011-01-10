@@ -20,6 +20,7 @@ public enum QueryField implements IQueryField {
 	
 	//TODO not tested
 	PROJECT("project_id", CompareOperator.IS, CompareOperator.IS_NOT),
+	STOREDQUERY("query_id", CompareOperator.IS),
 
 	STATUS("status_id", CompareOperator.OPEN, CompareOperator.IS, CompareOperator.IS_NOT, CompareOperator.CLOSED, CompareOperator.ALL),
 	PRIORITY("priority_id", CompareOperator.IS, CompareOperator.IS_NOT),

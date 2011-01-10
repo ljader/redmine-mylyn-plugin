@@ -100,8 +100,8 @@ public class QueryFilter {
 			throw new RedmineApiErrorException("Invalid Integer-Value `{0}` for Query-Field `{1}`", e, ""+values.get(0), queryField.getQueryValue());
 		}
 		
-		if(queryField==QueryField.PROJECT && values.size()==1 && operator==CompareOperator.IS) {
-			parts.add(new NameValuePair(QueryField.PROJECT.getQueryValue(), values.get(0)));
+		if((queryField==QueryField.PROJECT || queryField==QueryField.STOREDQUERY) && values.size()==1 && operator==CompareOperator.IS) {
+			parts.add(new NameValuePair(queryField.getQueryValue(), values.get(0)));
 		} else {
 			appendFieldAndOperator(parts);
 			appendValues(parts);
@@ -146,6 +146,10 @@ public class QueryFilter {
 			}
 		} else if(nvp.getName().equals(QueryField.PROJECT.getQueryValue())) {
 			filter = new QueryFilter(QueryField.PROJECT);
+			filter.setOperator(CompareOperator.IS);
+			filter.addValue(nvp.getValue());
+		} else if(nvp.getName().equals(QueryField.STOREDQUERY.getQueryValue())) {
+			filter = new QueryFilter(QueryField.STOREDQUERY);
 			filter.setOperator(CompareOperator.IS);
 			filter.addValue(nvp.getValue());
 		}

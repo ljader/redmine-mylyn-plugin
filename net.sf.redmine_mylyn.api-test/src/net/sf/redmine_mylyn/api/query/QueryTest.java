@@ -6,8 +6,10 @@ import static net.sf.redmine_mylyn.api.query.CompareOperator.OPEN;
 import static net.sf.redmine_mylyn.api.query.QueryField.STATUS;
 import static net.sf.redmine_mylyn.api.query.QueryField.TRACKER;
 import static net.sf.redmine_mylyn.api.query.QueryField.PROJECT;
+import static net.sf.redmine_mylyn.api.query.QueryField.STOREDQUERY;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -221,5 +223,39 @@ public class QueryTest {
 		
 		assertEquals(expected, query.getParams());
 	}
+
+	@Test
+	public void testIntegratedToUrl_storedQuery() throws Exception {
+		String enc = "UTF-8";
+
+		testee.addFilter(STOREDQUERY, IS, "4");
+		assertEquals("?query_id=4", testee.toUrl(enc));
+
+		/* Project related */
+		testee = new Query();
+		testee.addFilter(PROJECT, IS, "1");
+		testee.addFilter(STOREDQUERY, IS, "1");
+		assertEquals("?project_id=1&query_id=1", testee.toUrl(enc));
+	}
 	
+	@Test
+	public void testIntegratedFromUrl_storedQuery() throws Exception {
+		String enc = "UTF-8";
+		
+		Query query = Query.fromUrl("?query_id=4", enc, TestData.cfg);
+		assertNotNull(query);
+		
+		ArrayList<NameValuePair> expected = new ArrayList<NameValuePair>();
+		expected.add(new NameValuePair("query_id", "4"));
+		assertEquals(expected, query.getParams());
+
+		
+		/* Project related */
+		query = Query.fromUrl("?project_id=1&query_id=1", enc, TestData.cfg);
+		assertNotNull(query);
+		expected.clear();
+		expected.add(new NameValuePair("project_id", "1"));
+		expected.add(new NameValuePair("query_id", "1"));
+		assertEquals(expected, query.getParams());
+	}
 }

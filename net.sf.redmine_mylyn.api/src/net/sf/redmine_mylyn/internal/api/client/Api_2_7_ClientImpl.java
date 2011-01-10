@@ -18,6 +18,7 @@ import net.sf.redmine_mylyn.api.exception.RedmineApiRemoteException;
 import net.sf.redmine_mylyn.api.model.Attachment;
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.Issue;
+import net.sf.redmine_mylyn.api.model.Project;
 import net.sf.redmine_mylyn.api.model.TimeEntry;
 import net.sf.redmine_mylyn.api.model.container.AbstractPropertyContainer;
 import net.sf.redmine_mylyn.api.model.container.CustomFields;
@@ -159,7 +160,7 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 		} else {
 			monitor.worked(1);
 		}
-
+		
 		getConfiguration().copy(conf);
 	}
 	

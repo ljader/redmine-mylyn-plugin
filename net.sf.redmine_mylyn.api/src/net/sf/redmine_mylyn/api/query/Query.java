@@ -64,7 +64,7 @@ public class Query {
 		
 		return params;
 	}
-
+	
 	public String toUrl(String encoding) throws RedmineApiErrorException {
 		if(encoding==null) {
 			encoding="UTF-8";
@@ -93,7 +93,7 @@ public class Query {
 		if(encoding==null) {
 			encoding="UTF-8";
 		}
-		if(url==null || url.indexOf('&')<0) {
+		if(url==null || url.indexOf("query_id=")<0 && url.indexOf('&')<0) {
 			return null;
 		}
 
@@ -175,4 +175,7 @@ public class Query {
 		return query;
 	}
 
+	public boolean isStoredQuery() {
+		return getQueryFilter(QueryField.STOREDQUERY)!=null;
+	}
 }
