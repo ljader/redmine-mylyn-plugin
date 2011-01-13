@@ -102,7 +102,7 @@ public class IssueMapper {
 			}
 		}
 		
-		//TODO
+		//TODO Rights
 		if(true /*ticket.getRight(RedmineAcl.TIMEENTRY_VIEW*/) {
 			//TODO kind/label
 			taskAttribute = taskData.getRoot().createAttribute(IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY_TOTAL);

@@ -251,7 +251,7 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 
 		//Attributes for a new TimeEntry
 		if(existingTask) {
-			//TODO
+			//TODO Rights
 			if (true /*client.supportTimeEntries() && ticket.getRight(RedmineAcl.TIMEENTRY_NEW)*/) {
 				createAttribute(data, RedmineAttribute.TIME_ENTRY_HOURS);
 				createAttribute(data, RedmineAttribute.TIME_ENTRY_ACTIVITY, project.getTimeEntryActivities().getAll());
