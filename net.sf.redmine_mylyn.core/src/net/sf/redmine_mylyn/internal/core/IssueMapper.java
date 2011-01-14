@@ -103,7 +103,7 @@ public class IssueMapper {
 		}
 		
 		//TODO Rights
-		if(true /*ticket.getRight(RedmineAcl.TIMEENTRY_VIEW*/) {
+		if(issue.getTimeEntries().isViewAllowed()) {
 			//TODO kind/label
 			taskAttribute = taskData.getRoot().createAttribute(IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY_TOTAL);
 			
