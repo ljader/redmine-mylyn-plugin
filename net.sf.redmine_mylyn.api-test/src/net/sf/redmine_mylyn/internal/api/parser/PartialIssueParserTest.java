@@ -5,8 +5,10 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.InputStream;
 
+import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.internal.api.PartialIssueValidator;
 import net.sf.redmine_mylyn.internal.api.parser.adapter.type.Issues;
+import net.sf.redmine_mylyn.internal.api.parser.mock.ConfigurationMock;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.junit.After;
@@ -16,12 +18,13 @@ import org.junit.Test;
 public class PartialIssueParserTest {
 
 	InputStream input;
-	TypedParser<Issues> testee;
+	IssuesParser testee;
 	
 	@Before
 	public void setUp() throws Exception {
 		input = getClass().getResourceAsStream(PartialIssueValidator.RESOURCE_FILE);
-		testee = new TypedParser<Issues>(Issues.class);
+		Configuration conf = new ConfigurationMock();
+		testee = new IssuesParser(conf);
 	}
 
 	@After

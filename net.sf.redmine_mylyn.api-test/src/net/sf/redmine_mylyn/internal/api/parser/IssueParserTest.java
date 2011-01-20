@@ -5,9 +5,11 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.InputStream;
 
+import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.Issue;
 import net.sf.redmine_mylyn.internal.api.IssueValidator;
 import net.sf.redmine_mylyn.internal.api.parser.adapter.type.Issues;
+import net.sf.redmine_mylyn.internal.api.parser.mock.ConfigurationMock;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.junit.Before;
@@ -15,13 +17,14 @@ import org.junit.Test;
 
 public class IssueParserTest {
 
-	TypedParser<Issue> testee;
-	TypedParser<Issues> testee2;
+	IssueParser testee;
+	IssuesParser testee2;
 	
 	@Before
 	public void setUp() throws Exception {
-		testee = new TypedParser<Issue>(Issue.class);
-		testee2 = new TypedParser<Issues>(Issues.class);
+		Configuration conf = new ConfigurationMock();
+		testee = new IssueParser(conf);
+		testee2 = new IssuesParser(conf);
 	}
 	
 	@Test

@@ -33,6 +33,8 @@ public class IssueValidator {
 		assertNotNull(obj);
 		assertEquals(1, obj.getId());
 		assertFalse(obj.isEditAllowed());
+		assertTrue(obj.isClosed());
+
 		assertEquals("Can't print recipes", obj.getSubject());
 		assertEquals("Unable to print recipes", obj.getDescription());
 		assertEquals(1273183200000l, obj.getCreatedOn().getTime());
@@ -89,6 +91,7 @@ public class IssueValidator {
 		assertNotNull(obj);
 		assertEquals(2, obj.getId());
 		assertTrue(obj.isEditAllowed());
+		assertFalse(obj.isClosed());
 
 		assertEquals(10, obj.getDoneRatio());
 		assertEquals(3.5, obj.getEstimatedHours(), 0.0);
