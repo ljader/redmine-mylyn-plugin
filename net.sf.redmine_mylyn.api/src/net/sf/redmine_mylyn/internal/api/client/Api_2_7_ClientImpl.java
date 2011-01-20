@@ -18,7 +18,6 @@ import net.sf.redmine_mylyn.api.exception.RedmineApiRemoteException;
 import net.sf.redmine_mylyn.api.model.Attachment;
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.Issue;
-import net.sf.redmine_mylyn.api.model.Project;
 import net.sf.redmine_mylyn.api.model.TimeEntry;
 import net.sf.redmine_mylyn.api.model.container.AbstractPropertyContainer;
 import net.sf.redmine_mylyn.api.model.container.CustomFields;
@@ -34,6 +33,8 @@ import net.sf.redmine_mylyn.api.query.Query;
 import net.sf.redmine_mylyn.internal.api.parser.AttachmentParser;
 import net.sf.redmine_mylyn.internal.api.parser.AttributeParser;
 import net.sf.redmine_mylyn.internal.api.parser.IModelParser;
+import net.sf.redmine_mylyn.internal.api.parser.IssueParser;
+import net.sf.redmine_mylyn.internal.api.parser.IssuesParser;
 import net.sf.redmine_mylyn.internal.api.parser.SettingsParser;
 import net.sf.redmine_mylyn.internal.api.parser.StringParser;
 import net.sf.redmine_mylyn.internal.api.parser.SubmitedIssueParser;
@@ -85,8 +86,8 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	
 	private SettingsParser settingsParser;
 	private TypedParser<UpdatedIssuesType> updatedIssuesParser;
-	private TypedParser<Issue> issueParser;
-	private TypedParser<Issues> issuesParser;
+	private IssueParser issueParser;
+	private IssuesParser issuesParser;
 	private TypedParser<RedmineServerVersion> versionParser;
 	
 	private SubmitedIssueParser submitIssueParser;
@@ -95,7 +96,7 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	
 	private Configuration configuration;
 	
-	public Api_2_7_ClientImpl(IRedmineApiWebHelper webHelper) {
+	Api_2_7_ClientImpl(IRedmineApiWebHelper webHelper) {
 		super(webHelper);
 		
 		buildParser();
@@ -421,8 +422,8 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 		
 		settingsParser = new SettingsParser();
 		updatedIssuesParser = new TypedParser<UpdatedIssuesType>(UpdatedIssuesType.class);
-		issueParser = new TypedParser<Issue>(Issue.class);
-		issuesParser = new TypedParser<Issues>(Issues.class);
+		issueParser = new IssueParser(getConfiguration());
+		issuesParser = new IssuesParser(getConfiguration());
 		versionParser = new TypedParser<RedmineServerVersion>(RedmineServerVersion.class);
 		attachmentParser = new AttachmentParser();
 

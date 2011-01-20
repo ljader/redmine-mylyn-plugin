@@ -1,3 +1,4 @@
+
 package net.sf.redmine_mylyn.api.model;
 
 import java.util.Date;
@@ -85,6 +86,8 @@ public class Issue implements IModel {
 	@IssuePropertyMapping(RedmineApiIssueProperty.PARENT)
 	private int parentId;
 
+	private boolean closed;
+	
 	public Issue(){
 		
 	}
@@ -312,4 +315,11 @@ public class Issue implements IModel {
 		return id;
 	}
 
+	public boolean isClosed() {
+		return closed;
+	}
+	
+	public void setClosed(boolean closed) {
+		this.closed = closed;
+	}
 }
