@@ -1,15 +1,14 @@
 package net.sf.redmine_mylyn.api.query;
 
-import static net.sf.redmine_mylyn.api.query.CompareOperator.IS_NOT;
 import static net.sf.redmine_mylyn.api.query.CompareOperator.IS;
+import static net.sf.redmine_mylyn.api.query.CompareOperator.IS_NOT;
 import static net.sf.redmine_mylyn.api.query.CompareOperator.OPEN;
-import static net.sf.redmine_mylyn.api.query.QueryField.STATUS;
-import static net.sf.redmine_mylyn.api.query.QueryField.TRACKER;
 import static net.sf.redmine_mylyn.api.query.QueryField.PROJECT;
+import static net.sf.redmine_mylyn.api.query.QueryField.STATUS;
 import static net.sf.redmine_mylyn.api.query.QueryField.STOREDQUERY;
+import static net.sf.redmine_mylyn.api.query.QueryField.TRACKER;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
