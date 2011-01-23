@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aspectj>
+	<weaver>
+		<exclude within="net.sf.redmine_mylyn.internal.core.accesscontrol.*"/>
+	</weaver>
+</aspectj>
