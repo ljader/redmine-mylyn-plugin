@@ -251,7 +251,7 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 
 		//Attributes for a new TimeEntry
 		if(existingTask) {
-			if (issue.getTimeEntries().isNewAllowed()) {
+			if (issue.getTimeEntries()!=null && issue.getTimeEntries().isNewAllowed()) {
 				createAttribute(data, RedmineAttribute.TIME_ENTRY_HOURS);
 				createAttribute(data, RedmineAttribute.TIME_ENTRY_ACTIVITY, project.getTimeEntryActivities().getAll());
 				createAttribute(data, RedmineAttribute.TIME_ENTRY_COMMENTS);

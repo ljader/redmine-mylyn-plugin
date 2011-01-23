@@ -102,8 +102,7 @@ public class IssueMapper {
 			}
 		}
 		
-		//TODO Rights
-		if(issue.getTimeEntries().isViewAllowed()) {
+		if(issue.getTimeEntries()!=null && issue.getTimeEntries().isViewAllowed()) {
 			//TODO kind/label
 			taskAttribute = taskData.getRoot().createAttribute(IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY_TOTAL);
 			
