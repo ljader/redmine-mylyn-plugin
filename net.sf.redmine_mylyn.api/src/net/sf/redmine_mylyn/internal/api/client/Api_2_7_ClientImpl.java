@@ -97,22 +97,18 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	private Configuration configuration;
 	
 	Api_2_7_ClientImpl(IRedmineApiWebHelper webHelper) {
-		super(webHelper);
-		
-		buildParser();
+		this(webHelper, new Configuration());
 	}
 
 	public Api_2_7_ClientImpl(IRedmineApiWebHelper webHelper, Configuration initialConfiguration) {
-		this(webHelper);
+		super(webHelper);
 		
 		this.configuration = initialConfiguration;
+		buildParser();
 	}
 	
 	@Override
 	public Configuration getConfiguration() {
-		if(configuration==null) {
-			configuration = new Configuration();
-		}
 		return configuration;
 	}
 
