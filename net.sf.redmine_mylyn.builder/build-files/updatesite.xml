@@ -28,7 +28,10 @@
 		<!-- Copy features/plugin jars -->
 		<copy todir="${updatesite}" >
 			<fileset dir="${buildDirectory}/tmp/${archivePrefix}" >
+				<!--
 				<include name="**/net.sf.redmine_mylyn.*.jar"/>
+				-->
+				<include name="**/*.jar"/>
 			</fileset>
 		</copy>
 

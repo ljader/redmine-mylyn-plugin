@@ -60,7 +60,7 @@
 	<target name="-publish.sf.frs">
 		<scp todir="${sf.username},${sf.project.unixname}@frs.sf.net:/home/frs/project/r/re/redmin-mylyncon/Update-Site/N/" password="${sf.password}" verbose="true" trust="true" >
 			<fileset dir="${updatesite}">
-				<include name="**/*.jar"/>
+				<include name="**/net.sf.redmine_mylyn.*.jar"/>
 				<exclude name="**/*.xml"/>
 			</fileset>
 		</scp>

@@ -1,4 +1,5 @@
 feature@net.sf.redmine_mylyn.feature= COPY, ${sourceDir}, net.sf.redmine_mylyn.feature
+plugin@net.sf.redmine_mylyn.common= COPY, ${sourceDir}, net.sf.redmine_mylyn.common
 plugin@net.sf.redmine_mylyn.api= COPY, ${sourceDir}, net.sf.redmine_mylyn.api
 plugin@net.sf.redmine_mylyn.core= COPY, ${sourceDir}, net.sf.redmine_mylyn.core
 plugin@net.sf.redmine_mylyn.ui= COPY, ${sourceDir}, net.sf.redmine_mylyn.ui

@@ -1,0 +1,6 @@
+plugin@ch.qos.logback.classic,0.9.19=GET,file://${buildHome}/resources/bundles/ch.qos.logback.classic_0.9.19.v20100519-1505.jar
+plugin@ch.qos.logback.core,0.9.19=GET,file://${buildHome}/resources/bundles/ch.qos.logback.core_0.9.19.v20100419-1216.jar
+plugin@javax.xml.bind,2.0.0=GET,file://${buildHome}/resources/bundles/javax.xml.bind_2.0.0.v20080604-1500.jar
+plugin@org.aspectj.runtime,1.6.10=GET,file://${buildHome}/resources/bundles/org.aspectj.runtime_1.6.10.20101003133000.jar
+plugin@org.json,1.0.0=GET,file://${buildHome}/resources/bundles/org.json_1.0.0.v201003050614.jar
+plugin@org.slf4j.api,1.5.11=GET,file://${buildHome}/resources/bundles/org.slf4j.api_1.5.11.v20100519-1910.jar
