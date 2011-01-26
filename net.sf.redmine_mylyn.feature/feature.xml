@@ -43,6 +43,7 @@
       <import plugin="ch.qos.logback.core" version="0.9.19" match="greaterOrEqual"/>
       <import plugin="org.eclipse.equinox.log"/>
       <import plugin="javax.servlet"/>
+      <import plugin="org.aspectj.runtime" version="1.6.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
@@ -107,5 +108,11 @@
          install-size="0"
          version="0.0.0"
          unpack="false"/>
+
+   <plugin
+         id="org.aspectj.runtime"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
 
 </feature>
