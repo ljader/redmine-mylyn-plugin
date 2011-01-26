@@ -284,8 +284,6 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 			for (Property property : properties) {
 				attr.putOption(String.valueOf(property.getId()), property.getName());
 			}
-		} else {
-			attr.getMetaData().setReadOnly(true);
 		}
 		return attr;
 	}
