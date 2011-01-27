@@ -48,7 +48,7 @@ public enum QueryField implements IQueryField {
 			CompareOperator.TODAY, CompareOperator.CURRENT_WEEK,
 			CompareOperator.DAY_LATER, CompareOperator.DAY_LATER_LESS_THEN,
 			CompareOperator.DAY_LATER_MORE_THEN),
-	DATE_DUE("start_date",new DateValidator(),
+	DATE_DUE("due_date",new DateValidator(),
 			CompareOperator.DAY_AGO_MORE_THEN,
 			CompareOperator.DAY_AGO_LESS_THEN, CompareOperator.DAY_AGO,
 			CompareOperator.TODAY, CompareOperator.CURRENT_WEEK,
