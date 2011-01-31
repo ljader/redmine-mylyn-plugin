@@ -170,21 +170,6 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 		
 		return descriptors;
 	}
-
-//	//WORKARAOUND Zugriff auf nicht initialisierte Page
-//	//TODO Ticket erstellen
-//	@Override
-//	public IManagedForm getManagedForm() {
-//		IManagedForm form = super.getManagedForm();
-//		if (form==null) {
-//			FormEditor editor = getTaskEditor();
-//			if (editor!= null && !isActive()) {
-//				editor.setActivePage(getId());
-//				form = super.getManagedForm();
-//			}
-//		}
-//		return form;
-//	}
 	
 	@Override
 	protected void createParts() {
@@ -346,8 +331,7 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 					id = Integer.parseInt(taskAttribute.getValue());
 				}
 			} catch (NumberFormatException e) {
-				//TODO Plugin-ID
-				IStatus status = RedmineCorePlugin.toStatus(e, "Invalid {0}-ID {1}", attribute.name(), taskAttribute.getValue());
+				IStatus status = RedmineUiPlugin.toStatus(e, "Invalid {0}-ID {1}", attribute.name(), taskAttribute.getValue());
 				StatusHandler.fail(status);
 				getTaskEditor().setMessage("Problem occured when updating attributes", IMessageProvider.ERROR);
 			}

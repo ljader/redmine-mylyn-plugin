@@ -5,8 +5,8 @@ import java.lang.reflect.InvocationTargetException;
 import net.sf.redmine_mylyn.api.exception.RedmineApiErrorException;
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.query.Query;
-import net.sf.redmine_mylyn.core.RedmineCorePlugin;
 import net.sf.redmine_mylyn.core.RedmineRepositoryConnector;
+import net.sf.redmine_mylyn.ui.RedmineUiPlugin;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -76,8 +76,7 @@ public abstract class AbstractRedmineRepositoryQueryPage extends AbstractReposit
 			try {
 				return Query.fromUrl(repositoryQuery.getUrl(), getTaskRepository().getCharacterEncoding(), getConfiguration());
 			} catch (RedmineApiErrorException e) {
-				//TODO PluginId
-				IStatus status = RedmineCorePlugin.toStatus(e, "Restore of Query failed");
+				IStatus status = RedmineUiPlugin.toStatus(e, "Restore of Query failed");
 				StatusHandler.log(status);
 				setErrorMessage(status.getMessage());
 			}

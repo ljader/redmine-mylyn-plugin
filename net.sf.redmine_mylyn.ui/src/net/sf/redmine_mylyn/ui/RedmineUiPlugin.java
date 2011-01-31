@@ -1,5 +1,6 @@
 package net.sf.redmine_mylyn.ui;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -167,6 +168,15 @@ public class RedmineUiPlugin extends AbstractUIPlugin implements LogListener {
 
 	public static ILogService getLogService(Class<?> clazz) {
 		return plugin==null ? LogServiceImpl.getInstance() : LogServiceImpl.getInstance(plugin.getBundle(), clazz);
+	}
+
+	public static IStatus toStatus(Throwable e, String message) {
+		return new Status(IStatus.ERROR, PLUGIN_ID, message, e);
+	}
+
+	public static IStatus toStatus(Throwable e, String message, Object... params) {
+		message = MessageFormat.format(message, params);
+		return toStatus(e, message);
 	}
 
 }
