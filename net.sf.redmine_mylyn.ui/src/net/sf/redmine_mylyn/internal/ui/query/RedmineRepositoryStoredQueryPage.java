@@ -6,9 +6,9 @@ import net.sf.redmine_mylyn.api.query.CompareOperator;
 import net.sf.redmine_mylyn.api.query.Query;
 import net.sf.redmine_mylyn.api.query.QueryField;
 import net.sf.redmine_mylyn.api.query.QueryFilter;
-import net.sf.redmine_mylyn.core.RedmineCorePlugin;
 import net.sf.redmine_mylyn.core.RedmineRepositoryConnector;
 import net.sf.redmine_mylyn.core.RedmineUtil;
+import net.sf.redmine_mylyn.ui.RedmineUiPlugin;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -119,8 +119,7 @@ public class RedmineRepositoryStoredQueryPage extends AbstractRedmineRepositoryQ
 		try {
 			repositoryQuery.setUrl(query.toUrl(getTaskRepository().getCharacterEncoding()));
 		} catch (RedmineApiErrorException e) {
-			//TODO PluginId
-			IStatus status = RedmineCorePlugin.toStatus(e, "Creation of Query failed");
+			IStatus status = RedmineUiPlugin.toStatus(e, "Creation of Query failed");
 			StatusHandler.log(status);
 			setErrorMessage(status.getMessage());
 		}
@@ -155,8 +154,7 @@ public class RedmineRepositoryStoredQueryPage extends AbstractRedmineRepositoryQ
 			}
 		
 		} catch (IndexOutOfBoundsException e) {
-			//TODO PluginId
-			IStatus status = RedmineCorePlugin.toStatus(e, "Restore of Query failed");
+			IStatus status = RedmineUiPlugin.toStatus(e, "Restore of Query failed");
 			StatusHandler.log(status);
 			setErrorMessage(status.getMessage());
 		}

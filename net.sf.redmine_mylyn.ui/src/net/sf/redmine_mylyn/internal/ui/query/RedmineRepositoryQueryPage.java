@@ -18,8 +18,8 @@ import net.sf.redmine_mylyn.api.query.CompareOperator;
 import net.sf.redmine_mylyn.api.query.IQueryField;
 import net.sf.redmine_mylyn.api.query.Query;
 import net.sf.redmine_mylyn.api.query.QueryField;
-import net.sf.redmine_mylyn.core.RedmineCorePlugin;
 import net.sf.redmine_mylyn.core.RedmineRepositoryConnector;
+import net.sf.redmine_mylyn.ui.RedmineUiPlugin;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
@@ -487,8 +487,7 @@ public class RedmineRepositoryQueryPage extends AbstractRedmineRepositoryQueryPa
 		try {
 			repositoryQuery.setUrl(query.toUrl(getTaskRepository().getCharacterEncoding()));
 		} catch (RedmineApiErrorException e) {
-			//TODO PluginId
-			IStatus status = RedmineCorePlugin.toStatus(e, "Creation of Query failed");
+			IStatus status = RedmineUiPlugin.toStatus(e, "Creation of Query failed");
 			StatusHandler.log(status);
 			setErrorMessage(status.getMessage());
 		}
