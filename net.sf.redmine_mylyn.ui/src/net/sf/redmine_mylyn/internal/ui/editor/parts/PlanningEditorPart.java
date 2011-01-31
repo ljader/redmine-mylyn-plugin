@@ -4,7 +4,10 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import net.sf.redmine_mylyn.core.RedmineAttribute;
+import net.sf.redmine_mylyn.core.RedmineUtil;
 
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.mylyn.tasks.core.ITask;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskDataModelEvent;
 import org.eclipse.mylyn.tasks.core.data.TaskDataModelListener;
@@ -86,28 +89,27 @@ public class PlanningEditorPart extends AbstractTaskEditorPart {
 
 	}
 
-	//TODO
-//	@Override
-//	public void commit(boolean onSave) {
-//		ITask task = getTask();
-//		Assert.isNotNull(task);
-//
-//		TaskAttribute rootAttribute = getTaskData().getRoot();
-//		TaskAttribute attribute = null;
-//
-//		attribute = rootAttribute.getAttribute(RedmineAttribute.DATE_DUE.getTaskKey());
-//		if(getModel().getChangedAttributes().contains(attribute)) {
-//			String dueValue = attribute.getValue();
-//
-//			if (dueValue.equals("")) { //$NON-NLS-1$
-//				task.setDueDate(null);
-//			} else {
-//				task.setDueDate(RedmineUtil.parseDate(dueValue));
-//			}
-//		}
-//
-//		super.commit(onSave);
-//	}
+	@Override
+	public void commit(boolean onSave) {
+		ITask task = getModel().getTask();
+		Assert.isNotNull(task);
+
+		TaskAttribute rootAttribute = getTaskData().getRoot();
+		TaskAttribute attribute = null;
+
+		attribute = rootAttribute.getAttribute(RedmineAttribute.DATE_DUE.getTaskKey());
+		if(getModel().getChangedAttributes().contains(attribute)) {
+			String dueValue = attribute.getValue();
+
+			//Updating the Due-Date in Task-List
+			if (dueValue.isEmpty()) {
+				task.setDueDate(null);
+			} else {
+				task.setDueDate(RedmineUtil.parseDate(dueValue));
+			}
+		}
+		super.commit(onSave);
+	}
 
 	private void initialize() {
 		hasIncoming = false;
