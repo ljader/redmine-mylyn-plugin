@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.redmine_mylyn.api.RedmineApiPlugin;
 import net.sf.redmine_mylyn.api.exception.RedmineApiErrorException;
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.CustomField;
@@ -135,7 +136,7 @@ public class QueryFilter {
 						filter = new QueryFilter(customField, customField.getQueryField());
 					}
 				} catch (NumberFormatException e){
-					//TODO log
+					RedmineApiPlugin.getLogService(QueryFilter.class).error(e, "Can't restore QueryFilter, {0} isn't a CustomField-Id", nvp.getValue().substring(3));
 				}
 				
 			} else {
