@@ -106,7 +106,7 @@ public class Issue implements IModel {
 
 	private Attachments attachments;
 
-	//TODO
+	//TODO not implemented yet
 	//IssueRelations
 
 	private TimeEntries timeEntries;

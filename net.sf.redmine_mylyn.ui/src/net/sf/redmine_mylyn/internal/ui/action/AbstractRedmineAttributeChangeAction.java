@@ -79,7 +79,7 @@ public abstract class AbstractRedmineAttributeChangeAction extends Action {
 					RedmineUiPlugin.getDefault().notifyAttributeChanged(task, attribute);
 				} catch (CoreException e) {
 					ILogService log = RedmineUiPlugin.getLogService(getClass());
-					log.error(e, "Can't set value of attribute %s", attribute.name());
+					log.error(e, "Can't set value of attribute {0}", attribute.name());
 				}
 			}
 		}
