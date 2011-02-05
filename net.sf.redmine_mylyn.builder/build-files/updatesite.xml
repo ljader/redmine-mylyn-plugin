@@ -1,9 +1,5 @@
 <project name="Create Update-Site" >
 
-	<!--
-	<import file="common.xml" />
-	-->
-	
 	<target name="updatesite">
 		<antcall target="-updatesite.clean" />
 		<antcall target="-updateSite.create" />
@@ -28,9 +24,6 @@
 		<!-- Copy features/plugin jars -->
 		<copy todir="${updatesite}" >
 			<fileset dir="${buildDirectory}/tmp/${archivePrefix}" >
-				<!--
-				<include name="**/net.sf.redmine_mylyn.*.jar"/>
-				-->
 				<include name="**/*.jar"/>
 			</fileset>
 		</copy>
