@@ -1,4 +1,4 @@
-package net.sf.redmine_mylyn.internal.api;
+package net.sf.redmine_mylyn.api.model;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -9,6 +9,7 @@ import java.util.Arrays;
 
 import net.sf.redmine_mylyn.api.model.Project;
 import net.sf.redmine_mylyn.api.model.container.TimeEntryActivities;
+import net.sf.redmine_mylyn.internal.api.TimeEntryActivityValidator;
 
 public class ProjectValidator {
 

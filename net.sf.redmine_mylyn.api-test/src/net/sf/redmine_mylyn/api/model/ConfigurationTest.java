@@ -12,7 +12,6 @@ import net.sf.redmine_mylyn.internal.api.CustomFieldValidator;
 import net.sf.redmine_mylyn.internal.api.IssueCategoryValidator;
 import net.sf.redmine_mylyn.internal.api.IssuePriorityValidator;
 import net.sf.redmine_mylyn.internal.api.IssueStatusValidator;
-import net.sf.redmine_mylyn.internal.api.ProjectValidator;
 import net.sf.redmine_mylyn.internal.api.QueryValidator;
 import net.sf.redmine_mylyn.internal.api.TrackerValidator;
 import net.sf.redmine_mylyn.internal.api.UserValidator;

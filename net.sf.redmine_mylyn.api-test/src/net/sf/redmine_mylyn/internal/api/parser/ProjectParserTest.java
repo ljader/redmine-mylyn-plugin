@@ -5,8 +5,8 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.InputStream;
 
+import net.sf.redmine_mylyn.api.model.ProjectValidator;
 import net.sf.redmine_mylyn.api.model.container.Projects;
-import net.sf.redmine_mylyn.internal.api.ProjectValidator;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.junit.After;

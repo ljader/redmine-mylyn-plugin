@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.EnumSet;
 
+import net.sf.redmine_mylyn.api.RedmineApiPlugin;
 import net.sf.redmine_mylyn.api.model.Issue;
 
 public enum RedmineApiIssueProperty {
@@ -50,15 +51,13 @@ public enum RedmineApiIssueProperty {
 				Date date = (Date)field.get(issue);
 				return date==null ? "" : DATE_FORMAT.format(date);
 			}
-//			Class<?> type = field.getType();
 			
 			Object obj = field.get(issue);
 			if(obj!=null) {
 				value  =obj.toString();
 			}
 		} catch (Exception e) {
-			//TODO logging
-			e.printStackTrace();
+			RedmineApiPlugin.getLogService(getClass()).error(e, "Can't pick submit value for field {0}", field.getName());
 		} finally {
 			field.setAccessible(accessible);
 		}
