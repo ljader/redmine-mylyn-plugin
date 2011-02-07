@@ -6,6 +6,7 @@ import net.sf.redmine_mylyn.api.model.container.IssuePriorities;
 import net.sf.redmine_mylyn.core.RedmineAttribute;
 import net.sf.redmine_mylyn.core.RedmineUtil;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.mylyn.tasks.core.ITask.PriorityLevel;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskData;
@@ -17,6 +18,7 @@ public class RedmineTaskMapper extends TaskMapper {
 	
 	public RedmineTaskMapper(TaskData taskData, Configuration configuration) {
 		super(taskData);
+		Assert.isNotNull(configuration);
 		this.configuration = configuration;
 	}
 	
@@ -24,7 +26,7 @@ public class RedmineTaskMapper extends TaskMapper {
 	public PriorityLevel getPriorityLevel() {
 		PriorityLevel level =  super.getPriorityLevel();
 
-		//TODO null handling + catch refresh repositoryAttributes
+		//TODO repositoryAttributes (via aspect)
 		if (configuration!=null) {
 			IssuePriorities priorities = configuration.getIssuePriorities();
 			

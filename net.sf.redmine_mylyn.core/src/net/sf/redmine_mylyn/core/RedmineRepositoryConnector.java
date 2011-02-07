@@ -197,6 +197,7 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 		return true;
 	}
 	
+	@SuppressWarnings("restriction")
 	@Override
 	public boolean canSynchronizeTask(TaskRepository taskRepository, ITask task) {
 		//WORKAROUND: http://sourceforge.net/tracker/index.php?func=detail&aid=3069723&group_id=228995&atid=1075435

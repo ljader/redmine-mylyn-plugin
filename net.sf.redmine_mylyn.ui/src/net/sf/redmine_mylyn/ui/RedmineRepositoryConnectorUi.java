@@ -25,7 +25,7 @@ public class RedmineRepositoryConnectorUi extends AbstractRepositoryConnectorUi 
 
 	@Override
 	public boolean hasSearchPage() {
-		// TODO Auto-generated method stub
+		// TODO not implemented yet
 		return false;
 	}
 

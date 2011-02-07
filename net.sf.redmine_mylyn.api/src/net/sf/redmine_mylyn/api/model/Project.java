@@ -130,8 +130,7 @@ public class Project extends Property {
 		this.issueCategoryIds = issueCategoryIds;
 	}
 
-	//TODO should not be public
-	public Map<Integer, int[]> getCustomFieldIdsByTrackerId() {
+	protected Map<Integer, int[]> getCustomFieldIdsByTrackerId() {
 		if(customFieldIdsByTrackerId==null) {
 			customFieldIdsByTrackerId = new HashMap<Integer, int[]>();
 		}

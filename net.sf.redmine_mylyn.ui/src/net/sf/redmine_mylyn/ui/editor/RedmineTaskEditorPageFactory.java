@@ -30,13 +30,11 @@ public class RedmineTaskEditorPageFactory extends AbstractTaskEditorPageFactory 
 	
 	@Override
 	public Image getPageImage() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String getPageText() {
-		// TODO Auto-generated method stub
 		return "Redmine";
 	}
 	

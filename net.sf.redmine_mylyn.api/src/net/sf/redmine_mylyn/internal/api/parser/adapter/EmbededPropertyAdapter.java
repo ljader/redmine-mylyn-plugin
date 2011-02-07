@@ -8,7 +8,6 @@ public class EmbededPropertyAdapter extends XmlAdapter<EmbededPropertyType, Inte
 
 	@Override
 	public EmbededPropertyType marshal(Integer arg0) throws Exception {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

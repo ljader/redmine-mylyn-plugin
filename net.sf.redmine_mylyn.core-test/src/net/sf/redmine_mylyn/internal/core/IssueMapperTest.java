@@ -154,7 +154,6 @@ public class IssueMapperTest {
 		assertEquals(""+te.getSpentOn().getTime(), attribute.getAttribute(IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY_SPENTON).getValue());
 
 		cv = te.getCustomValues().get(5);
-		//TODO was ist die benötigte string-repräsentation von Booleschen werten?
 		assertEquals("1", attribute.getAttribute(IRedmineConstants.TASK_KEY_PREFIX_TIMEENTRY_CF+cv.getCustomFieldId()).getValue());
 		
 		fail("Not finished yet implemented");

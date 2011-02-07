@@ -11,7 +11,6 @@ public class DateAdapter extends XmlAdapter<String, Date> {
 
 	@Override
 	public String marshal(Date arg0) throws Exception {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

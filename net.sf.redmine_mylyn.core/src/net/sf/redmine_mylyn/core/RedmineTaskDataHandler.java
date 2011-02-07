@@ -225,7 +225,6 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 
 ////			createAttribute(data, RedmineAttribute.RELATION, ticket.getRelations(), false);
 //			
-//			createAttribute(data, RedmineAttribute.TIME_ENTRY_TOTAL);
 		} else {
 			createAttribute(data, RedmineAttribute.STATUS, cfg.getIssueStatuses().getAll());
 			createAttribute(data, RedmineAttribute.STATUS_CHG, cfg.getIssueStatuses().getAll());
@@ -233,7 +232,6 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 		}
 		
 		createAttribute(data, RedmineAttribute.CATEGORY, cfg.getIssueCategories().getById(project.getIssueCategoryIds()), true);
-		//TODO prüfen alt: createAttribute nur, wenn:  existingTask RedmineUtil.parseInteger(ticket.getValue(RedmineAttribute.VERSION.getTicketKey()))!=null
 		createAttribute(data, RedmineAttribute.VERSION, cfg.getVersions().getOpenById(project.getVersionIds()), true);
 		
 		attribute = createAttribute(data, RedmineAttribute.PROGRESS, ProgressValues.availableValues());
@@ -322,7 +320,6 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 		}
 		
 		if(currentStatus!=null) {
-			//TODO add parentId to label
 			createOperation(taskData, RedmineOperation.none, ""+currentStatus.getId(), currentStatus.getName());
 		}
 		

@@ -116,7 +116,7 @@ public class IssueValidator {
 		assertEquals(2, cfs.get(5).getCustomFieldId());
 		assertEquals("", cfs.get(5).getValue());
 		
-		//TODO
+		//TODO not implemented yet
 		//IssueRelations
 		
 		Attachments attachments = obj.getAttachments();
