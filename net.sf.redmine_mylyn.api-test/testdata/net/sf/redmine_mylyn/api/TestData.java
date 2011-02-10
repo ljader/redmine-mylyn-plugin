@@ -92,6 +92,8 @@ public class TestData {
 			
 			/* TimeEntries + sum*/
 			TimeEntries timeEntries = new TimeEntries();
+			timeEntries.setNewAllowed(true);
+			timeEntries.setViewAllowed(true);
 			Field sum = timeEntries.getClass().getDeclaredField("sum");
 			sum.setAccessible(true);
 			sum.setFloat(timeEntries, 4.25f);
