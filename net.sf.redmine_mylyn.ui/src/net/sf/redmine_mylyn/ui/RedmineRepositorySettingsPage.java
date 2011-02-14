@@ -17,14 +17,14 @@ import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.ui.wizards.AbstractRepositorySettingsPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
 
@@ -153,12 +153,20 @@ public class RedmineRepositorySettingsPage extends AbstractRepositorySettingsPag
 
 		apiKeyText = new Text(parent, SWT.BORDER);
 		apiKeyText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-		apiKeyText.addListener(SWT.CHANGED, new Listener() {
+		//TODO SWT.CHANGED not available in 3.5, test this in 3.6
+		apiKeyText.addModifyListener(new ModifyListener() {
 			@Override
-			public void handleEvent(Event event) {
+			public void modifyText(ModifyEvent e) {
 				isPageComplete();
+				
 			}
 		});
+//		apiKeyText.addListener(SWT.CHANGED, new Listener() {
+//			@Override
+//			public void handleEvent(Event event) {
+//				isPageComplete();
+//			}
+//		});
 		
 		if(apiKey!=null) {
 			apiKeyText.setText(apiKey);
