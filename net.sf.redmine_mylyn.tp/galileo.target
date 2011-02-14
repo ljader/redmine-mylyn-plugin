@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?pde version="3.6"?>
+
+<target name="Galileo">
+<locations>
+<location includeAllPlatforms="true" includeMode="slicer" type="InstallableUnit">
+<unit id="org.eclipse.mylyn.commons.feature.group" version="3.4.2.v20100916-0100-e3x-7Z7j6FGpAasic6jpTQsxM4"/>
+<unit id="org.eclipse.mylyn.bugzilla_feature.feature.group" version="3.4.2.v20100916-0100-e3x-7D773BgJ9DH9fCc4CICE1"/>
+<unit id="org.eclipse.mylyn.sdk_feature.feature.group" version="3.4.2.v20100916-0100-e3x-8j9F7LFXiI9j9DENrbFi96Z"/>
+<unit id="org.eclipse.mylyn_feature.feature.group" version="3.4.2.v20100916-0100-e3x-7Z7f77FBBoPbPQeUoFeZXJ8"/>
+<unit id="org.eclipse.mylyn.context_feature.feature.group" version="3.4.2.v20100916-0100-e3x-777718s73533L3L135331"/>
+<unit id="org.eclipse.mylyn.wikitext_feature.feature.group" version="1.3.2.v20100916-0100-e3x-7F7e1FC7sReRSnX-DReRRD"/>
+<unit id="org.eclipse.mylyn.wikitext.sdk.feature.group" version="1.3.2.v20100916-0100-e3x-7U8M4FQCnvLuxi66SxLuuS"/>
+<repository location="http://download.eclipse.org/tools/mylyn/update/e3.4/"/>
+</location>
+<location includeAllPlatforms="true" includeMode="slicer" type="InstallableUnit">
+<unit id="org.eclipse.jdt.feature.group" version="3.5.2.r352_v20100108-7r88FEwFI0WTuoBl0iaG0tyhfZH6"/>
+<unit id="org.eclipse.platform.feature.group" version="3.5.2.R35x_v20100210-0800-9hEiFzmFst-TiEn9hNYgDWg1XN8ulH_JvCNGB"/>
+<unit id="org.eclipse.rcp.feature.group" version="3.5.2.R35x_v20100119-9SA0FxwFnoCU5XxWItFdXXb27BA6"/>
+<unit id="org.eclipse.rcp.source.feature.group" version="3.5.2.R35x_v20100119-9SA0FxwFnoCU5XxWItFdXXb27BA6"/>
+<repository location="http://download.eclipse.org/eclipse/updates/3.5"/>
+</location>
+<location path="${workspace_loc:net.sf.redmine_mylyn.builder/resources/bundles}" type="Directory"/>
+<location includeAllPlatforms="true" includeMode="slicer" type="InstallableUnit">
+<unit id="org.eclipse.equinox.sdk.feature.group" version="3.5.2.r352_v20100209-7G7MAD7lQiEeG_QL5AOoAHLYaYBg"/>
+<repository location="http://download.eclipse.org/releases/galileo"/>
+</location>
+</locations>
+</target>
