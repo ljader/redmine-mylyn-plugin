@@ -3,6 +3,7 @@ package net.sf.redmine_mylyn.internal.ui.editor.parts;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import net.sf.redmine_mylyn.core.IRedmineConstants;
@@ -145,15 +146,12 @@ public class TimeEntryEditorPart extends AbstractTaskEditorPart {
 		
 		private TaskAttribute attribute;
 		
-		private RedmineTaskTimeEntryMapper mapper;
-		
 		private ExpandableComposite timeEntryComposite;
 		
 		private boolean hasIncoming;
 		
 		private TimeEntryViewer(TaskAttribute timeEntryAttribute) {
 			attribute = timeEntryAttribute;
-			mapper = RedmineTaskTimeEntryMapper.fromTimeEntryAttribute(timeEntryAttribute);
 			hasIncoming = getModel().hasIncomingChanges(timeEntryAttribute);
 			
 		}
@@ -280,11 +278,13 @@ public class TimeEntryEditorPart extends AbstractTaskEditorPart {
 			}
 			
 			//Date
-			if (mapper.getSpentOn()!=null) {
+			TaskAttributeMapper attributeMapper = attribute.getTaskData().getAttributeMapper();
+			Date spentOnDate = attributeMapper.getDateValue(RedmineTaskTimeEntryMapper.getSpentOnAttribute(attribute));
+			if (spentOnDate!=null) {
 				if(sb.length()>0) {
 					sb.append(", "); //$NON-NLS-1$
 				}
-				sb.append(DateFormat.getDateInstance(DateFormat.MEDIUM).format(mapper.getSpentOn()));
+				sb.append(DateFormat.getDateInstance(DateFormat.MEDIUM).format(spentOnDate));
 			}
 			
 			formHyperlink.setText(sb.toString());
