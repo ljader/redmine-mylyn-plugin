@@ -152,9 +152,7 @@ public class IssueMapperTest {
 		assertEquals(""+te.getHours(), attribute.getAttribute(IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY_HOURS).getValue());
 		assertEquals(""+te.getComments(), attribute.getAttribute(IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY_COMMENTS).getValue());
 		assertEquals(""+te.getSpentOn().getTime(), attribute.getAttribute(IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY_SPENTON).getValue());
-
-		cv = te.getCustomValues().get(5);
-		assertEquals("1", attribute.getAttribute(IRedmineConstants.TASK_KEY_PREFIX_TIMEENTRY_CF+cv.getCustomFieldId()).getValue());
+		assertEquals("1", attribute.getAttribute(IRedmineConstants.TASK_KEY_PREFIX_TIMEENTRY_CF+"7").getValue());
 		
 		fail("Not finished yet implemented");
 	}

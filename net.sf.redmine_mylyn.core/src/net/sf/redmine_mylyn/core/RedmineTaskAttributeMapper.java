@@ -43,4 +43,13 @@ public class RedmineTaskAttributeMapper extends TaskAttributeMapper {
 		return person;
 	}
 
+	@Override
+	public boolean getBooleanValue(TaskAttribute attribute) {
+		String value = attribute.getValue();
+		if (value.equals("1")) {
+			return true;
+		}
+		return super.getBooleanValue(attribute);
+	}
+	
 }
