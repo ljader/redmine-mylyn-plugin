@@ -250,6 +250,7 @@ public class IssueMapper {
 	}
 
 	private static void setValue(TaskAttribute attribute, String value) {
+		//TODO use AttributeMapper
 		if(value==null) {
 			attribute.setValue("");
 		} else if(attribute.getMetaData().getType()==null) {
@@ -265,6 +266,7 @@ public class IssueMapper {
 	}
 
 	private static void setValue(TaskAttribute attribute, Date value) {
+		//TODO use AttributeMapper
 		if(value==null) {
 			attribute.setValue("");
 		} else {
@@ -273,6 +275,7 @@ public class IssueMapper {
 	}
 	
 	private static void setValue(TaskAttribute attribute, int value) {
+		//TODO use AttributeMapper
 		if (attribute.getId().equals(RedmineAttribute.PROGRESS.getTaskKey()) && attribute.getMetaData().getType()==null) {
 			attribute.setValue("");
 		} else if((attribute.getMetaData().getType()!=null && attribute.getMetaData().getType().equals(TaskAttribute.TYPE_SINGLE_SELECT) || attribute.getId().equals(RedmineAttribute.PARENT.getTaskKey())) && value<1) {
@@ -283,6 +286,7 @@ public class IssueMapper {
 	}
 	
 	private static void setProperty(RedmineAttribute redmineAttribute, TaskAttribute root, Issue issue) throws CoreException {
+		//TODO use AttributeMapper
 		Field field = redmineAttribute.getAttributeField();
 		if(!redmineAttribute.isReadOnly() && field!=null) {
 			TaskAttribute taskAttribute = root.getAttribute(redmineAttribute.getTaskKey());

@@ -3,6 +3,6 @@
 
 <target name="RMC exported TP">
 <locations>
-<location path="${workspace_loc:/net.sf.redmine_mylyn.tp/export}" type="Profile"/>
+<location path="${workspace_loc:/net.sf.redmine_mylyn.tp/export}" type="Directory"/>
 </locations>
 </target>

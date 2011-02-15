@@ -104,7 +104,7 @@ public class JaxbParser<T extends Object> {
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
 			int idx = atts.getIndex("authenticated");
-			if(idx>0) {
+			if(idx>=0) {
 				boolean authenticated = Boolean.parseBoolean(atts.getValue(idx));
 				if(authenticated) {
 					String authenticatedAs = atts.getValue(atts.getIndex("authenticatedAs"));
