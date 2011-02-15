@@ -35,12 +35,6 @@ public class RedmineTaskTimeEntryMapper {
 	
 	private List<CustomValue> customValues;
 	
-	public static RedmineTaskTimeEntryMapper fromTimeEntryAttribute(TaskAttribute attribute) {
-		RedmineTaskTimeEntryMapper mapper = new RedmineTaskTimeEntryMapper();
-		mapper.readTaskAttribute(attribute);
-		return mapper;
-	}
-	
 	public void applyTo(TaskAttribute taskAttribute, Configuration configuration) {
 		Assert.isNotNull(taskAttribute);
 		
@@ -103,24 +97,6 @@ public class RedmineTaskTimeEntryMapper {
 		}
 	}
 	
-	private void readTaskAttribute(TaskAttribute taskAttribute) {
-		TaskData taskData = taskAttribute.getTaskData();
-		TaskAttributeMapper mapper = taskData.getAttributeMapper();
-		
-		id = mapper.getIntegerValue(taskAttribute);
-		try {
-			hours = Float.parseFloat(mapper.getValue(taskAttribute.getMappedAttribute(IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY_HOURS)));
-		} catch (NumberFormatException e) {
-			IStatus status = RedmineCorePlugin.toStatus(e, null, "INVALID_HOURS_FORMAT_{0}", mapper.getValue(taskAttribute.getMappedAttribute(IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY_HOURS)));
-			StatusHandler.log(status);
-		}
-		activityId = mapper.getIntegerValue(taskAttribute.getMappedAttribute(IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY_ACTIVITY));
-		user = mapper.getRepositoryPerson(taskAttribute.getMappedAttribute(IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY_AUTHOR));
-		spentOn = mapper.getDateValue(taskAttribute.getMappedAttribute(IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY_SPENTON));
-		comments = mapper.getValue(taskAttribute.getMappedAttribute(IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY_COMMENTS));
-		//TODO customs
-	}
-
 	public int getTimeEntryId() {
 		return id;
 	}
@@ -188,6 +164,10 @@ public class RedmineTaskTimeEntryMapper {
 
 	public static TaskAttribute getActivityAttribute(TaskAttribute timeEntryAttribute) {
 		return timeEntryAttribute.getMappedAttribute(IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY_ACTIVITY);
+	}
+	
+	public static TaskAttribute getSpentOnAttribute(TaskAttribute timeEntryAttribute) {
+		return timeEntryAttribute.getMappedAttribute(IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY_SPENTON);
 	}
 	
 	public static TaskAttribute getCommentsAttribute(TaskAttribute timeEntryAttribute) {
