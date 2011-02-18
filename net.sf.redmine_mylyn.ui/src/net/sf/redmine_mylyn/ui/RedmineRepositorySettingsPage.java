@@ -153,7 +153,6 @@ public class RedmineRepositorySettingsPage extends AbstractRepositorySettingsPag
 
 		apiKeyText = new Text(parent, SWT.BORDER);
 		apiKeyText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-		//TODO SWT.CHANGED not available in 3.5, test this in 3.6
 		apiKeyText.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent e) {
@@ -161,12 +160,6 @@ public class RedmineRepositorySettingsPage extends AbstractRepositorySettingsPag
 				
 			}
 		});
-//		apiKeyText.addListener(SWT.CHANGED, new Listener() {
-//			@Override
-//			public void handleEvent(Event event) {
-//				isPageComplete();
-//			}
-//		});
 		
 		if(apiKey!=null) {
 			apiKeyText.setText(apiKey);
