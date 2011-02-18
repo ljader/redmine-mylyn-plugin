@@ -35,7 +35,14 @@ public class AttributePartLayoutHelper {
 	private final FormToolkit toolkit;
 	
 	private final Composite parent;
-
+	
+	private boolean dynamic = false;
+	
+	public AttributePartLayoutHelper(Composite attributeComposite, FormToolkit toolkit, boolean dynamic) {
+		this(attributeComposite,  toolkit);
+		this.dynamic = dynamic;
+	}
+	
 	public AttributePartLayoutHelper(Composite attributeComposite, FormToolkit toolkit) {
 		this.parent = attributeComposite;
 		this.toolkit = toolkit;
@@ -75,39 +82,43 @@ public class AttributePartLayoutHelper {
 			}
 		}
 		
+		LayoutHint layoutHint = editor.getLayoutHint();
+		boolean isMultiRowEditor = layoutHint!=null && layoutHint.rowSpan==RowSpan.MULTIPLE;
+		
 		Label label = editor.getLabelControl();
-		GridData gd = GridDataFactory.fillDefaults()
-				.align(SWT.RIGHT, SWT.CENTER)
-				.hint(LABEL_WIDTH, SWT.DEFAULT)
+		GridData labelGridData = GridDataFactory.fillDefaults()
+				.align(SWT.RIGHT, isMultiRowEditor ? SWT.TOP : SWT.CENTER)
+				.hint((dynamic ? SWT.DEFAULT : LABEL_WIDTH), SWT.DEFAULT)
 				.create();
 		
 		if (currentColumn > 1) {
-			gd.horizontalIndent = COLUMN_GAP;
-			gd.widthHint = LABEL_WIDTH + COLUMN_GAP;
+			labelGridData.horizontalIndent = COLUMN_GAP;
+			if(!dynamic) {
+				labelGridData.widthHint = LABEL_WIDTH + COLUMN_GAP;
+			}
 		}
-		label.setLayoutData(gd);
+		label.setLayoutData(labelGridData);
 		currentColumn++;
 
-		LayoutHint layoutHint = editor.getLayoutHint();
-		gd = new GridData(SWT.FILL, SWT.CENTER, false, false);
+		GridData controlGridData = new GridData(SWT.FILL, SWT.CENTER, dynamic, false);
 		if (layoutHint != null && !(layoutHint.rowSpan == RowSpan.SINGLE && layoutHint.columnSpan == ColumnSpan.SINGLE)) {
-			if (layoutHint.rowSpan == RowSpan.MULTIPLE) {
-				gd.heightHint = MULTI_ROW_HEIGHT;
+			if (isMultiRowEditor) {
+				controlGridData.heightHint = MULTI_ROW_HEIGHT;
 			}
 			if (layoutHint.columnSpan == ColumnSpan.SINGLE) {
-				gd.widthHint = COLUMN_WIDTH;
-				gd.horizontalSpan = 1;
+				controlGridData.widthHint = COLUMN_WIDTH;
+				controlGridData.horizontalSpan = 1;
 			} else {
-				gd.widthHint = MULTI_COLUMN_WIDTH;
-				gd.horizontalSpan = numColumns - currentColumn;
+				controlGridData.widthHint = MULTI_COLUMN_WIDTH;
+				controlGridData.horizontalSpan = numColumns - currentColumn;
 			}
 		} else {
-			gd.widthHint = COLUMN_WIDTH;
-			gd.horizontalSpan = 1;
+			controlGridData.widthHint = COLUMN_WIDTH;
+			controlGridData.horizontalSpan = 1;
 		}
-		editor.getControl().setLayoutData(gd);
+		editor.getControl().setLayoutData(controlGridData);
 		
-		currentColumn += gd.horizontalSpan;
+		currentColumn += controlGridData.horizontalSpan;
 		currentColumn %= numColumns;
 
 	}

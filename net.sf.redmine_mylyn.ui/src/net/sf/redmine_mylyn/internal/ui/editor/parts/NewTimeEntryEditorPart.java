@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.sf.redmine_mylyn.core.IRedmineConstants;
 import net.sf.redmine_mylyn.core.RedmineAttribute;
+import net.sf.redmine_mylyn.internal.ui.editor.helper.AttributePartLayoutHelper;
 
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskDataModelEvent;
@@ -12,7 +13,6 @@ import org.eclipse.mylyn.tasks.core.data.TaskDataModelListener;
 import org.eclipse.mylyn.tasks.ui.editors.AbstractAttributeEditor;
 import org.eclipse.mylyn.tasks.ui.editors.AbstractTaskEditorPart;
 import org.eclipse.mylyn.tasks.ui.editors.AttributeEditorToolkit;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -38,23 +38,14 @@ public class NewTimeEntryEditorPart extends AbstractTaskEditorPart {
 	
 	@Override
 	public void createControl(Composite parent, FormToolkit toolkit) {
-		//TODO layout / AttributePartLayoutHelper
-		
 		initialize();
 		
 		section = createSection(parent, toolkit, ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED);
 		setSection(toolkit, section);
-		
-
-		GridLayout gl = new GridLayout();
-		GridData gd = new GridData(SWT.FILL, SWT.NONE, false, false);
-		gd.horizontalSpan = 4;
-		section.setLayout(gl);
-		section.setLayoutData(gd);
 
 		Composite composite = toolkit.createComposite(section);
 		composite.setLayout(new GridLayout(4, false));
-		gd = new GridData();
+		GridData gd = new GridData();
 		gd.horizontalSpan = 4;
 		composite.setLayoutData(gd);
 
@@ -62,6 +53,7 @@ public class NewTimeEntryEditorPart extends AbstractTaskEditorPart {
 		TaskAttribute root = getTaskData().getRoot();
 		AbstractAttributeEditor attributeEditor;
 		TaskAttribute attribute;
+		AttributePartLayoutHelper layoutHelper = new AttributePartLayoutHelper(composite, toolkit, true);
 
 		attribute = root.getAttribute(RedmineAttribute.TIME_ENTRY_HOURS.getTaskKey());
 		if (attribute != null) {
@@ -70,6 +62,7 @@ public class NewTimeEntryEditorPart extends AbstractTaskEditorPart {
 			attributeEditor.createLabelControl(composite, toolkit);
 			attributeEditor.createControl(composite, toolkit);
 			attributeEditor.setDecorationEnabled(false);
+			layoutHelper.setLayoutData(attributeEditor);
 			editorToolkit.adapt(attributeEditor);
 		}
 
@@ -80,6 +73,7 @@ public class NewTimeEntryEditorPart extends AbstractTaskEditorPart {
 			attributeEditor.createLabelControl(composite, toolkit);
 			attributeEditor.createControl(composite, toolkit);
 			attributeEditor.setDecorationEnabled(false);
+			layoutHelper.setLayoutData(attributeEditor);
 			editorToolkit.adapt(attributeEditor);
 		}
 		
@@ -90,14 +84,8 @@ public class NewTimeEntryEditorPart extends AbstractTaskEditorPart {
 			attributeEditor.createLabelControl(composite, toolkit);
 			attributeEditor.createControl(composite, toolkit);
 			attributeEditor.setDecorationEnabled(false);
+			layoutHelper.setLayoutData(attributeEditor);
 			editorToolkit.adapt(attributeEditor);
-			
-			gd = new GridData();
-			gd.horizontalSpan = 3;
-			gd.horizontalAlignment = SWT.FILL;
-			gd.verticalAlignment = SWT.FILL;
-			gd.heightHint = 40;
-			attributeEditor.getControl().setLayoutData(gd);
 		}
 
 		for (TaskAttribute childAttribute : root.getAttributes().values()) {
@@ -107,6 +95,7 @@ public class NewTimeEntryEditorPart extends AbstractTaskEditorPart {
 				attributeEditor.createLabelControl(composite, toolkit);
 				attributeEditor.createControl(composite, toolkit);
 				attributeEditor.setDecorationEnabled(false);
+				layoutHelper.setLayoutData(attributeEditor);
 				editorToolkit.adapt(attributeEditor);
 			}
 		}
