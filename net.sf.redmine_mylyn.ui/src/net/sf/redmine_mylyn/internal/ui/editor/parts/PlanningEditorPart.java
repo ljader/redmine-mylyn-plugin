@@ -14,7 +14,6 @@ import org.eclipse.mylyn.tasks.core.data.TaskDataModelListener;
 import org.eclipse.mylyn.tasks.ui.editors.AbstractAttributeEditor;
 import org.eclipse.mylyn.tasks.ui.editors.AbstractTaskEditorPart;
 import org.eclipse.mylyn.tasks.ui.editors.AttributeEditorToolkit;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -41,16 +40,22 @@ public class PlanningEditorPart extends AbstractTaskEditorPart {
 		initialize();
 		Section timeSection = createSection(parent, toolkit, hasIncoming);
 
-		GridLayout gl = new GridLayout();
-		GridData gd = new GridData(SWT.FILL, SWT.NONE, false, false);
-		gd.horizontalSpan = 4;
-		timeSection.setLayout(gl);
-		timeSection.setLayoutData(gd);
+//		GridLayout gl = new GridLayout();
+//		GridData gd = new GridData(SWT.FILL, SWT.NONE, false, false);
+//		gd.horizontalSpan = 4;
+//		timeSection.setLayout(gl);
+//		timeSection.setLayoutData(gd);
+
+//		Composite timeComposite = toolkit.createComposite(timeSection);
+//		gl = new GridLayout(6, false);
+//		timeComposite.setLayout(gl);
+//		gd = new GridData();
+//		gd.horizontalSpan = 4;
+//		timeComposite.setLayoutData(gd);
 
 		Composite timeComposite = toolkit.createComposite(timeSection);
-		gl = new GridLayout(6, false);
-		timeComposite.setLayout(gl);
-		gd = new GridData();
+		timeComposite.setLayout(new GridLayout(6, false));
+		GridData gd = new GridData();
 		gd.horizontalSpan = 4;
 		timeComposite.setLayoutData(gd);
 

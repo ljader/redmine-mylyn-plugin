@@ -298,7 +298,7 @@ public class TimeEntryEditorPart extends AbstractTaskEditorPart {
 			if (expanded) {
 				AttributeEditorToolkit editorToolkit = getTaskEditorPage().getAttributeEditorToolkit();
 
-				AttributePartLayoutHelper layoutHelper = new AttributePartLayoutHelper(composite, toolkit);
+				AttributePartLayoutHelper layoutHelper = new AttributePartLayoutHelper(composite, toolkit, true);
 				
 				List<TaskAttribute> attributes = new ArrayList<TaskAttribute>();
 				attributes.add(RedmineTaskTimeEntryMapper.getCommentsAttribute(attribute));
