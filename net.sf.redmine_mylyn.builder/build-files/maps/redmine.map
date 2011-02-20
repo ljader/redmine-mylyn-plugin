@@ -3,4 +3,4 @@ plugin@net.sf.redmine_mylyn.common= COPY, ${sourceDir}, net.sf.redmine_mylyn.com
 plugin@net.sf.redmine_mylyn.api= COPY, ${sourceDir}, net.sf.redmine_mylyn.api
 plugin@net.sf.redmine_mylyn.core= COPY, ${sourceDir}, net.sf.redmine_mylyn.core
 plugin@net.sf.redmine_mylyn.ui= COPY, ${sourceDir}, net.sf.redmine_mylyn.ui
-#plugin@net.sf.redmine_mylyn= COPY, ${sourceDir}, net.sf.redmine_mylyn
+plugin@net.sf.redmine_mylyn= COPY, ${sourceDir}, net.sf.redmine_mylyn
