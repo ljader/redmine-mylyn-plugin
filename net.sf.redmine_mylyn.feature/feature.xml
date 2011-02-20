@@ -3,7 +3,8 @@
       id="net.sf.redmine_mylyn.feature"
       label="%Feature-Name"
       version="0.1.0.qualifier"
-      provider-name="%Feature-Vendor">
+      provider-name="%Feature-Vendor"
+      plugin="net.sf.redmine_mylyn">
 
    <description url="http://www.example.com/description">
       %description
@@ -114,6 +115,13 @@
          install-size="0"
          version="0.9.19.v20100519-1910"
          fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="net.sf.redmine_mylyn"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
          unpack="false"/>
 
 </feature>
