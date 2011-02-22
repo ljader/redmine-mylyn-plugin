@@ -8,6 +8,7 @@ import static org.junit.Assert.fail;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 
 import net.sf.redmine_mylyn.api.TestData;
@@ -79,7 +80,7 @@ public class IssueMapperTest {
 		assertEquals(""+issue.getStatusId(), root.getAttribute(RedmineAttribute.STATUS_CHG.getTaskKey()).getValue());
 		assertEquals(""+issue.getPriorityId(), root.getAttribute(RedmineAttribute.PRIORITY.getTaskKey()).getValue());
 		//TODO watched
-		//TODO watchers
+		assertEquals("[1, 3]", Arrays.toString(root.getAttribute(RedmineAttribute.WATCHERS.getTaskKey()).getValues().toArray(new String[2])));
 		assertEquals(""+issue.getStartDate().getTime(), root.getAttribute(RedmineAttribute.DATE_START.getTaskKey()).getValue());
 		assertEquals("", root.getAttribute(RedmineAttribute.DATE_DUE.getTaskKey()).getValue());
 		assertEquals(""+issue.getDoneRatio(), root.getAttribute(RedmineAttribute.PROGRESS.getTaskKey()).getValue());
@@ -190,7 +191,7 @@ public class IssueMapperTest {
 		assertEquals("", root.getAttribute(RedmineAttribute.STATUS_CHG.getTaskKey()).getValue());
 		assertEquals("", root.getAttribute(RedmineAttribute.PRIORITY.getTaskKey()).getValue());
 		//TODO watched
-		//TODO watchers
+		//new task - watchers is empty 
 		assertEquals("", root.getAttribute(RedmineAttribute.DATE_START.getTaskKey()).getValue());
 		assertEquals("", root.getAttribute(RedmineAttribute.DATE_DUE.getTaskKey()).getValue());
 		assertEquals("", root.getAttribute(RedmineAttribute.PROGRESS.getTaskKey()).getValue());

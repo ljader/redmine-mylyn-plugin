@@ -257,6 +257,12 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 			}
 		}
 
+		//Watchers
+		if(existingTask) {
+			if(issue.isWatchersViewAllowed()) {
+				createAttribute(data, RedmineAttribute.WATCHERS);
+			}
+		}
 	}
 	
 	private static TaskAttribute createAttribute(TaskData data, RedmineAttribute redmineAttribute) {

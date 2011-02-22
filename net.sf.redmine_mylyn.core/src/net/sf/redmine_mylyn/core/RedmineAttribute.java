@@ -60,6 +60,7 @@ public enum RedmineAttribute {
 	PROGRESS("Done ratio: ", RedmineAttribute.TASK_KEY_PROGRESS, TaskAttribute.TYPE_SINGLE_SELECT),
 	@PropertyAccessor("estimatedHours")
 	ESTIMATED("Estimated hours: ", RedmineAttribute.TASK_KEY_ESTIMATE, IRedmineConstants.EDITOR_TYPE_ESTIMATED, Flag.HIDDEN),
+	WATCHERS("Watchers ", RedmineAttribute.TASK_KEY_WATCHERS, TaskAttribute.TYPE_PERSON, Flag.HIDDEN),
 	
 	TIME_ENTRY_TOTAL("Total (hours):", TASK_ATTRIBUTE_TIMEENTRY_TOTAL, TaskAttribute.TYPE_SHORT_TEXT, Flag.HIDDEN, Flag.READ_ONLY),
 	TIME_ENTRY_HOURS("Spent time (hours):", TASK_ATTRIBUTE_TIMEENTRY_HOURS, TaskAttribute.TYPE_SHORT_TEXT, Flag.HIDDEN),
@@ -74,6 +75,7 @@ public enum RedmineAttribute {
 	public final static String TASK_KEY_PROGRESS = "task.redmine.progress";
 	public final static String TASK_KEY_ESTIMATE = "task.redmine.estimate";
 	public final static String TASK_KEY_STARTDATE = "task.redmine.startdate";
+	public final static String TASK_KEY_WATCHERS = "task.redmine.watchers";
 	
 	private final String prettyName;
 

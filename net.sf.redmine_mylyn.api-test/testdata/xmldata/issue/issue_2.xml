@@ -9,7 +9,7 @@
   <statusId>2</statusId>
   <priorityId>5</priorityId>
   <watched>true</watched>
-  <watchers>1 3</watchers>
+  <watchers viewAllowed="true" addAllowed="true" deleteAllowed="true" >1 3</watchers>
   <startDate>2010-05-08</startDate>
   <doneRatio>10</doneRatio>
   <estimatedHours>3.5</estimatedHours>

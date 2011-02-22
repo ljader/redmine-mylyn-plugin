@@ -58,6 +58,9 @@ public class TestData {
 			issue.setPriorityId(5);
 			issue.setWatched(true);
 			issue.setWatcherIds(new int[]{1,3});
+			issue.setWatchersViewAllowed(true);
+			issue.setWatchersAddAllowed(true);
+			issue.setWatchersDeleteAllowed(true);
 			issue.setStartDate(df.parse("2010-05-08"));
 			//dueDate
 			issue.setDoneRatio(10);

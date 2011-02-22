@@ -95,11 +95,16 @@ public class IssueValidator {
 
 		assertEquals(10, obj.getDoneRatio());
 		assertEquals(3.5, obj.getEstimatedHours(), 0.0);
+		
+		//Watchers
 		assertTrue(obj.isWatched());
 		assertEquals("[1, 3]", Arrays.toString(obj.getWatcherIds()));
 		assertEquals(3, obj.getAssignedToId());
 		assertEquals(2, obj.getFixedVersionId());
 		assertEquals(1, obj.getParentId());
+		assertTrue(obj.isWatchersViewAllowed());
+		assertTrue(obj.isWatchersAddAllowed());
+		assertTrue(obj.isWatchersDeleteAllowed());
 		
 		TimeEntries tEntrys = obj.getTimeEntries();
 		assertEquals(4.25f, tEntrys.getSum(), 0.0);

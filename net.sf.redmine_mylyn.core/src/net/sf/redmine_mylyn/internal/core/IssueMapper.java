@@ -40,9 +40,14 @@ public class IssueMapper {
 		
 		/* Default Attributes */
 		for (RedmineAttribute redmineAttribute : RedmineAttribute.values()) {
+			String taskKey = redmineAttribute.getTaskKey();
+			if(taskKey==null) {
+				continue;
+			}
+			
 			Field field = redmineAttribute.getAttributeField();
+			taskAttribute = root.getAttribute(taskKey);
 			if(field!=null) {
-				taskAttribute = root.getAttribute(redmineAttribute.getTaskKey());
 				if(taskAttribute !=null ) {
 					try {
 						setValue(taskAttribute, field.get(issue));
@@ -53,9 +58,20 @@ public class IssueMapper {
 						throw new CoreException(status);
 					}
 				}
+			} else {
+				switch (redmineAttribute) {
+				case WATCHERS:
+					for(int watcherId : issue.getWatcherIds()) {
+						taskAttribute.addValue(Integer.toString(watcherId));
+					}
+					break;
+				default:
+					break;
+				}
+				
 			}
 		}
-
+		
 		/* Custom Attributes */
 		if(issue.getCustomValues()!=null) {
 			for (CustomValue customValue : issue.getCustomValues().getAll()) {
