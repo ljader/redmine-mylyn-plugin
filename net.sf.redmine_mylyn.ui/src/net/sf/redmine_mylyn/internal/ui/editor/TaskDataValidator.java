@@ -39,6 +39,8 @@ public class TaskDataValidator {
 			}
 		} else if (attribute.getId().equals(RedmineAttribute.ESTIMATED.getTaskKey())) {
 			validateEstimatedHours(taskData, collector);
+		} else if (attribute.getId().equals(RedmineAttribute.TIME_ENTRY_HOURS.getTaskKey())) {
+			validateTimeEntry(taskData, collector);
 		} else if (attribute.getId().equals(RedmineAttribute.PARENT.getTaskKey())) {
 			validateParentTask(taskData, collector);
 		}
@@ -49,6 +51,7 @@ public class TaskDataValidator {
 	protected void validateDefaultAttributes(TaskData taskData, ErrorMessageCollector collector) {
 		validateRequiredDefaultAttributes(taskData, collector);
 		validateEstimatedHours(taskData, collector);
+		validateTimeEntry(taskData, collector);
 	}
 
 	protected void validateRequiredDefaultAttributes(TaskData taskData, ErrorMessageCollector collector) {
@@ -72,12 +75,29 @@ public class TaskDataValidator {
 	protected void validateEstimatedHours(TaskData taskData, ErrorMessageCollector collector) {
 		TaskAttribute attribute = taskData.getRoot().getAttribute(RedmineAttribute.ESTIMATED.getTaskKey());
 		if (attribute != null) {
-			
 			if (!attribute.getValue().trim().isEmpty()) {
 				try {
 					Double.valueOf(attribute.getValue().trim());
 				} catch (NumberFormatException e) {
 					collector.add(attribute, RedmineAttribute.ESTIMATED.getLabel() + " must be a float");
+				}
+			}
+		}
+	}
+	
+	protected void validateTimeEntry(TaskData taskData, ErrorMessageCollector collector) {
+		TaskAttribute attribute = taskData.getRoot().getAttribute(RedmineAttribute.TIME_ENTRY_HOURS.getTaskKey());
+		if (attribute != null) {
+			if (!attribute.getValue().trim().isEmpty()) {
+				try {
+					Double.valueOf(attribute.getValue().trim());
+				} catch (NumberFormatException e) {
+					collector.add(attribute, RedmineAttribute.TIME_ENTRY_HOURS.getLabel() + " must be a float");
+				}
+
+				attribute = taskData.getRoot().getAttribute(RedmineAttribute.TIME_ENTRY_ACTIVITY.getTaskKey());
+				if(attribute==null || attribute.getValue().isEmpty()) {
+					collector.add(attribute, RedmineAttribute.TIME_ENTRY_ACTIVITY.getLabel() + " is required");
 				}
 			}
 		}

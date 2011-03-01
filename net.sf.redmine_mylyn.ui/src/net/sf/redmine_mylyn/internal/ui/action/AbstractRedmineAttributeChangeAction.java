@@ -7,10 +7,8 @@ import net.sf.redmine_mylyn.ui.RedmineUiPlugin;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.action.Action;
-import org.eclipse.mylyn.commons.core.StatusHandler;
 import org.eclipse.mylyn.tasks.core.ITask;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.core.data.ITaskDataManager;
@@ -20,7 +18,6 @@ import org.eclipse.mylyn.tasks.core.data.TaskData;
 import org.eclipse.mylyn.tasks.core.data.TaskDataModel;
 import org.eclipse.mylyn.tasks.ui.TasksUi;
 import org.eclipse.mylyn.tasks.ui.editors.TaskEditorInput;
-import org.eclipse.swt.SWT;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
@@ -28,27 +25,29 @@ import org.eclipse.ui.PlatformUI;
 
 public abstract class AbstractRedmineAttributeChangeAction extends Action {
 
-	private RedmineAttribute attribute;
+	protected final RedmineAttribute[] attributes;
 
 	protected final ITask[] tasks;
 
-	protected String value;
+	abstract protected String getValue(RedmineAttribute attribute, TaskData taskData);
 
-	AbstractRedmineAttributeChangeAction(RedmineAttribute attribute, String value, ITask[] tasks) {
-		this(attribute, value, value, tasks);
+	public AbstractRedmineAttributeChangeAction(RedmineAttribute attribute, ITask... tasks) {
+		this(new RedmineAttribute[]{attribute}, tasks);
 	}
-
-	AbstractRedmineAttributeChangeAction(RedmineAttribute attribute, String value, String name, ITask[] tasks) {
-		super(name, SWT.NONE);
-		
+	
+	public AbstractRedmineAttributeChangeAction(ITask task, RedmineAttribute... attributes) {
+		this(attributes, new ITask[]{task});
+	}
+	
+	public AbstractRedmineAttributeChangeAction(RedmineAttribute[] attributes, ITask[] tasks) {
+		super();
 		Assert.isNotNull(tasks);
-		Assert.isNotNull(attribute);
-		Assert.isTrue(tasks.length>0);
+		Assert.isNotNull(attributes);
 		
-		this.attribute = attribute;
-		this.value = value;
+		this.attributes = attributes;
 		this.tasks = tasks;
 	}
+
 	
 	@Override
 	public void run() {
@@ -57,29 +56,39 @@ public abstract class AbstractRedmineAttributeChangeAction extends Action {
 		
 		for (ITask task : tasks) {
 			if(taskDataManager.hasTaskData(task)) {
+				String attributeName = null;
 				try {
+					boolean openTask = isTaskOpen(task);
 					TaskAttribute attribute = null;
-										
-					if(isTaskOpen(task)) {
-						TaskData taskData = taskDataManager.getTaskData(task);
-						attribute = taskData.getRoot().getAttribute(this.attribute.getTaskKey());
-						setOpenTaskValue(attribute, value, taskData);
-					} else {
-						ITaskDataWorkingCopy copy = taskDataManager.getWorkingCopy(task);
-						TaskDataModel model = new TaskDataModel(repository, task, copy);
-						TaskData taskData = model.getTaskData();
-						
-						attribute = taskData.getRoot().getAttribute(this.attribute.getTaskKey());
-						if(!attribute.getValue().equals(value)) {
-							setClosedTaskValue(attribute, value, taskData, model);
-							model.save(new NullProgressMonitor());
+					
+					for (RedmineAttribute redmineAttribute : attributes) {
+						if(redmineAttribute!=null) {
+							attributeName = redmineAttribute.name();
+							
+							if(openTask) {
+								TaskData taskData = taskDataManager.getTaskData(task);
+								attribute = taskData.getRoot().getAttribute(redmineAttribute.getTaskKey());
+								setOpenTaskValue(attribute, getValue(redmineAttribute, taskData), taskData);
+							} else {
+								ITaskDataWorkingCopy copy = taskDataManager.getWorkingCopy(task);
+								TaskDataModel model = new TaskDataModel(repository, task, copy);
+								TaskData taskData = model.getTaskData();
+								
+								attribute = taskData.getRoot().getAttribute(redmineAttribute.getTaskKey());
+								String value = getValue(redmineAttribute, taskData);
+								if(!attribute.getValue().equals(value)) {
+									setClosedTaskValue(attribute, value, taskData, model);
+									model.save(new NullProgressMonitor());
+								}
+							}
+							
+							RedmineUiPlugin.getDefault().notifyAttributeChanged(task, attribute);
 						}
 					}
-					
-					RedmineUiPlugin.getDefault().notifyAttributeChanged(task, attribute);
+										
 				} catch (CoreException e) {
 					ILogService log = RedmineUiPlugin.getLogService(getClass());
-					log.error(e, "Can't set value of attribute {0}", attribute.name());
+					log.error(e, "Can't set value of attribute {0}", attributeName);
 				}
 			}
 		}

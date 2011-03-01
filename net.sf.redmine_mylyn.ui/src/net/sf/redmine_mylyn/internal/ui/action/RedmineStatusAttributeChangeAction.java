@@ -10,8 +10,17 @@ import org.eclipse.mylyn.tasks.core.data.TaskDataModel;
 
 public class RedmineStatusAttributeChangeAction extends AbstractRedmineAttributeChangeAction {
 	
+	private final  String value;
+	
 	public RedmineStatusAttributeChangeAction(String statusId, String statusName, ITask[] tasks) {
-		super(RedmineAttribute.STATUS_CHG, statusId, statusName, tasks);
+		super(RedmineAttribute.STATUS_CHG, tasks);
+		setText(statusName);
+		this.value = statusId;
+	}
+	
+	@Override
+	protected String getValue(RedmineAttribute attribute, TaskData taskData) {
+		return value;
 	}
 	
 	@Override
