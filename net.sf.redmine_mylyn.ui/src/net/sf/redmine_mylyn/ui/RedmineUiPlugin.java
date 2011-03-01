@@ -6,6 +6,7 @@ import java.util.List;
 
 import net.sf.redmine_mylyn.common.logging.ILogService;
 import net.sf.redmine_mylyn.common.logging.LogServiceImpl;
+import net.sf.redmine_mylyn.core.IRedmineSpentTimeManager;
 import net.sf.redmine_mylyn.core.RedmineCorePlugin;
 import net.sf.redmine_mylyn.core.RedmineRepositoryConnector;
 import net.sf.redmine_mylyn.internal.IRedmineAttributeChangedListener;
@@ -44,6 +45,8 @@ public class RedmineUiPlugin extends AbstractUIPlugin implements LogListener {
 	private IStructuredSelection taskListSelection;
 	
 	private List<IRedmineAttributeChangedListener> attributeListeners;
+	
+	private IRedmineSpentTimeManager spentTimeManager;
 	
 	private ServiceReference logReaderServiceReference;
 	
@@ -92,11 +95,14 @@ public class RedmineUiPlugin extends AbstractUIPlugin implements LogListener {
 			ISelectionService selServive = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService();
 			selServive.addSelectionListener(taskListSelectionListener);
 		} catch (NullPointerException e) {}
+		
+		spentTimeManager = RedmineCorePlugin.getDefault().getSpentTimeManager(TasksUi.getTaskActivityManager());
 	}
 
 	
 	@Override
 	public void stop(BundleContext bundleContext) throws Exception {
+		
 		try {
 			ISelectionService selServive = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService();
 			selServive.removePostSelectionListener(taskListSelectionListener);
@@ -140,6 +146,10 @@ public class RedmineUiPlugin extends AbstractUIPlugin implements LogListener {
 		return taskListSelection;
 	}
 
+	public IRedmineSpentTimeManager getSpentTimeManager() {
+		return spentTimeManager;
+	}
+	
 	public void addAttributeChangedListener(IRedmineAttributeChangedListener listener) {
 		synchronized (attributeListeners) {
 			if(!attributeListeners.contains(listener)) {

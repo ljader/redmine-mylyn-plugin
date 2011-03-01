@@ -64,7 +64,7 @@ public class EstimatedEditor extends AbstractAttributeEditor {
 			});
 			
 			ImageHyperlink clearEstimated = toolkit.createImageHyperlink(composite, SWT.NONE);
-			clearEstimated.setImage(Images.getImage(Images.FIND_CLEAR));
+			clearEstimated.setImage(Images.getImage(Images.CLEAR));
 			clearEstimated.setToolTipText("Clear");
 			clearEstimated.addHyperlinkListener(new HyperlinkAdapter() {
 				@Override

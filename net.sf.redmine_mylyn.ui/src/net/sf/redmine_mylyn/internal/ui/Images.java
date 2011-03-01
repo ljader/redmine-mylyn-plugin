@@ -10,12 +10,22 @@ public class Images {
 
 	private static ImageRegistry registry;
 	
-	public final static String FIND_CLEAR = "/icons/etool16/clear.gif";
+	public final static String CLEAR = "/icons/etool16/clear.gif";
+
+	public final static String FIND_CLEAR = "/icons/etool16/find-clear.gif";
+	
+	public final static String FIND_CLEAR_DISABLED = "/icons/etool16/find-clear-disabled.gif";
+
+	public final static String REPLY = "/icons/etool16/reply.gif";
 
 	public final static String PERSON_NARROW = "/icons/etool16/person-narrow.gif";
 
 	public static ImageDescriptor getImageDescriptor(String key) {
 		ImageDescriptor imageDescriptor = RedmineUiPlugin.imageDescriptorFromPlugin("org.eclipse.mylyn.commons.ui", key);
+		
+		if(imageDescriptor==null) {
+			imageDescriptor = RedmineUiPlugin.imageDescriptorFromPlugin("org.eclipse.mylyn.tasks.ui", key);
+		}
 		return imageDescriptor;
 	}
 
