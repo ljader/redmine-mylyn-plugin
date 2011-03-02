@@ -7,6 +7,7 @@ import net.sf.redmine_mylyn.core.IRedmineSpentTimeManagerListener;
 import net.sf.redmine_mylyn.core.RedmineCorePlugin;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.mylyn.commons.core.DateUtil;
 import org.eclipse.mylyn.tasks.core.ITask;
 import org.eclipse.mylyn.tasks.core.ITaskActivationListener;
 import org.eclipse.mylyn.tasks.core.ITaskActivityListener;
@@ -28,8 +29,6 @@ public class RedmineSpentTimeManager implements IRedmineSpentTimeManager {
 	
 	private final ArrayList<IRedmineSpentTimeManagerListener> listeners = new ArrayList<IRedmineSpentTimeManagerListener>();
 	
-//	private ITask activeTask;
-	
 	public RedmineSpentTimeManager(ITaskActivityManager taskActivityManager) {
 		this.taskActivityManager = taskActivityManager;
 		
@@ -37,7 +36,9 @@ public class RedmineSpentTimeManager implements IRedmineSpentTimeManager {
 			@Override
 			public void elapsedTimeUpdated(ITask task, long newElapsedTime) {
 				if(isUsableTask(task)) {
-					setElapsedTime(task, newElapsedTime);
+					if(RedmineSpentTimeManager.this.taskActivityManager.isActive(task)) {
+						setActiveTask(task);
+					}
 				}
 			}
 		};
@@ -45,32 +46,16 @@ public class RedmineSpentTimeManager implements IRedmineSpentTimeManager {
 		taskActivationListener = new TaskActivationAdapter() {
 			@Override
 			public void taskActivated(ITask task) {
-				if (task!=null && isUsableTask(task)) {
-					setActiveTask(task);
-				} else {
-					clearActiveTask();
-				}
 			}
 			
 			@Override
 			public void taskDeactivated(ITask task) {
-				if (task!=null && isUsableTask(task)) {
-					setActiveTask(task);
-				}
-				clearActiveTask();
 			}
 		};
 	}
 	
 	public void start() {
-		ITask task = taskActivityManager.getActiveTask();
-		
-		if(task!=null && isUsableTask(task)) {
-			setActiveTask(task);
-		} else {
-			clearActiveTask();
-		}
-		
+
 		taskActivityManager.addActivityListener(taskActivityListener);
 		taskActivityManager.addActivationListener(taskActivationListener);
 		
@@ -79,8 +64,6 @@ public class RedmineSpentTimeManager implements IRedmineSpentTimeManager {
 	public void stop() {
 		taskActivityManager.removeActivityListener(taskActivityListener);
 		taskActivityManager.removeActivationListener(taskActivationListener);
-		
-		clearActiveTask();
 	}
 
 	@Override
@@ -163,11 +146,6 @@ public class RedmineSpentTimeManager implements IRedmineSpentTimeManager {
 	
 	private void setActiveTask(ITask task) {
 		setElapsedTime(task, taskActivityManager.getElapsedTime(task));
-//		activeTask = task;
-	}
-	
-	private void clearActiveTask() {
-//		activeTask = null;
 	}
 	
 	private long readLongAttribute(ITask task, String attribute) {

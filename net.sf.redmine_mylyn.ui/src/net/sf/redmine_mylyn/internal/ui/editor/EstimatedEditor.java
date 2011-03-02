@@ -7,11 +7,15 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.mylyn.commons.core.StatusHandler;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskDataModel;
+import org.eclipse.mylyn.tasks.core.data.TaskDataModelEvent;
+import org.eclipse.mylyn.tasks.core.data.TaskDataModelListener;
 import org.eclipse.mylyn.tasks.ui.editors.AbstractAttributeEditor;
 import org.eclipse.mylyn.tasks.ui.editors.LayoutHint;
 import org.eclipse.mylyn.tasks.ui.editors.LayoutHint.ColumnSpan;
 import org.eclipse.mylyn.tasks.ui.editors.LayoutHint.RowSpan;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridLayout;
@@ -25,11 +29,29 @@ import org.eclipse.ui.forms.widgets.ImageHyperlink;
 
 public class EstimatedEditor extends AbstractAttributeEditor {
 
+	private final static int STEPS = 25;
+	
 	Spinner spinner;
+	
+	private final TaskDataModelListener modelListener;
 	
 	public EstimatedEditor(TaskDataModel manager, TaskAttribute taskAttribute) {
 		super(manager, taskAttribute);
 		setLayoutHint(new LayoutHint(RowSpan.SINGLE, ColumnSpan.SINGLE));
+		
+		modelListener = new TaskDataModelListener() {
+			@Override
+			public void attributeChanged(TaskDataModelEvent event) {
+				if(event.getTaskAttribute().getId().equals(getTaskAttribute().getId())) {
+					if (spinner!=null && !spinner.isDisposed()) {
+						int newValue = toSelectionValue(event.getTaskAttribute().getValue());
+						if(spinner.getSelection()!=newValue) {
+							spinner.setSelection(newValue);
+						}
+					}
+				}
+			}
+		};
 	}
 
 	@Override
@@ -49,7 +71,7 @@ public class EstimatedEditor extends AbstractAttributeEditor {
 			spinner.setDigits(2);
 			spinner.setMaximum(10000);
 			spinner.setMinimum(0);
-			spinner.setIncrement(25);
+			spinner.setIncrement(STEPS);
 			spinner.setSelection(getValue());
 			
 //			!PlatformUtil.spinnerHasNativeBorder()
@@ -74,30 +96,54 @@ public class EstimatedEditor extends AbstractAttributeEditor {
 			});
 			
 			control = spinner;
+			
 		}
 		
 		toolkit.paintBordersFor(composite);
 		toolkit.adapt(control, false, false);
 		setControl(control);
+
+		
+		getControl().addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				getModel().removeModelListener(modelListener);
+			}
+		});
+		getModel().addModelListener(modelListener);
 	}
 
 	private int getValue() {
-		float estimatedHours = 0f;
-		if (getTaskAttribute().getValue().length()>0) {
-			try {
-				estimatedHours = Float.valueOf(getTaskAttribute().getValue());
-				estimatedHours *= 1e2;
-			} catch (NumberFormatException e) {
-				IStatus status = RedmineCorePlugin.toStatus(e, "INVALID_ESTIMATED_HOURS {0}", getTaskAttribute().getValue());
-				StatusHandler.log(status);
-			}
-		}
-		return (int)estimatedHours;
+		return toSelectionValue(getTaskAttribute().getValue());
 	}
 
 	private void setValue(int val) {
-		getTaskAttribute().setValue("" + (((float)(val))*1e-2));
-		attributeChanged();
+		String newValue = "" + (((float)(val))*1e-2);
+		if(!newValue.equals(getTaskAttribute().getValue())) {
+			getTaskAttribute().setValue(newValue);
+			attributeChanged();
+		}
 	}
+	
+	private int toSelectionValue(String val) {
+		float selectionVal = 0;
+		if(!val.isEmpty()) {
+			try {
+				selectionVal = Float.valueOf(val);
+				selectionVal *= 1e2;
+				
+				float rest = selectionVal%STEPS;
+				if(rest>0) {
+					selectionVal += STEPS-rest;
+				}
+				
+			} catch (NumberFormatException e) {
+				IStatus status = RedmineCorePlugin.toStatus(e, "INVALID_REDMINE_HOURS {0}", getTaskAttribute().getValue());
+				StatusHandler.log(status);
+			}
+		}
+		return (int)selectionVal;
+	}
+	
 
 }

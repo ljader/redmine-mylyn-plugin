@@ -29,7 +29,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.IFormColors;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
@@ -52,7 +52,7 @@ public class NewTimeEntryEditorPart extends AbstractTaskEditorPart {
 	
 	private Label uncapturedTimeValueLabel;
 	
-	private Text timeEntryHoursText;
+	private Spinner timeEntrySpinner;
 	
 	private final IRedmineSpentTimeManagerListener spentTimeListener;
 	
@@ -103,6 +103,10 @@ public class NewTimeEntryEditorPart extends AbstractTaskEditorPart {
 
 		attribute = root.getAttribute(RedmineAttribute.TIME_ENTRY_HOURS.getTaskKey());
 		if (attribute != null) {
+			//TODO WORKAROUND - remove later
+			if (!attribute.getMetaData().getType().equals(IRedmineConstants.EDITOR_TYPE_ESTIMATED)) {
+				attribute.getMetaData().setType(IRedmineConstants.EDITOR_TYPE_ESTIMATED);
+			}
 			attributeList.add(attribute.getId());
 			attributeEditor = createAttributeEditor(attribute);
 			attributeEditor.createLabelControl(composite, toolkit);
@@ -111,7 +115,7 @@ public class NewTimeEntryEditorPart extends AbstractTaskEditorPart {
 			layoutHelper.setLayoutData(attributeEditor);
 			editorToolkit.adapt(attributeEditor);
 			
-			timeEntryHoursText = (Text)attributeEditor.getControl();
+			timeEntrySpinner = (Spinner)attributeEditor.getControl();
 		}
 		
 
@@ -202,9 +206,9 @@ public class NewTimeEntryEditorPart extends AbstractTaskEditorPart {
 				if(attributeList.contains(event.getTaskAttribute().getId())) {
 					markDirty();
 				}
-				
+
 				captureActiveTimeAction.setEnabled(
-						timeEntryHoursText.getText().trim().isEmpty()
+						timeEntrySpinner.getSelection()==0
 						&& spentTimeManager.getUncapturedSpentTime(getModel().getTask()) > 0);
 			}
 		};
@@ -222,13 +226,6 @@ public class NewTimeEntryEditorPart extends AbstractTaskEditorPart {
 						if(redmineAttribute!=null && modelAttribute!=null) {
 							modelAttribute.setValue(changedAttribute.getValue());
 							getModel().attributeChanged(modelAttribute);
-							
-							switch (redmineAttribute) {
-							case TIME_ENTRY_HOURS:
-								timeEntryHoursText.setText(changedAttribute.getValue());
-								break;
-								
-							}
 						}
 					
 				}
@@ -251,7 +248,7 @@ public class NewTimeEntryEditorPart extends AbstractTaskEditorPart {
 			uncapturedTimeValueLabel.setText(uncapturedTimeString);
 			
 			resetActiveTimeAction.setEnabled(notEmpty);
-			captureActiveTimeAction.setEnabled(notEmpty && timeEntryHoursText.getText().trim().isEmpty());
+			captureActiveTimeAction.setEnabled(notEmpty && timeEntrySpinner.getSelection()==0);
 		}
 	}
 	

@@ -1,7 +1,5 @@
 package net.sf.redmine_mylyn.internal.ui.action;
 
-import java.util.Locale;
-
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.Project;
 import net.sf.redmine_mylyn.api.model.TimeEntryActivity;
@@ -35,8 +33,7 @@ public class RedmineCaptureActivityTimeAction extends AbstractRedmineAttributeCh
 			
 			long milisec = RedmineUiPlugin.getDefault().getSpentTimeManager().getAndClearUncapturedSpentTime(task);
 			float hours = ((float)Math.ceil(milisec/1000/60))/60;
-			//TODO without Local / implement universal
-			return String.format(Locale.ENGLISH, "%.2f", hours);
+			return ""+hours;
 			
 		case TIME_ENTRY_ACTIVITY:
 			/*
