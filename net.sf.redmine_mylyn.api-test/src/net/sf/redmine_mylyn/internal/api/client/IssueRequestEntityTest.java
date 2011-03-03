@@ -4,9 +4,11 @@ import static org.junit.Assert.assertEquals;
 
 import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import net.sf.redmine_mylyn.api.TestData;
+import net.sf.redmine_mylyn.api.client.RedmineApiIssueProperty;
 import net.sf.redmine_mylyn.api.model.Issue;
 import net.sf.redmine_mylyn.api.model.TimeEntry;
 
@@ -22,6 +24,7 @@ public class IssueRequestEntityTest {
 	static LinkedHashMap<String, String> timeCutomValues;
 
 	Method writeIssueMethod;
+	Method writeIssueMethod2;
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -61,6 +64,9 @@ public class IssueRequestEntityTest {
 	public void setUp() throws Exception {
 		writeIssueMethod = IssueRequestEntity.class.getDeclaredMethod("writeIssue", Issue.class, String.class, TimeEntry.class);
 		writeIssueMethod.setAccessible(true);
+
+		writeIssueMethod2 = IssueRequestEntity.class.getDeclaredMethod("writeIssue", Map.class, String.class, TimeEntry.class);
+		writeIssueMethod2.setAccessible(true);
 	}
 	
 	@Test
@@ -76,6 +82,33 @@ public class IssueRequestEntityTest {
 		assertEquals(builder.toString(), result);
 	}
 
+	@Test
+	public void testWriteIssueMap() throws Exception{
+		StringBuilder builder = new StringBuilder();
+		builder.append("{\"issue\":{");
+		append(builder, issueValues);
+		builder.append("}}");
+		
+		Map<RedmineApiIssueProperty, String> values = new LinkedHashMap<RedmineApiIssueProperty, String>();
+		values.put(RedmineApiIssueProperty.SUBJECT, TestData.issue2.getSubject());
+		values.put(RedmineApiIssueProperty.DESCRIPTION, TestData.issue2.getDescription());
+		values.put(RedmineApiIssueProperty.TRACKER, ""+TestData.issue2.getTrackerId());//2
+		values.put(RedmineApiIssueProperty.PROJECT, ""+TestData.issue2.getProjectId());//1
+		values.put(RedmineApiIssueProperty.STATUS, ""+TestData.issue2.getStatusId());//2
+		values.put(RedmineApiIssueProperty.PRIORITY, ""+TestData.issue2.getPriorityId());//5
+		values.put(RedmineApiIssueProperty.START_DATE, "2010-05-08");
+		values.put(RedmineApiIssueProperty.DUE_DATE, "");
+		values.put(RedmineApiIssueProperty.DONE_RATIO, ""+TestData.issue2.getDoneRatio());//10
+		values.put(RedmineApiIssueProperty.ESTIMATED_HOURS, ""+TestData.issue2.getEstimatedHours());//3.5
+		values.put(RedmineApiIssueProperty.CATEGORY, "");
+		values.put(RedmineApiIssueProperty.ASSIGNED_TO, ""+TestData.issue2.getAssignedToId());//3
+		values.put(RedmineApiIssueProperty.FIXED_VERSION, ""+TestData.issue2.getFixedVersionId());//2
+		values.put(RedmineApiIssueProperty.PARENT, ""+TestData.issue2.getParentId());//1
+		
+		String result = (String)writeIssueMethod2.invoke(null, values, null, null);
+		assertEquals(builder.toString(), result);
+	}
+	
 	@Test
 	public void testWriteIssueIssueStringTimeEntry() throws Exception {
 		TimeEntry timeEntry = TestData.issue2.getTimeEntries().getAll().get(0); 

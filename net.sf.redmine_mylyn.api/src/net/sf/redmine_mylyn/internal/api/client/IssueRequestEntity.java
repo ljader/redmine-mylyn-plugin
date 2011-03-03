@@ -3,7 +3,10 @@ package net.sf.redmine_mylyn.internal.api.client;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
+import java.util.Map;
+import java.util.Map.Entry;
 
+import net.sf.redmine_mylyn.api.client.RedmineApiIssueProperty;
 import net.sf.redmine_mylyn.api.exception.RedmineApiErrorException;
 import net.sf.redmine_mylyn.api.model.CustomValue;
 import net.sf.redmine_mylyn.api.model.Issue;
@@ -23,8 +26,32 @@ public class IssueRequestEntity extends StringRequestEntity {
 	public IssueRequestEntity(Issue issue, String comment, TimeEntry timeEntry) throws UnsupportedEncodingException, RedmineApiErrorException {
 		super(writeIssue(issue, comment, timeEntry), "application/json", "UTF-8");
 	}
+
+	public IssueRequestEntity(Map<RedmineApiIssueProperty, String> issue, String comment, TimeEntry timeEntry) throws UnsupportedEncodingException, RedmineApiErrorException {
+		super(writeIssue(issue, comment, timeEntry), "application/json", "UTF-8");
+	}
 	
 	private static String writeIssue(Issue issue, String comment, TimeEntry timeEntry) throws RedmineApiErrorException {
+		try {
+			StringWriter stringWriter = new StringWriter();
+			
+			JSONWriter jsonWriter = new JSONWriter(stringWriter);
+			
+			jsonWriter.object();
+			writeIssueValues(jsonWriter, issue);
+			writeComment(jsonWriter, comment);
+			writeTimeEntry(jsonWriter, timeEntry);
+			jsonWriter.endObject();
+			
+			
+			return stringWriter.toString();
+		} catch (JSONException e) {
+			e.printStackTrace();
+			throw new RedmineApiErrorException("Creation of Submit-JSON failed", e);
+		}
+	}
+	
+	private static String writeIssue(Map<RedmineApiIssueProperty, String> issue, String comment, TimeEntry timeEntry) throws RedmineApiErrorException {
 		try {
 			StringWriter stringWriter = new StringWriter();
 			
@@ -77,6 +104,16 @@ public class IssueRequestEntity extends StringRequestEntity {
 		}
 		
 		writeCustomValues(jsonWriter, issue.getCustomValues());
+		
+		jsonWriter.endObject();
+	}
+	
+	private static void writeIssueValues(JSONWriter jsonWriter, Map<RedmineApiIssueProperty, String> issue) throws JSONException {
+		jsonWriter.key("issue").object();
+		
+		for (Entry<RedmineApiIssueProperty, String> entry : issue.entrySet()) {
+			writeValue(jsonWriter, entry.getKey().getSubmitKey(), entry.getValue());
+		}
 		
 		jsonWriter.endObject();
 	}

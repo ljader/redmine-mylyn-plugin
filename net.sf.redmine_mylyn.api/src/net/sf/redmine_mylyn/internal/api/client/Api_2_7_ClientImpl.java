@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 
 import net.sf.redmine_mylyn.api.client.IRedmineApiErrorCollector;
 import net.sf.redmine_mylyn.api.client.IRedmineApiWebHelper;
+import net.sf.redmine_mylyn.api.client.RedmineApiIssueProperty;
 import net.sf.redmine_mylyn.api.client.RedmineServerVersion;
 import net.sf.redmine_mylyn.api.exception.RedmineApiErrorException;
 import net.sf.redmine_mylyn.api.exception.RedmineApiInvalidDataException;
@@ -288,19 +289,12 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	}
 	
 	@Override
-	public void updateIssue(Issue issue, String comment, TimeEntry timeEntry, IRedmineApiErrorCollector errorCollector, IProgressMonitor monitor) throws RedmineApiInvalidDataException, RedmineApiErrorException {
+	public void updateIssue(int issueId, Map<RedmineApiIssueProperty, String> issueValues, String comment, TimeEntry timeEntry, IRedmineApiErrorCollector errorCollector, IProgressMonitor monitor) throws RedmineApiInvalidDataException, RedmineApiErrorException {
 		monitor = Policy.monitorFor(monitor);
 		monitor.beginTask("Upload Task", 1);
 
-		Object response = null;
-		
 		try {
-			//Workaround: remote method UPDATE dosn't support API-Keys, we need a session
-			getAuthenticityToken(monitor);
-			
-			PutMethod method = new PutMethod(String.format(URL_UPDATE_ISSUE, issue.getId()));
-			method.setRequestEntity(new IssueRequestEntity(issue, comment, timeEntry));
-			response = executeMethod(method, submitIssueParser, monitor, HttpStatus.SC_OK, HttpStatus.SC_UNPROCESSABLE_ENTITY);
+			updateIssue(issueId, new IssueRequestEntity(issueValues, comment, timeEntry), errorCollector, monitor);
 		} catch (UnsupportedEncodingException e) {
 			throw new RedmineApiErrorException("Execution of method failed - Invalid encoding {}", e, "UTF-8");
 		} finally {
@@ -310,7 +304,34 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 				monitor.worked(1);
 			}
 		}
+	}
+	
+	@Override
+	public void updateIssue(Issue issue, String comment, TimeEntry timeEntry, IRedmineApiErrorCollector errorCollector, IProgressMonitor monitor) throws RedmineApiInvalidDataException, RedmineApiErrorException {
+		monitor = Policy.monitorFor(monitor);
+		monitor.beginTask("Upload Task", 1);
 
+		try {
+			updateIssue(issue.getId(), new IssueRequestEntity(issue, comment, timeEntry), errorCollector, monitor);
+		} catch (UnsupportedEncodingException e) {
+			throw new RedmineApiErrorException("Execution of method failed - Invalid encoding {}", e, "UTF-8");
+		} finally {
+			if(monitor.isCanceled()) {
+				throw new OperationCanceledException();
+			} else {
+				monitor.worked(1);
+			}
+		}
+	}
+	
+	private void updateIssue(int issueId, IssueRequestEntity requestEntity, IRedmineApiErrorCollector errorCollector, IProgressMonitor monitor) throws RedmineApiInvalidDataException, RedmineApiErrorException {
+		//Workaround: remote method UPDATE dosn't support API-Keys, we need a session
+		getAuthenticityToken(monitor);
+		
+		PutMethod method = new PutMethod(String.format(URL_UPDATE_ISSUE, issueId));
+		method.setRequestEntity(requestEntity);
+		Object response = executeMethod(method, submitIssueParser, monitor, HttpStatus.SC_OK, HttpStatus.SC_UNPROCESSABLE_ENTITY);
+		
 		if(response instanceof SubmitError) {
 			SubmitError error = (SubmitError)response;
 			for (String errMsg : error.errors) {
