@@ -46,21 +46,21 @@
          id="net.sf.redmine_mylyn.api"
          download-size="0"
          install-size="0"
-         version="0.1.0.qualifier"
+         version="0.2.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.sf.redmine_mylyn.core"
          download-size="0"
          install-size="0"
-         version="0.1.0.qualifier"
+         version="0.2.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="net.sf.redmine_mylyn.ui"
          download-size="0"
          install-size="0"
-         version="0.1.0.qualifier"
+         version="0.2.0.qualifier"
          unpack="false"/>
 
    <plugin
