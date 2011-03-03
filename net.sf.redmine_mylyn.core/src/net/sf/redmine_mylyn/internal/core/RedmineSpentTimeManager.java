@@ -7,7 +7,6 @@ import net.sf.redmine_mylyn.core.IRedmineSpentTimeManagerListener;
 import net.sf.redmine_mylyn.core.RedmineCorePlugin;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.mylyn.commons.core.DateUtil;
 import org.eclipse.mylyn.tasks.core.ITask;
 import org.eclipse.mylyn.tasks.core.ITaskActivationListener;
 import org.eclipse.mylyn.tasks.core.ITaskActivityListener;
