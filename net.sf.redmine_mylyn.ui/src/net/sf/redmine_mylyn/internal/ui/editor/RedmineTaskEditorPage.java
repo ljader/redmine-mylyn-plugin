@@ -17,7 +17,6 @@ import net.sf.redmine_mylyn.core.RedmineAttribute;
 import net.sf.redmine_mylyn.core.RedmineCorePlugin;
 import net.sf.redmine_mylyn.core.RedmineOperation;
 import net.sf.redmine_mylyn.core.RedmineRepositoryConnector;
-import net.sf.redmine_mylyn.internal.IRedmineAttributeChangedListener;
 import net.sf.redmine_mylyn.internal.ui.editor.TaskDataValidator.ErrorMessageCollector;
 import net.sf.redmine_mylyn.internal.ui.editor.helper.AttributePartLayoutHelper;
 import net.sf.redmine_mylyn.internal.ui.editor.parts.NewTimeEntryEditorPart;
@@ -29,7 +28,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.mylyn.commons.core.StatusHandler;
-import org.eclipse.mylyn.tasks.core.ITask;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskDataModel;
 import org.eclipse.mylyn.tasks.core.data.TaskDataModelEvent;
@@ -58,8 +56,6 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 
 	public final static String ID = "net.sf.redmine_mylyn.ui.editor.page";
 
-	private final IRedmineAttributeChangedListener taskListAttributeListener;
-
 	private final TaskDataModelListener projectAttributeListener;
 	private final TaskDataModelListener trackerAttributeListener;
 	private final TaskDataModelListener validatorAttributeListener;
@@ -83,23 +79,6 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 		setNeedsPrivateSection(true);
 		setNeedsSubmitButton(true);
 		
-		taskListAttributeListener = new IRedmineAttributeChangedListener() {
-			public void attributeChanged(ITask task, TaskAttribute attribute) {
-				if(getTask()==task) {
-					if(attribute.getId().equals(RedmineAttribute.STATUS_CHG.getTaskKey())) {
-						TaskDataModel model = getModel();
-						TaskAttribute modelAttribute = model.getTaskData().getRoot().getAttribute(attribute.getId());
-						
-						if(!modelAttribute.getValue().equals(attribute.getValue())) {
-							modelAttribute.setValue(attribute.getValue());
-							model.attributeChanged(modelAttribute);
-							
-						}
-					}
-				}
-			}
-		};
-	
 		projectAttributeListener = new ProjectTaskDataModelListener();
 		trackerAttributeListener = new TrackerTaskDataModelListener();
 		validatorAttributeListener = new ValidatorTaskDataModelListener();
@@ -121,8 +100,6 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 		getModel().addModelListener(trackerAttributeListener);
 		getModel().addModelListener(validatorAttributeListener);
 		getModel().addModelListener(statusAttributeListener);
-
-		RedmineUiPlugin.getDefault().addAttributeChangedListener(taskListAttributeListener);
 	}
 	
 	@Override
@@ -131,8 +108,6 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 		getModel().removeModelListener(trackerAttributeListener);
 		getModel().removeModelListener(validatorAttributeListener);
 		getModel().removeModelListener(statusAttributeListener);
-
-		RedmineUiPlugin.getDefault().removeAttributeChangedListener(taskListAttributeListener);
 		
 		super.dispose();
 	}
@@ -203,6 +178,8 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 				final AbstractAttributeEditor editor;
 				if(IRedmineConstants.EDITOR_TYPE_ESTIMATED.equals(type)) {
 					editor = new EstimatedEditor(getModel(), taskAttribute);
+				} else if(IRedmineConstants.EDITOR_TYPE_DURATION.equals(type)) {
+						editor = new DurationEditor(getModel(), taskAttribute);
 				} else if(IRedmineConstants.EDITOR_TYPE_PARENTTASK.equals(type)) {
 					editor = super.createEditor(TaskAttribute.TYPE_TASK_DEPENDENCY, taskAttribute);
 					editor.setLayoutHint(new LayoutHint(RowSpan.SINGLE, ColumnSpan.SINGLE));

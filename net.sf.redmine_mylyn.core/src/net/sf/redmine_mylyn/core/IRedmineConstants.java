@@ -8,6 +8,7 @@ public interface IRedmineConstants {
 
 	public final static String EDITOR_TYPE_ESTIMATED = "estimated";
 	public final static String EDITOR_TYPE_PARENTTASK = "parenttask";
+	public final static String EDITOR_TYPE_DURATION = "duration";
 	
 	public final static String TASK_ATTRIBUTE_TIMEENTRY = "task.redmine.timeentry";
 	public final static String TASK_ATTRIBUTE_TIMEENTRY_PREFIX = "task.redmine.timeentry.";
