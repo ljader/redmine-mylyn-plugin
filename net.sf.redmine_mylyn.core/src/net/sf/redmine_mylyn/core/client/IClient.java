@@ -2,8 +2,10 @@ package net.sf.redmine_mylyn.core.client;
 
 import java.io.InputStream;
 import java.util.Date;
+import java.util.Map;
 import java.util.Set;
 
+import net.sf.redmine_mylyn.api.client.RedmineApiIssueProperty;
 import net.sf.redmine_mylyn.api.client.RedmineServerVersion;
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.Issue;
@@ -34,6 +36,8 @@ public interface IClient {
 	public int createIssue(Issue issue, IProgressMonitor monitor) throws RedmineStatusException;
 
 	public void updateIssue(Issue issue, String comment, TimeEntry timeEntry, IProgressMonitor monitor) throws RedmineStatusException;
+
+	public void updateIssue(int issueId, Map<RedmineApiIssueProperty, String> issueValues, String comment, TimeEntry timeEntry, IProgressMonitor monitor) throws RedmineStatusException;
 
 	public InputStream getAttachmentContent(int attachmentId, String fileName, IProgressMonitor monitor) throws RedmineStatusException;
 	

@@ -14,6 +14,7 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import net.sf.redmine_mylyn.api.model.Configuration;
+import net.sf.redmine_mylyn.core.IRedmineClientManager;
 import net.sf.redmine_mylyn.core.RedmineCorePlugin;
 import net.sf.redmine_mylyn.core.RedmineStatusException;
 import net.sf.redmine_mylyn.core.client.ClientFactory;
@@ -22,11 +23,10 @@ import net.sf.redmine_mylyn.core.client.IClient;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.mylyn.commons.core.StatusHandler;
-import org.eclipse.mylyn.tasks.core.IRepositoryListener;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.core.TaskRepositoryLocationFactory;
 
-public class ClientManager implements IRepositoryListener {
+public class ClientManager implements IRedmineClientManager {
 
 	private final static char[] ILLEGAL_ZIP_ENTRY_CHARS = "/*\\".toCharArray();
 	
@@ -47,6 +47,7 @@ public class ClientManager implements IRepositoryListener {
 		readCache();
 	}
 	
+	@Override
 	public IClient getClient(TaskRepository repository) throws RedmineStatusException {
 		
 		synchronized(clientByUrl) {

@@ -2,9 +2,11 @@ package net.sf.redmine_mylyn.internal.core.client;
 
 import java.io.InputStream;
 import java.util.Date;
+import java.util.Map;
 import java.util.Set;
 
 import net.sf.redmine_mylyn.api.client.IRedmineApiClient;
+import net.sf.redmine_mylyn.api.client.RedmineApiIssueProperty;
 import net.sf.redmine_mylyn.api.client.RedmineServerVersion;
 import net.sf.redmine_mylyn.api.exception.RedmineApiErrorException;
 import net.sf.redmine_mylyn.api.exception.RedmineApiInvalidDataException;
@@ -129,6 +131,19 @@ public class Client implements IClient {
 		ErrrorCollector errorCollector = new ErrrorCollector();
 		try {
 			apiClient.updateIssue(issue, comment, timeEntry, errorCollector, monitor);
+		} catch (RedmineApiErrorException e) {
+			throw new RedmineStatusException(e);
+		} catch (RedmineApiInvalidDataException e) {
+			IStatus status = new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, errorCollector.getErrorString(), e);
+			throw new RedmineStatusException(status);
+		}
+	}
+	
+	@Override
+	public void updateIssue(int issueId, Map<RedmineApiIssueProperty, String> issueValues, String comment, TimeEntry timeEntry, IProgressMonitor monitor) throws RedmineStatusException {
+		ErrrorCollector errorCollector = new ErrrorCollector();
+		try {
+			apiClient.updateIssue(issueId, issueValues, comment, timeEntry, errorCollector, monitor);
 		} catch (RedmineApiErrorException e) {
 			throw new RedmineStatusException(e);
 		} catch (RedmineApiInvalidDataException e) {

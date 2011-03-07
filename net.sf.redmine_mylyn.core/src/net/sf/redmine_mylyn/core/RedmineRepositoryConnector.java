@@ -51,7 +51,7 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 		taskDataHandler = new RedmineTaskDataHandler(this);
 	}
 
-	public synchronized ClientManager getClientManager() {
+	public synchronized IRedmineClientManager getClientManager() {
 		if (clientManager == null) {
 			IPath path = RedmineCorePlugin.getDefault().getRepostioryAttributeCachePath();
 			IPath path2 = RedmineCorePlugin.getDefault().getRepostioryAttributeCachePath2();
