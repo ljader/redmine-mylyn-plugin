@@ -3,6 +3,7 @@ package net.sf.redmine_mylyn.internal.ui.action;
 import net.sf.redmine_mylyn.common.logging.ILogService;
 import net.sf.redmine_mylyn.core.RedmineAttribute;
 import net.sf.redmine_mylyn.core.RedmineCorePlugin;
+import net.sf.redmine_mylyn.ui.RedmineTasksUiUtil;
 import net.sf.redmine_mylyn.ui.RedmineUiPlugin;
 
 import org.eclipse.core.runtime.Assert;
@@ -17,11 +18,6 @@ import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskData;
 import org.eclipse.mylyn.tasks.core.data.TaskDataModel;
 import org.eclipse.mylyn.tasks.ui.TasksUi;
-import org.eclipse.mylyn.tasks.ui.editors.TaskEditorInput;
-import org.eclipse.ui.IEditorReference;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 
 public abstract class AbstractRedmineAttributeChangeAction extends Action {
 
@@ -58,33 +54,40 @@ public abstract class AbstractRedmineAttributeChangeAction extends Action {
 			if(taskDataManager.hasTaskData(task)) {
 				String attributeName = null;
 				try {
-					boolean openTask = isTaskOpen(task);
-					TaskAttribute attribute = null;
+					
+					boolean openTask = true;
+					TaskDataModel model = RedmineTasksUiUtil.findOpenTaskModel(task);
+					
+					if(model==null) {
+						openTask = false;
+						ITaskDataWorkingCopy copy = taskDataManager.getWorkingCopy(task);
+						model = new TaskDataModel(repository, task, copy);
+					}
+
+					TaskData taskData = model.getTaskData();
+					
 					
 					for (RedmineAttribute redmineAttribute : attributes) {
 						if(redmineAttribute!=null) {
 							attributeName = redmineAttribute.name();
-							
-							if(openTask) {
-								TaskData taskData = taskDataManager.getTaskData(task);
-								attribute = taskData.getRoot().getAttribute(redmineAttribute.getTaskKey());
-								setOpenTaskValue(attribute, getValue(redmineAttribute, taskData), taskData);
-							} else {
-								ITaskDataWorkingCopy copy = taskDataManager.getWorkingCopy(task);
-								TaskDataModel model = new TaskDataModel(repository, task, copy);
-								TaskData taskData = model.getTaskData();
-								
-								attribute = taskData.getRoot().getAttribute(redmineAttribute.getTaskKey());
-								String value = getValue(redmineAttribute, taskData);
-								if(!attribute.getValue().equals(value)) {
-									setClosedTaskValue(attribute, value, taskData, model);
-									model.save(new NullProgressMonitor());
+							TaskAttribute attribute = taskData.getRoot().getAttribute(redmineAttribute.getTaskKey());
+
+							String newValue = getValue(redmineAttribute, taskData);
+							if(!attribute.getValue().equals(newValue)) {
+								if(openTask) {
+									setOpenTaskValue(attribute, newValue, taskData, model);
+								} else {
+									setClosedTaskValue(attribute, newValue, taskData, model);
 								}
 							}
 							
-							RedmineUiPlugin.getDefault().notifyAttributeChanged(task, attribute);
 						}
 					}
+
+					if(!openTask) {
+						model.save(new NullProgressMonitor());
+					}
+
 										
 				} catch (CoreException e) {
 					ILogService log = RedmineUiPlugin.getLogService(getClass());
@@ -99,27 +102,9 @@ public abstract class AbstractRedmineAttributeChangeAction extends Action {
 		model.attributeChanged(attribute);
 	}
 
-	protected void setOpenTaskValue(TaskAttribute attribute, String value, TaskData taskData) {
+	protected void setOpenTaskValue(TaskAttribute attribute, String value, TaskData taskData, TaskDataModel model) {
 		attribute.setValue(value);
+		model.attributeChanged(attribute);
 	}
 	
-	private boolean isTaskOpen(ITask task) {
-		IWorkbenchWindow[] windows = PlatformUI.getWorkbench().getWorkbenchWindows();
-		for (IWorkbenchWindow window : windows) {
-			IEditorReference[] editorReferences = window.getActivePage().getEditorReferences();
-			for (IEditorReference editorReference : editorReferences) {
-				try {
-					if (editorReference.getEditorInput() instanceof TaskEditorInput) {
-						TaskEditorInput input = (TaskEditorInput) editorReference.getEditorInput();
-						if (input.getTask()!=null && input.getTask()==task) {
-							return true;
-						}
-					}
-				} catch (PartInitException e) {
-					// ignore
-				}
-			}
-		}
-		return false;
-	}
 }
