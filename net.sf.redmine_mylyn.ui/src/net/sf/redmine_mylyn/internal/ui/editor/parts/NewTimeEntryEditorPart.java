@@ -7,7 +7,6 @@ import net.sf.redmine_mylyn.core.IRedmineConstants;
 import net.sf.redmine_mylyn.core.IRedmineSpentTimeManager;
 import net.sf.redmine_mylyn.core.IRedmineSpentTimeManagerListener;
 import net.sf.redmine_mylyn.core.RedmineAttribute;
-import net.sf.redmine_mylyn.internal.IRedmineAttributeChangedListener;
 import net.sf.redmine_mylyn.internal.ui.action.RedmineCaptureActivityTimeAction;
 import net.sf.redmine_mylyn.internal.ui.action.RedmineResetUncapturedActivityTimeAction;
 import net.sf.redmine_mylyn.internal.ui.editor.helper.AttributePartLayoutHelper;
@@ -29,7 +28,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.IFormColors;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
@@ -44,15 +42,11 @@ public class NewTimeEntryEditorPart extends AbstractTaskEditorPart {
 
 	private TaskDataModelListener modelListener;
 
-	private IRedmineAttributeChangedListener activeTimeCapturedListener;
-	
 	private Action resetActiveTimeAction;
 
 	private Action captureActiveTimeAction;
 	
 	private Label uncapturedTimeValueLabel;
-	
-	private Spinner timeEntrySpinner;
 	
 	private final IRedmineSpentTimeManagerListener spentTimeListener;
 	
@@ -104,8 +98,8 @@ public class NewTimeEntryEditorPart extends AbstractTaskEditorPart {
 		attribute = root.getAttribute(RedmineAttribute.TIME_ENTRY_HOURS.getTaskKey());
 		if (attribute != null) {
 			//TODO WORKAROUND - remove later
-			if (!attribute.getMetaData().getType().equals(IRedmineConstants.EDITOR_TYPE_ESTIMATED)) {
-				attribute.getMetaData().setType(IRedmineConstants.EDITOR_TYPE_ESTIMATED);
+			if (!attribute.getMetaData().getType().equals(IRedmineConstants.EDITOR_TYPE_DURATION)) {
+				attribute.getMetaData().setType(IRedmineConstants.EDITOR_TYPE_DURATION);
 			}
 			attributeList.add(attribute.getId());
 			attributeEditor = createAttributeEditor(attribute);
@@ -115,7 +109,7 @@ public class NewTimeEntryEditorPart extends AbstractTaskEditorPart {
 			layoutHelper.setLayoutData(attributeEditor);
 			editorToolkit.adapt(attributeEditor);
 			
-			timeEntrySpinner = (Spinner)attributeEditor.getControl();
+			attributeEditor.getControl();
 		}
 		
 
@@ -207,33 +201,11 @@ public class NewTimeEntryEditorPart extends AbstractTaskEditorPart {
 					markDirty();
 				}
 
-				captureActiveTimeAction.setEnabled(
-						timeEntrySpinner.getSelection()==0
-						&& spentTimeManager.getUncapturedSpentTime(getModel().getTask()) > 0);
-			}
-		};
-		
-		activeTimeCapturedListener = new IRedmineAttributeChangedListener() {
-			@Override
-			public void attributeChanged(ITask task, TaskAttribute changedAttribute) {
-				if (task.getHandleIdentifier().equals(getModel().getTask().getHandleIdentifier())) {
-					
-						RedmineAttribute redmineAttribute = RedmineAttribute.fromTaskKey(changedAttribute.getId());
-						
-						TaskAttribute modelAttribute = getModel().getTaskData()
-								.getRoot().getAttribute(changedAttribute.getId());
-						
-						if(redmineAttribute!=null && modelAttribute!=null) {
-							modelAttribute.setValue(changedAttribute.getValue());
-							getModel().attributeChanged(modelAttribute);
-						}
-					
-				}
+				captureActiveTimeAction.setEnabled(spentTimeManager.getUncapturedSpentTime(getModel().getTask()) >= 60000);
 			}
 		};
 		
 		spentTimeManager.addRedmineSpentTimeManagerListener(spentTimeListener);
-		RedmineUiPlugin.getDefault().addAttributeChangedListener(activeTimeCapturedListener);
 		getModel().addModelListener(modelListener);
 	}
 	
@@ -248,13 +220,12 @@ public class NewTimeEntryEditorPart extends AbstractTaskEditorPart {
 			uncapturedTimeValueLabel.setText(uncapturedTimeString);
 			
 			resetActiveTimeAction.setEnabled(notEmpty);
-			captureActiveTimeAction.setEnabled(notEmpty && timeEntrySpinner.getSelection()==0);
+			captureActiveTimeAction.setEnabled(notEmpty);
 		}
 	}
 	
 	@Override
 	public void dispose() {
-		RedmineUiPlugin.getDefault().removeAttributeChangedListener(activeTimeCapturedListener);
 		getModel().removeModelListener(modelListener);
 		spentTimeManager.removeRedmineSpentTimeManagerListener(spentTimeListener);
 		super.dispose();
