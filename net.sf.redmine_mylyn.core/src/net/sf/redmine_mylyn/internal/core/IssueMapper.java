@@ -191,7 +191,12 @@ public class IssueMapper {
 				timeEntry = new TimeEntry();
 				
 				/* Default Attributes */
-				timeEntry.setHours(Float.parseFloat(val));
+				long milisec = Long.parseLong(val);
+				long minutes = milisec/60000;
+				float hours = minutes/60;
+				hours += ((float)(minutes%60))/60.0;
+				
+				timeEntry.setHours(hours);
 				timeEntry.setActivityId(Integer.parseInt(getValue(taskData, RedmineAttribute.TIME_ENTRY_ACTIVITY)));
 				timeEntry.setComments(getValue(taskData, RedmineAttribute.TIME_ENTRY_COMMENTS));
 				
