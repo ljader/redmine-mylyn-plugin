@@ -13,6 +13,7 @@ import net.sf.redmine_mylyn.ui.RedmineUiPlugin;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.mylyn.tasks.core.AbstractRepositoryConnector;
 import org.eclipse.mylyn.tasks.core.ITask;
+import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskAttributeMapper;
 import org.eclipse.mylyn.tasks.core.data.TaskData;
 import org.eclipse.mylyn.tasks.ui.TasksUi;
@@ -28,12 +29,20 @@ public class RedmineCaptureActivityTimeAction extends AbstractRedmineAttributeCh
 	
 	@Override
 	protected String getValue(RedmineAttribute attribute, TaskData taskData) {
+		TaskAttributeMapper taskAttributeMapper = taskData.getAttributeMapper();
+		TaskAttribute taskAttribute = taskData.getRoot().getAttribute(attribute.getTaskKey());
+
 		switch (attribute) {
 		case TIME_ENTRY_HOURS:
-			
+
 			long milisec = RedmineUiPlugin.getDefault().getSpentTimeManager().getAndClearUncapturedSpentTime(task);
-			float hours = ((float)Math.ceil(milisec/1000/60))/60;
-			return ""+hours;
+			
+			String oldValue = taskAttribute.getValue();
+			if(!oldValue.isEmpty()) {
+				milisec += Long.parseLong(oldValue);
+			}
+			
+			return Long.toString(milisec);
 			
 		case TIME_ENTRY_ACTIVITY:
 			/*
@@ -44,9 +53,7 @@ public class RedmineCaptureActivityTimeAction extends AbstractRedmineAttributeCh
 			 */
 			
 			String value = "";
-			TaskAttributeMapper taskAttributeMapper = taskData.getAttributeMapper();
-			//TODO doesn't work - taskData isn't the same as in editor
-			Integer activityId = taskAttributeMapper.getIntegerValue(taskData.getRoot().getAttribute(RedmineAttribute.TIME_ENTRY_ACTIVITY.getTaskKey()));
+			Integer activityId = taskAttributeMapper.getIntegerValue(taskAttribute);
 
 			if(activityId==null) {
 				AbstractRepositoryConnector connector = TasksUi.getRepositoryConnector(RedmineCorePlugin.REPOSITORY_KIND);
@@ -65,7 +72,7 @@ public class RedmineCaptureActivityTimeAction extends AbstractRedmineAttributeCh
 						TimeEntryActivities activities = project.getTimeEntryActivities();
 						TimeEntryActivity activity = activities.getDefault();
 						if(activity==null && activities.getAll().size()>0) {
-							activities.getAll().get(0);
+							activity = activities.getAll().get(0);
 						}
 						if(activity!=null) {
 							value = Integer.toString(activity.getId());

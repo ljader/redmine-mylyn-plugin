@@ -1,24 +1,18 @@
 package net.sf.redmine_mylyn.ui;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
 
 import net.sf.redmine_mylyn.common.logging.ILogService;
 import net.sf.redmine_mylyn.common.logging.LogServiceImpl;
 import net.sf.redmine_mylyn.core.IRedmineSpentTimeManager;
 import net.sf.redmine_mylyn.core.RedmineCorePlugin;
 import net.sf.redmine_mylyn.core.RedmineRepositoryConnector;
-import net.sf.redmine_mylyn.internal.IRedmineAttributeChangedListener;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.mylyn.tasks.core.AbstractRepositoryConnector;
-import org.eclipse.mylyn.tasks.core.ITask;
-import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.ui.TaskRepositoryLocationUiFactory;
 import org.eclipse.mylyn.tasks.ui.TasksUi;
 import org.eclipse.ui.ISelectionListener;
@@ -44,8 +38,6 @@ public class RedmineUiPlugin extends AbstractUIPlugin implements LogListener {
 	
 	private IStructuredSelection taskListSelection;
 	
-	private List<IRedmineAttributeChangedListener> attributeListeners;
-	
 	private IRedmineSpentTimeManager spentTimeManager;
 	
 	private ServiceReference logReaderServiceReference;
@@ -64,8 +56,6 @@ public class RedmineUiPlugin extends AbstractUIPlugin implements LogListener {
 				}
 			}
 		};
-		
-		attributeListeners = new ArrayList<IRedmineAttributeChangedListener>();
 	}
 	
 	@Override
@@ -150,32 +140,6 @@ public class RedmineUiPlugin extends AbstractUIPlugin implements LogListener {
 		return spentTimeManager;
 	}
 	
-	public void addAttributeChangedListener(IRedmineAttributeChangedListener listener) {
-		synchronized (attributeListeners) {
-			if(!attributeListeners.contains(listener)) {
-				attributeListeners.add(listener);
-			}
-		}
-	}
-
-	public void removeAttributeChangedListener(IRedmineAttributeChangedListener listener) {
-		synchronized (attributeListeners) {
-			if(attributeListeners.contains(listener)) {
-				attributeListeners.remove(listener);
-			}
-		}
-	}
-	
-	public void notifyAttributeChanged(ITask task, TaskAttribute attribute) {
-		Assert.isNotNull(task);
-		Assert.isNotNull(attribute);
-		Assert.isTrue(task.getConnectorKind().equals(RedmineCorePlugin.REPOSITORY_KIND));
-		
-		for (IRedmineAttributeChangedListener listener : attributeListeners) {
-			listener.attributeChanged(task, attribute);
-		}
-	}
-
 	public static ILogService getLogService(Class<?> clazz) {
 		return plugin==null ? LogServiceImpl.getInstance() : LogServiceImpl.getInstance(plugin.getBundle(), clazz);
 	}
