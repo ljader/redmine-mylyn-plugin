@@ -5,6 +5,7 @@ import java.text.MessageFormat;
 import net.sf.redmine_mylyn.common.logging.ILogService;
 import net.sf.redmine_mylyn.common.logging.LogServiceImpl;
 import net.sf.redmine_mylyn.internal.core.RedmineSpentTimeManager;
+import net.sf.redmine_mylyn.internal.core.client.ClientManager;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
@@ -59,7 +60,7 @@ public class RedmineCorePlugin extends Plugin /*implements BundleActivator*/ {
 		}
 
 		if(connector!=null) {
-			connector.getClientManager().writeCache();
+			((ClientManager)connector.getClientManager()).writeCache();
 		}
 		
 		RedmineCorePlugin.context = null;
