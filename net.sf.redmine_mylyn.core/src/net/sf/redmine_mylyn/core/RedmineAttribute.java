@@ -10,6 +10,7 @@ import static net.sf.redmine_mylyn.core.IRedmineConstants.TASK_ATTRIBUTE_TIMEENT
 import java.lang.reflect.Field;
 import java.util.EnumSet;
 
+import net.sf.redmine_mylyn.api.client.RedmineApiIssueProperty;
 import net.sf.redmine_mylyn.api.model.Issue;
 import net.sf.redmine_mylyn.internal.core.PropertyAccessor;
 
@@ -21,50 +22,50 @@ import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 
 public enum RedmineAttribute {
 
-	ID("<used by search engine>", null, TaskAttribute.TYPE_INTEGER, Flag.HIDDEN, Flag.READ_ONLY),
+	ID("<used by search engine>", null, null, TaskAttribute.TYPE_INTEGER, Flag.HIDDEN, Flag.READ_ONLY),
 	
 	@PropertyAccessor(value="subject")
-	SUMMARY("Summary:", TaskAttribute.SUMMARY, TaskAttribute.TYPE_SHORT_TEXT, Flag.HIDDEN, Flag.REQUIRED),
+	SUMMARY("Summary:", TaskAttribute.SUMMARY, RedmineApiIssueProperty.SUBJECT, TaskAttribute.TYPE_SHORT_TEXT, Flag.HIDDEN, Flag.REQUIRED),
 	@PropertyAccessor("authorId")
-	REPORTER("Reporter:", TaskAttribute.USER_REPORTER, TaskAttribute.TYPE_PERSON, Flag.READ_ONLY),
+	REPORTER("Reporter:", TaskAttribute.USER_REPORTER, null, TaskAttribute.TYPE_PERSON, Flag.READ_ONLY),
 	@PropertyAccessor
-	DESCRIPTION("Description:", TaskAttribute.DESCRIPTION, TaskAttribute.TYPE_LONG_RICH_TEXT, Flag.HIDDEN, Flag.REQUIRED),
+	DESCRIPTION("Description:", TaskAttribute.DESCRIPTION, RedmineApiIssueProperty.DESCRIPTION, TaskAttribute.TYPE_LONG_RICH_TEXT, Flag.HIDDEN, Flag.REQUIRED),
 	@PropertyAccessor("assignedToId")
-	ASSIGNED_TO("Assigned To:", TaskAttribute.USER_ASSIGNED, TaskAttribute.TYPE_SINGLE_SELECT),
+	ASSIGNED_TO("Assigned To:", TaskAttribute.USER_ASSIGNED, RedmineApiIssueProperty.ASSIGNED_TO,  TaskAttribute.TYPE_SINGLE_SELECT),
 	@PropertyAccessor("createdOn")
-	DATE_SUBMITTED("Submitted:", TaskAttribute.DATE_CREATION, TaskAttribute.TYPE_DATE, Flag.HIDDEN, Flag.READ_ONLY),
+	DATE_SUBMITTED("Submitted:", TaskAttribute.DATE_CREATION, null, TaskAttribute.TYPE_DATE, Flag.HIDDEN, Flag.READ_ONLY),
 	@PropertyAccessor("updatedOn")
-	DATE_UPDATED("Last Modification:", TaskAttribute.DATE_MODIFICATION, TaskAttribute.TYPE_DATE, Flag.HIDDEN, Flag.READ_ONLY),
+	DATE_UPDATED("Last Modification:", TaskAttribute.DATE_MODIFICATION, null, TaskAttribute.TYPE_DATE, Flag.HIDDEN, Flag.READ_ONLY),
 	@PropertyAccessor("startDate")
-	DATE_START("Start Date:",  RedmineAttribute.TASK_KEY_STARTDATE, TaskAttribute.TYPE_DATE, Flag.HIDDEN),
+	DATE_START("Start Date:",  RedmineAttribute.TASK_KEY_STARTDATE, RedmineApiIssueProperty.START_DATE, TaskAttribute.TYPE_DATE, Flag.HIDDEN),
 	@PropertyAccessor("dueDate")
-	DATE_DUE("Due Date:", TaskAttribute.DATE_DUE, TaskAttribute.TYPE_DATE, Flag.HIDDEN),
+	DATE_DUE("Due Date:", TaskAttribute.DATE_DUE, RedmineApiIssueProperty.DUE_DATE, TaskAttribute.TYPE_DATE, Flag.HIDDEN),
 	@PropertyAccessor
-	PROJECT("Project:", TaskAttribute.PRODUCT, TaskAttribute.TYPE_SINGLE_SELECT, Flag.REQUIRED),
+	PROJECT("Project:", TaskAttribute.PRODUCT, RedmineApiIssueProperty.PROJECT, TaskAttribute.TYPE_SINGLE_SELECT, Flag.REQUIRED),
 	@PropertyAccessor
-	PRIORITY("Priority:", TaskAttribute.PRIORITY, TaskAttribute.TYPE_SINGLE_SELECT, Flag.HIDDEN, Flag.REQUIRED),
+	PRIORITY("Priority:", TaskAttribute.PRIORITY, RedmineApiIssueProperty.PRIORITY, TaskAttribute.TYPE_SINGLE_SELECT, Flag.HIDDEN, Flag.REQUIRED),
 	@PropertyAccessor
-	CATEGORY("Category:", RedmineAttribute.TASK_KEY_CATEGORY, TaskAttribute.TYPE_SINGLE_SELECT),
+	CATEGORY("Category:", RedmineAttribute.TASK_KEY_CATEGORY, RedmineApiIssueProperty.CATEGORY, TaskAttribute.TYPE_SINGLE_SELECT),
 	@PropertyAccessor("fixedVersionId")
-	VERSION("Target version:", TaskAttribute.VERSION, TaskAttribute.TYPE_SINGLE_SELECT),
+	VERSION("Target version:", TaskAttribute.VERSION, RedmineApiIssueProperty.FIXED_VERSION, TaskAttribute.TYPE_SINGLE_SELECT),
 	@PropertyAccessor
-	TRACKER("Tracker:", RedmineAttribute.TASK_KEY_TRACKER, TaskAttribute.TYPE_SINGLE_SELECT, Flag.REQUIRED),
+	TRACKER("Tracker:", RedmineAttribute.TASK_KEY_TRACKER, RedmineApiIssueProperty.TRACKER, TaskAttribute.TYPE_SINGLE_SELECT, Flag.REQUIRED),
 	@PropertyAccessor
-	STATUS("Status:", TaskAttribute.STATUS, TaskAttribute.TYPE_SINGLE_SELECT, Flag.REQUIRED, Flag.HIDDEN),
+	STATUS("Status:", TaskAttribute.STATUS, null, TaskAttribute.TYPE_SINGLE_SELECT, Flag.REQUIRED, Flag.HIDDEN),
 	@PropertyAccessor("statusId")
-	STATUS_CHG("Status:",  TASK_ATTRIBUTE_STATUS_CHANGE, TaskAttribute.TYPE_SINGLE_SELECT, Flag.OPERATION),
+	STATUS_CHG("Status:",  TASK_ATTRIBUTE_STATUS_CHANGE, RedmineApiIssueProperty.STATUS, TaskAttribute.TYPE_SINGLE_SELECT, Flag.OPERATION),
 	@PropertyAccessor("parentId")
-	PARENT("Parent:",  TASK_ATTRIBUTE_PARENT, IRedmineConstants.EDITOR_TYPE_PARENTTASK),
-	COMMENT("Comment: ", TaskAttribute.COMMENT_NEW, TaskAttribute.TYPE_LONG_RICH_TEXT, Flag.HIDDEN),
+	PARENT("Parent:",  TASK_ATTRIBUTE_PARENT, RedmineApiIssueProperty.PARENT, IRedmineConstants.EDITOR_TYPE_PARENTTASK),
+	COMMENT("Comment: ", TaskAttribute.COMMENT_NEW, null, TaskAttribute.TYPE_LONG_RICH_TEXT, Flag.HIDDEN),
 	@PropertyAccessor("doneRatio")
-	PROGRESS("Done ratio: ", RedmineAttribute.TASK_KEY_PROGRESS, TaskAttribute.TYPE_SINGLE_SELECT),
+	PROGRESS("Done ratio: ", RedmineAttribute.TASK_KEY_PROGRESS, RedmineApiIssueProperty.DONE_RATIO, TaskAttribute.TYPE_SINGLE_SELECT),
 	@PropertyAccessor("estimatedHours")
-	ESTIMATED("Estimated hours: ", RedmineAttribute.TASK_KEY_ESTIMATE, IRedmineConstants.EDITOR_TYPE_ESTIMATED, Flag.HIDDEN),
+	ESTIMATED("Estimated hours: ", RedmineAttribute.TASK_KEY_ESTIMATE, RedmineApiIssueProperty.ESTIMATED_HOURS, IRedmineConstants.EDITOR_TYPE_ESTIMATED, Flag.HIDDEN),
 	
-	TIME_ENTRY_TOTAL("Total (hours):", TASK_ATTRIBUTE_TIMEENTRY_TOTAL, TaskAttribute.TYPE_SHORT_TEXT, Flag.HIDDEN, Flag.READ_ONLY),
-	TIME_ENTRY_HOURS("Spent time (hours):", TASK_ATTRIBUTE_TIMEENTRY_HOURS, IRedmineConstants.EDITOR_TYPE_DURATION, Flag.HIDDEN),
-	TIME_ENTRY_ACTIVITY("Activity:", TASK_ATTRIBUTE_TIMEENTRY_ACTIVITY, TaskAttribute.TYPE_SINGLE_SELECT, Flag.HIDDEN),
-	TIME_ENTRY_COMMENTS("Comment:", TASK_ATTRIBUTE_TIMEENTRY_COMMENTS, TaskAttribute.TYPE_LONG_TEXT, Flag.HIDDEN)
+	TIME_ENTRY_TOTAL("Total (hours):", TASK_ATTRIBUTE_TIMEENTRY_TOTAL, null, TaskAttribute.TYPE_SHORT_TEXT, Flag.HIDDEN, Flag.READ_ONLY),
+	TIME_ENTRY_HOURS("Spent time (hours):", TASK_ATTRIBUTE_TIMEENTRY_HOURS, null, IRedmineConstants.EDITOR_TYPE_DURATION, Flag.HIDDEN),
+	TIME_ENTRY_ACTIVITY("Activity:", TASK_ATTRIBUTE_TIMEENTRY_ACTIVITY, null, TaskAttribute.TYPE_SINGLE_SELECT, Flag.HIDDEN),
+	TIME_ENTRY_COMMENTS("Comment:", TASK_ATTRIBUTE_TIMEENTRY_COMMENTS, null, TaskAttribute.TYPE_LONG_TEXT, Flag.HIDDEN)
 	; 
 
 
@@ -78,6 +79,8 @@ public enum RedmineAttribute {
 	private final String prettyName;
 
 	private final String taskKey;
+	
+	private final RedmineApiIssueProperty apiIssueProperty;
 	
 	private final String type;
 	
@@ -94,10 +97,11 @@ public enum RedmineAttribute {
 		return null;
 	}
 
-	RedmineAttribute(String prettyName, String taskKey, String type, Flag... flags) {
+	RedmineAttribute(String prettyName, String taskKey, RedmineApiIssueProperty issueProperty, String type, Flag... flags) {
 		this.taskKey = taskKey;
 		this.prettyName = prettyName;
 		this.type = type;
+		this.apiIssueProperty = issueProperty;
 		
 		this.flags = flags.length==0 || flags[0]==null ? EnumSet.noneOf(Flag.class) : EnumSet.of(flags [0], flags);
 		
@@ -128,9 +132,9 @@ public enum RedmineAttribute {
 		
 		
 	}
-	
-	RedmineAttribute(String prettyName, String taskKey, String type) {
-		this(prettyName, taskKey, type, (Flag)null);
+
+	public RedmineApiIssueProperty getApiIssueProperty() {
+		return apiIssueProperty;
 	}
 
 	public String getTaskKey() {
