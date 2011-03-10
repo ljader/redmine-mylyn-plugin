@@ -71,6 +71,7 @@ public class TimeEntryEditorPart extends AbstractTaskEditorPart {
 			String val = "0:00";
 			if (!totalAttribute.getValue().isEmpty()) {
 				float hours = Float.parseFloat(totalAttribute.getValue());
+				hours = Math.round( hours * 100. ) / 100.f;
 				int minutes = 60* ( ((int)(hours*100)) %100 ) /100;
 				val = String.format("%02d:%02d", (int)hours, minutes);
 			}
