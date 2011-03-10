@@ -2,7 +2,7 @@
 <feature
       id="net.sf.redmine_mylyn.feature"
       label="%Feature-Name"
-      version="0.2.0.qualifier"
+      version="0.2.1.qualifier"
       provider-name="%Feature-Vendor"
       plugin="net.sf.redmine_mylyn">
 
@@ -60,7 +60,7 @@
          id="net.sf.redmine_mylyn.ui"
          download-size="0"
          install-size="0"
-         version="0.2.0.qualifier"
+         version="0.2.1.qualifier"
          unpack="false"/>
 
    <plugin
@@ -82,7 +82,7 @@
          id="net.sf.redmine_mylyn"
          download-size="0"
          install-size="0"
-         version="0.2.0.qualifier"
+         version="0.2.1.qualifier"
          unpack="false"/>
 
 </feature>

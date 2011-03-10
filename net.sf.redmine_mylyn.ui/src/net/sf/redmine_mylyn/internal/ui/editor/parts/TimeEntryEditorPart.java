@@ -66,7 +66,16 @@ public class TimeEntryEditorPart extends AbstractTaskEditorPart {
 		TaskAttribute totalAttribute = getTaskData().getRoot().getAttribute(RedmineAttribute.TIME_ENTRY_TOTAL.getTaskKey());
 		if(totalAttribute!=null && totalAttribute.getValue()!="") {
 			nameDetail.append(" - ").append("Total");
-			nameDetail.append(": ").append(totalAttribute.getValue());
+
+			//Move into RedmineUtil
+			String val = "0:00";
+			if (!totalAttribute.getValue().isEmpty()) {
+				float hours = Float.parseFloat(totalAttribute.getValue());
+				int minutes = 60* ( ((int)(hours*100)) %100 ) /100;
+				val = String.format("%02d:%02d", (int)hours, minutes);
+			}
+
+			nameDetail.append(": ").append(val);
 			nameDetail.append(" hours");
 		}
 		
