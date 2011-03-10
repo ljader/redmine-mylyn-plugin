@@ -124,6 +124,14 @@ public class DurationEditor extends AbstractAttributeEditor {
 				}
 			});
 			
+			text.addDisposeListener(new DisposeListener() {
+				@Override
+				public void widgetDisposed(DisposeEvent e) {
+					getModel().removeModelListener(modelListener);
+				}
+			});
+			getModel().addModelListener(modelListener);
+
 			control = text;
 		}
 		
@@ -132,13 +140,6 @@ public class DurationEditor extends AbstractAttributeEditor {
 		setControl(control);
 
 		
-		getControl().addDisposeListener(new DisposeListener() {
-			@Override
-			public void widgetDisposed(DisposeEvent e) {
-				getModel().removeModelListener(modelListener);
-			}
-		});
-		getModel().addModelListener(modelListener);
 	}
 
 	public void setValue(String mixed) {
@@ -173,6 +174,7 @@ public class DurationEditor extends AbstractAttributeEditor {
 	
 	private void setValue(int hours, int minutes) {
 		String newVal = String.format("%01d:%02d", hours, minutes);
+		
 		if(!newVal.equals(text.getText())) {
 			text.setText(newVal);
 		}
