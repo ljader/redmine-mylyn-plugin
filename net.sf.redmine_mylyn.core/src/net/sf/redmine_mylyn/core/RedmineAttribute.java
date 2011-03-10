@@ -62,7 +62,7 @@ public enum RedmineAttribute {
 	@PropertyAccessor("estimatedHours")
 	ESTIMATED("Estimated hours: ", RedmineAttribute.TASK_KEY_ESTIMATE, RedmineApiIssueProperty.ESTIMATED_HOURS, IRedmineConstants.EDITOR_TYPE_ESTIMATED, Flag.HIDDEN),
 	
-	TIME_ENTRY_TOTAL("Total (hours):", TASK_ATTRIBUTE_TIMEENTRY_TOTAL, null, TaskAttribute.TYPE_SHORT_TEXT, Flag.HIDDEN, Flag.READ_ONLY),
+	TIME_ENTRY_TOTAL("Total (hours):", TASK_ATTRIBUTE_TIMEENTRY_TOTAL, null, IRedmineConstants.EDITOR_TYPE_DURATION, Flag.HIDDEN, Flag.READ_ONLY),
 	TIME_ENTRY_HOURS("Spent time (hours):", TASK_ATTRIBUTE_TIMEENTRY_HOURS, null, IRedmineConstants.EDITOR_TYPE_DURATION, Flag.HIDDEN),
 	TIME_ENTRY_ACTIVITY("Activity:", TASK_ATTRIBUTE_TIMEENTRY_ACTIVITY, null, TaskAttribute.TYPE_SINGLE_SELECT, Flag.HIDDEN),
 	TIME_ENTRY_COMMENTS("Comment:", TASK_ATTRIBUTE_TIMEENTRY_COMMENTS, null, TaskAttribute.TYPE_LONG_TEXT, Flag.HIDDEN)

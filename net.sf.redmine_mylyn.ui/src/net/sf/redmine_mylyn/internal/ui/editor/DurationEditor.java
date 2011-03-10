@@ -66,7 +66,15 @@ public class DurationEditor extends AbstractAttributeEditor {
 		composite.setLayout(layout);
 
 		if (isReadOnly()) {
-			control = toolkit.createText(composite, getTaskAttribute().getValue(), SWT.FLAT | SWT.READ_ONLY);
+			//Move into RedmineUtil
+			String val = "0:00";
+			if (!getTaskAttribute().getValue().isEmpty()) {
+				float hours = Float.parseFloat(getTaskAttribute().getValue());
+				int minutes = 60* ( ((int)(hours*100)) %100 ) /100;
+				val = String.format("%02d:%02d", (int)hours, minutes);
+			}
+			
+			control = toolkit.createText(composite, val, SWT.FLAT | SWT.READ_ONLY);
 			control.setData(FormToolkit.KEY_DRAW_BORDER, Boolean.FALSE);
 		} else {
 			text = new Text(composite, SWT.FLAT);
