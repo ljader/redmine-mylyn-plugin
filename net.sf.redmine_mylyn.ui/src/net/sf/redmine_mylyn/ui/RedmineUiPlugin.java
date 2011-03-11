@@ -9,6 +9,7 @@ import net.sf.redmine_mylyn.core.RedmineCorePlugin;
 import net.sf.redmine_mylyn.core.RedmineRepositoryConnector;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -21,7 +22,9 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.statushandlers.StatusManager;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogEntry;
 import org.osgi.service.log.LogListener;
@@ -87,12 +90,24 @@ public class RedmineUiPlugin extends AbstractUIPlugin implements LogListener {
 		} catch (NullPointerException e) {}
 		
 		spentTimeManager = RedmineCorePlugin.getDefault().getSpentTimeManager(TasksUi.getTaskActivityManager());
+		
+		
+		//Workaround for a bundle with experimental addons
+		Bundle extrasBundle = Platform.getBundle("net.sf.redmine_mylyn.ui.extras");
+		if(extrasBundle!=null) {
+			try {
+				extrasBundle.start(Bundle.START_TRANSIENT);
+			} catch (BundleException e ) {
+				getLogService(this.getClass()).error(e, "Can't start bundle net.sf.redmine_mylyn.ui.extras");
+			} catch (IllegalStateException e ) {
+				getLogService(this.getClass()).error(e, "Can't start bundle net.sf.redmine_mylyn.ui.extras");
+			}
+		}
 	}
 
 	
 	@Override
 	public void stop(BundleContext bundleContext) throws Exception {
-		
 		try {
 			ISelectionService selServive = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService();
 			selServive.removePostSelectionListener(taskListSelectionListener);
