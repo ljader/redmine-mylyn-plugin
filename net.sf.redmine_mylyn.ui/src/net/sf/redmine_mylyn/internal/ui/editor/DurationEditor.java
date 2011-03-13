@@ -70,9 +70,8 @@ public class DurationEditor extends AbstractAttributeEditor {
 			String val = "0:00";
 			if (!getTaskAttribute().getValue().isEmpty()) {
 				float hours = Float.parseFloat(getTaskAttribute().getValue());
-				hours = Math.round( hours * 100. ) / 100.f;
-				int minutes = 60* ( ((int)(hours*100)) %100 ) /100;
-				val = String.format("%02d:%02d", (int)hours, minutes);
+				float minutes = (int)(60.f * (hours - (int)hours));
+				val = String.format("%02d:%02d", (int)hours, (int)minutes);
 			}
 			
 			control = toolkit.createText(composite, val, SWT.FLAT | SWT.READ_ONLY);
@@ -177,9 +176,8 @@ public class DurationEditor extends AbstractAttributeEditor {
 	}
 	
 	public void setValue(float hours) {
-		hours = Math.round( hours * 100. ) / 100.f;
-		int minutes = 60* ( ((int)(hours*100)) %100 ) /100;
-		setValue((int)hours, minutes);
+		float minutes = (int)(60.f * (hours - (int)hours));
+		setValue((int)hours, (int)minutes);
 	}
 	
 	private void setValue(int hours, int minutes) {
