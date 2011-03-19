@@ -11,7 +11,7 @@ public class ErrrorCollector implements IRedmineApiErrorCollector {
 		if(builder==null) {
 			builder = new StringBuilder(errorMessage);
 		} else {
-			builder.append("\n");
+			builder.append("\n"); //$NON-NLS-1$
 			builder.append(errorMessage);
 		}
 	}
@@ -20,7 +20,7 @@ public class ErrrorCollector implements IRedmineApiErrorCollector {
 		if(builder!=null) {
 			return builder.toString();
 		}
-		return "";
+		return ""; //$NON-NLS-1$
 	}
 
 }

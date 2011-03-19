@@ -52,7 +52,7 @@ public class RedmineCaptureActivityTimeAction extends AbstractRedmineAttributeCh
 			 * 3 - first value
 			 */
 			
-			String value = "";
+			String value = ""; //$NON-NLS-1$
 			Integer activityId = taskAttributeMapper.getIntegerValue(taskAttribute);
 
 			if(activityId==null) {
@@ -87,7 +87,7 @@ public class RedmineCaptureActivityTimeAction extends AbstractRedmineAttributeCh
 			
 		}
 		
-		return "";
+		return ""; //$NON-NLS-1$
 	}
 	
 	@Override

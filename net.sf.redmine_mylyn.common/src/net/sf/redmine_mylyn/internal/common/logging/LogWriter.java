@@ -48,19 +48,19 @@ public class LogWriter implements LogListener {
 				configurator.setContext(ctx);
 				
 				ctx.reset();
-				ctx.putProperty("rmc.logfile", path.toString());
+				ctx.putProperty("rmc.logfile", path.toString()); //$NON-NLS-1$
 				
-				configurator.doConfigure(getClass().getResourceAsStream("/logback.xml"));
+				configurator.doConfigure(getClass().getResourceAsStream("/logback.xml")); //$NON-NLS-1$
 			} catch (JoranException e) {
 				ILogService logService = LogServiceImpl.getInstance(RedmineCommonPlugin.getDefault().getBundle(), LogWriter.class);
-				logService.error(e, "Logback configuration failed");
+				logService.error(e, "Logback configuration failed"); //$NON-NLS-1$
 			}
 		}
 	}
 	
 	@Override
 	public void logged(LogEntry entry) {
-		if (entry.getBundle().getSymbolicName().startsWith("net.sf.redmine_mylyn.")) {
+		if (entry.getBundle().getSymbolicName().startsWith("net.sf.redmine_mylyn.")) { //$NON-NLS-1$
 			writeLog(entry);
 		}
 	}
@@ -76,7 +76,7 @@ public class LogWriter implements LogListener {
 		}
 		
 		if(loggerName==null) {
-			loggerName = "RedmineConnector";
+			loggerName = "RedmineConnector"; //$NON-NLS-1$
 		}
 
 		Logger logger = loggerFactory.getLogger(loggerName);

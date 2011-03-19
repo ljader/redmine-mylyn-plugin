@@ -2,7 +2,9 @@ package net.sf.redmine_mylyn.internal.ui.editor;
 
 import java.util.regex.Pattern;
 
+import net.sf.redmine_mylyn.core.IRedmineConstants;
 import net.sf.redmine_mylyn.internal.ui.Images;
+import net.sf.redmine_mylyn.internal.ui.Messages;
 
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskDataModel;
@@ -30,9 +32,9 @@ import org.eclipse.ui.forms.widgets.ImageHyperlink;
 
 public class DurationEditor extends AbstractAttributeEditor {
 
-	private final static Pattern VALIDATION_REGEX1 = Pattern.compile("^\\d*(?::(?:[0-5][0-9]?)?)?$"); 
+	private final static Pattern VALIDATION_REGEX1 = Pattern.compile("^\\d*(?::(?:[0-5][0-9]?)?)?$");  //$NON-NLS-1$
 	
-	private final static Pattern VALIDATION_REGEX2 = Pattern.compile("^\\d*(?:\\.(?:\\d*)?)?$"); 
+	private final static Pattern VALIDATION_REGEX2 = Pattern.compile("^\\d*(?:\\.(?:\\d*)?)?$");  //$NON-NLS-1$
 	
 	Text text;
 	
@@ -67,11 +69,11 @@ public class DurationEditor extends AbstractAttributeEditor {
 
 		if (isReadOnly()) {
 			//Move into RedmineUtil
-			String val = "0:00";
+			String val = IRedmineConstants.EMPTY_DURATION_VALUE;
 			if (!getTaskAttribute().getValue().isEmpty()) {
 				float hours = Float.parseFloat(getTaskAttribute().getValue());
 				float minutes = (int)(60.f * (hours - (int)hours));
-				val = String.format("%02d:%02d", (int)hours, (int)minutes);
+				val = String.format(Messages.TIME_VALUE_X_X, (int)hours, (int)minutes);
 			}
 			
 			control = toolkit.createText(composite, val, SWT.FLAT | SWT.READ_ONLY);
@@ -124,11 +126,11 @@ public class DurationEditor extends AbstractAttributeEditor {
 			
 			ImageHyperlink clearEstimated = toolkit.createImageHyperlink(composite, SWT.NONE);
 			clearEstimated.setImage(Images.getImage(Images.CLEAR));
-			clearEstimated.setToolTipText("Clear");
+			clearEstimated.setToolTipText(Messages.Clear);
 			clearEstimated.addHyperlinkListener(new HyperlinkAdapter() {
 				@Override
 				public void linkActivated(HyperlinkEvent e) {
-					text.setText("");
+					text.setText(""); //$NON-NLS-1$
 				}
 			});
 			
@@ -154,11 +156,11 @@ public class DurationEditor extends AbstractAttributeEditor {
 		if (mixed!=null && !(mixed=mixed.trim()).isEmpty()) {
 			try {
 				String[] parts;
-				if((parts=mixed.split(":")).length==2) {
+				if((parts=mixed.split(":")).length==2) { //$NON-NLS-1$
 					//1:30
 					setValue((parts[0].isEmpty() ? 0 : Integer.parseInt(parts[0])), (parts[1].isEmpty() ? 0 : Integer.parseInt(parts[1])));
 					return;
-				} else if (mixed.matches("^(?:\\d*\\.)?\\d+$")) {
+				} else if (mixed.matches("^(?:\\d*\\.)?\\d+$")) { //$NON-NLS-1$
 					//.30 or 0.30 or 0
 					setValue(Float.parseFloat(mixed));
 					return;
@@ -181,14 +183,14 @@ public class DurationEditor extends AbstractAttributeEditor {
 	}
 	
 	private void setValue(int hours, int minutes) {
-		String newVal = String.format("%01d:%02d", hours, minutes);
+		String newVal = String.format(Messages.TIME_VALUE_X_X, hours, minutes);
 		
 		if(!newVal.equals(text.getText())) {
 			text.setText(newVal);
 		}
 
 		long milisec = (hours*60+minutes)*60000;
-		String newAttributeValue = milisec==0l ? "" : Long.toString(milisec);
+		String newAttributeValue = milisec==0l ? "" : Long.toString(milisec); //$NON-NLS-1$
 		if (!getTaskAttribute().getValue().equals(newAttributeValue)) {
 			getTaskAttribute().setValue(newAttributeValue);
 			attributeChanged();

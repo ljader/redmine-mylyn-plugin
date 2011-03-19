@@ -19,9 +19,9 @@ public class RedmineCorePlugin extends Plugin /*implements BundleActivator*/ {
 
 	private static BundleContext context;
 
-	public static final String PLUGIN_ID = "net.sf.redmine_mylyn.core";
+	public static final String PLUGIN_ID = "net.sf.redmine_mylyn.core"; //$NON-NLS-1$
 
-	public final static String REPOSITORY_KIND = "redmineV2";
+	public final static String REPOSITORY_KIND = "redmineV2"; //$NON-NLS-1$
 	
 	private static RedmineCorePlugin plugin;
 	
@@ -77,12 +77,12 @@ public class RedmineCorePlugin extends Plugin /*implements BundleActivator*/ {
 	
 	public IPath getRepostioryAttributeCachePath() {
 		IPath stateLocation = Platform.getStateLocation(getBundle());
-		return stateLocation.append("repositoryClientDataCache");
+		return stateLocation.append("repositoryClientDataCache"); //$NON-NLS-1$
 	}
 
 	public IPath getRepostioryAttributeCachePath2() {
 		IPath stateLocation = Platform.getStateLocation(getBundle());
-		return stateLocation.append("repositoryClientDataCache.zip");
+		return stateLocation.append("repositoryClientDataCache.zip"); //$NON-NLS-1$
 	}
 	
 	public IRedmineSpentTimeManager getSpentTimeManager(ITaskActivityManager taskActivityManager) {

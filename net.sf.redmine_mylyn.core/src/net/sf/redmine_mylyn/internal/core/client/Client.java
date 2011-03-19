@@ -19,6 +19,7 @@ import net.sf.redmine_mylyn.core.RedmineCorePlugin;
 import net.sf.redmine_mylyn.core.RedmineStatusException;
 import net.sf.redmine_mylyn.core.RedmineUtil;
 import net.sf.redmine_mylyn.core.client.IClient;
+import net.sf.redmine_mylyn.internal.core.Messages;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -45,7 +46,7 @@ public class Client implements IClient {
 		try {
 			apiClient.updateConfiguration(monitor);
 		} catch (RedmineApiErrorException e) {
-			throw new RedmineStatusException(e, "Update of configuration failed - {0}", e.getMessage());
+			throw new RedmineStatusException(e, Messages.ERRMSG_CONFIGURATION_UPDATE_FAILED, e.getMessage());
 		}
 	}
 	

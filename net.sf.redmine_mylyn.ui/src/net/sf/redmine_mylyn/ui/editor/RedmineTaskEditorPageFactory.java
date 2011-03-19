@@ -1,6 +1,7 @@
 package net.sf.redmine_mylyn.ui.editor;
 
 import net.sf.redmine_mylyn.core.RedmineCorePlugin;
+import net.sf.redmine_mylyn.internal.ui.Messages;
 import net.sf.redmine_mylyn.internal.ui.editor.RedmineTaskEditorPage;
 
 import org.eclipse.mylyn.tasks.ui.ITasksUiConstants;
@@ -35,7 +36,7 @@ public class RedmineTaskEditorPageFactory extends AbstractTaskEditorPageFactory 
 
 	@Override
 	public String getPageText() {
-		return "Redmine";
+		return Messages.REDMINE;
 	}
 	
 	@Override

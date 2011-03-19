@@ -14,6 +14,7 @@ import net.sf.redmine_mylyn.api.model.Property;
 import net.sf.redmine_mylyn.api.model.TimeEntry;
 import net.sf.redmine_mylyn.core.client.IClient;
 import net.sf.redmine_mylyn.internal.core.IssueMapper;
+import net.sf.redmine_mylyn.internal.core.Messages;
 import net.sf.redmine_mylyn.internal.core.ProgressValues;
 
 import org.eclipse.core.runtime.CoreException;
@@ -67,8 +68,8 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 	
 	@Override
 	public boolean initializeSubTaskData(TaskRepository repository, TaskData taskData, TaskData parentTaskData, IProgressMonitor monitor) throws CoreException {
-		System.out.println("Parent-Project: " + parentTaskData.getRoot().getAttribute(RedmineAttribute.PROJECT.getTaskKey()).getValue());
-		System.out.println("Parent-Tracker: " + parentTaskData.getRoot().getAttribute(RedmineAttribute.TRACKER.getTaskKey()).getValue());
+		System.out.println("Parent-Project: " + parentTaskData.getRoot().getAttribute(RedmineAttribute.PROJECT.getTaskKey()).getValue()); //$NON-NLS-1$
+		System.out.println("Parent-Tracker: " + parentTaskData.getRoot().getAttribute(RedmineAttribute.TRACKER.getTaskKey()).getValue()); //$NON-NLS-1$
 		
 		Issue issue = new Issue();
 		
@@ -101,7 +102,7 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 			
 			return initializeNewTaskData(issue, repository, taskData, monitor);
 		} catch (RuntimeException e) {
-			IStatus status = new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, "Initialization of task failed. The provided data are insufficient.", e);
+			IStatus status = new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, Messages.ERRMSG_TASK_INITIALIZATION_FALED_INSUFFICENT_DATA, e);
 			StatusHandler.log(status);
 			throw new CoreException(status);
 		}
@@ -116,23 +117,23 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 			
 			/* Default-Values */
 			TaskAttribute root = taskData.getRoot();
-			root.getAttribute(RedmineAttribute.PROJECT.getTaskKey()).setValue(""+issue.getProjectId());
-			root.getAttribute(RedmineAttribute.TRACKER.getTaskKey()).setValue(""+issue.getTrackerId());
+			root.getAttribute(RedmineAttribute.PROJECT.getTaskKey()).setValue(""+issue.getProjectId()); //$NON-NLS-1$
+			root.getAttribute(RedmineAttribute.TRACKER.getTaskKey()).setValue(""+issue.getTrackerId()); //$NON-NLS-1$
 			
 			IssuePriority priority = conf.getIssuePriorities().getDefault();
 			if(priority!=null) {
-				root.getAttribute(RedmineAttribute.PRIORITY.getTaskKey()).setValue(""+priority.getId());
+				root.getAttribute(RedmineAttribute.PRIORITY.getTaskKey()).setValue(""+priority.getId()); //$NON-NLS-1$
 			} else if(conf.getIssuePriorities().getAll().size()>0){
-				root.getAttribute(RedmineAttribute.PRIORITY.getTaskKey()).setValue(""+conf.getIssuePriorities().getAll().get(0));
+				root.getAttribute(RedmineAttribute.PRIORITY.getTaskKey()).setValue(""+conf.getIssuePriorities().getAll().get(0)); //$NON-NLS-1$
 			}
 			
 			IssueStatus status = conf.getIssueStatuses().getDefault();
 			if(status!=null) {
-				root.getAttribute(RedmineAttribute.STATUS.getTaskKey()).setValue(""+status.getId());
-				root.getAttribute(RedmineAttribute.STATUS_CHG.getTaskKey()).setValue(""+status.getId());
+				root.getAttribute(RedmineAttribute.STATUS.getTaskKey()).setValue(""+status.getId()); //$NON-NLS-1$
+				root.getAttribute(RedmineAttribute.STATUS_CHG.getTaskKey()).setValue(""+status.getId()); //$NON-NLS-1$
 			} else if(conf.getIssueStatuses().getAll().size()>0){
-				root.getAttribute(RedmineAttribute.STATUS.getTaskKey()).setValue(""+conf.getIssueStatuses().getAll().get(0));
-				root.getAttribute(RedmineAttribute.STATUS_CHG.getTaskKey()).setValue(""+conf.getIssueStatuses().getAll().get(0));
+				root.getAttribute(RedmineAttribute.STATUS.getTaskKey()).setValue(""+conf.getIssueStatuses().getAll().get(0)); //$NON-NLS-1$
+				root.getAttribute(RedmineAttribute.STATUS_CHG.getTaskKey()).setValue(""+conf.getIssueStatuses().getAll().get(0)); //$NON-NLS-1$
 			}
 			
 		} catch (RedmineStatusException e) {
@@ -163,7 +164,7 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 			throw new CoreException(e.getStatus());
 		}
 		
-		return new RepositoryResponse(ResponseKind.TASK_CREATED, "" + taskId);
+		return new RepositoryResponse(ResponseKind.TASK_CREATED, "" + taskId); //$NON-NLS-1$
 	}
 	
 	public TaskData createTaskDataFromIssue(TaskRepository repository, Issue issue, IProgressMonitor monitor) throws CoreException {
@@ -192,7 +193,7 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 		Project project = cfg.getProjects().getById(issue.getProjectId());
 
 		if (project==null || cfg.getSettings()==null) {
-			IStatus status = new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, "Initialization of task failed. The provided data are insufficient.");
+			IStatus status = new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, Messages.ERRMSG_TASK_INITIALIZATION_FALED_INSUFFICENT_DATA);
 			StatusHandler.log(status);
 			throw new RedmineStatusException(status);
 		}
@@ -294,7 +295,7 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 			}
 			if (customField.getFieldFormat()==Format.LIST) {
 				if (!customField.isRequired()) {
-					taskAttribute.putOption("", "");
+					taskAttribute.putOption("", ""); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 				for (String option : customField.getPossibleValues()) {
 					taskAttribute.putOption(option, option);
@@ -320,7 +321,7 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 		}
 		
 		if(currentStatus!=null) {
-			createOperation(taskData, RedmineOperation.none, ""+currentStatus.getId(), currentStatus.getName());
+			createOperation(taskData, RedmineOperation.none, ""+currentStatus.getId(), currentStatus.getName()); //$NON-NLS-1$
 		}
 		
 		createOperation(taskData, RedmineOperation.markas, null);
@@ -338,7 +339,7 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 		
 		if(operation.isAssociated()) {
 			attribute.getMetaData().putValue(TaskAttribute.META_ASSOCIATED_ATTRIBUTE_ID, operation.getInputId());
-		} else if(operation.needsRestoreValue() && defaultValue!=null && defaultValue!=""){
+		} else if(operation.needsRestoreValue() && defaultValue!=null && defaultValue!=""){ //$NON-NLS-1$
 			attribute.getMetaData().putValue(IRedmineConstants.TASK_ATTRIBUTE_OPERATION_RESTORE, defaultValue);
 		}
 

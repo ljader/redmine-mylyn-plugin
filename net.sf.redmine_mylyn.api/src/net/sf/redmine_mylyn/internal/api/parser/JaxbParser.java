@@ -14,6 +14,7 @@ import net.sf.redmine_mylyn.api.RedmineApiPlugin;
 import net.sf.redmine_mylyn.api.exception.RedmineApiErrorException;
 import net.sf.redmine_mylyn.api.exception.RedmineApiRemoteException;
 import net.sf.redmine_mylyn.common.logging.ILogService;
+import net.sf.redmine_mylyn.internal.api.Messages;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -22,9 +23,9 @@ import org.xml.sax.helpers.XMLFilterImpl;
 
 public class JaxbParser<T extends Object> {
 
-	private final static String UNSUPPORTED_NS = "http://redmin-mylyncon.sf.net/schemas/WS-API-2.6";
+	private final static String UNSUPPORTED_NS = "http://redmin-mylyncon.sf.net/schemas/WS-API-2.6"; //$NON-NLS-1$
 
-	private final static String SUPPORTED_NS = "http://redmin-mylyncon.sf.net/api";
+	private final static String SUPPORTED_NS = "http://redmin-mylyncon.sf.net/api"; //$NON-NLS-1$
 	
 	protected Class<T> clazz;
 	
@@ -59,11 +60,11 @@ public class JaxbParser<T extends Object> {
 			return parseInputStream(source);
 			
 		} catch (ParserConfigurationException e) {
-			RedmineApiErrorException exc = new RedmineApiErrorException("Parsing of InputStream failed (Configuration error)- {0}", e.getMessage(), e);
+			RedmineApiErrorException exc = new RedmineApiErrorException(Messages.ERRMSG_INPUTSTREAM_PARSING_FAILED_CONFIG_ERROR_X, e.getMessage(), e);
 			log.error(e, exc.getMessage());
 			throw exc;
 		} catch (SAXException e) {
-			RedmineApiErrorException exc = new RedmineApiErrorException("Parsing of InputStream failed - {0}", e.getMessage(), e);
+			RedmineApiErrorException exc = new RedmineApiErrorException(Messages.ERRMSG_INPUTSTREAM_PARSING_FAILED_X, e.getMessage(), e);
 			log.error(e, exc.getMessage());
 			throw exc;
 		}
@@ -82,7 +83,7 @@ public class JaxbParser<T extends Object> {
 				throw (RedmineApiRemoteException)e.getLinkedException();
 			}
 
-			RedmineApiErrorException exc = new RedmineApiErrorException("Parsing of InputStream failed", e);
+			RedmineApiErrorException exc = new RedmineApiErrorException(Messages.ERRMSG_INPUTSTREAM_PARSING_FAILED, e);
 			log.error(e, exc.getMessage());
 			throw exc;
 		}
@@ -103,14 +104,14 @@ public class JaxbParser<T extends Object> {
 		
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
-			int idx = atts.getIndex("authenticated");
+			int idx = atts.getIndex("authenticated"); //$NON-NLS-1$
 			if(idx>=0) {
 				boolean authenticated = Boolean.parseBoolean(atts.getValue(idx));
 				if(authenticated) {
-					String authenticatedAs = atts.getValue(atts.getIndex("authenticatedAs"));
-					log.debug("AUTHENTICATED AS {0}", authenticatedAs);
+					String authenticatedAs = atts.getValue(atts.getIndex("authenticatedAs")); //$NON-NLS-1$
+					log.debug("AUTHENTICATED AS {0}", authenticatedAs); //$NON-NLS-1$
 				} else {
-					log.debug("NOT AUTHENTICATED");
+					log.debug("NOT AUTHENTICATED"); //$NON-NLS-1$
 				}
 			}
 			super.startElement(uri, localName, qName, atts);
@@ -119,12 +120,12 @@ public class JaxbParser<T extends Object> {
 		@Override
 		public void startPrefixMapping(String prefix, String uri) throws SAXException {
 			if(uri.equals(UNSUPPORTED_NS)) {
-				String msg = "Unsupported Redmine plugin detected, WS-API 2.7 or higher is required.";
+				String msg = Messages.ERRMSG_UNSUPPORTED_REDMINE_VERSION;
 				throw new SAXException(msg, new RedmineApiRemoteException(msg));
 			}
 			
 			if(!uri.equals(SUPPORTED_NS)) {
-				String msg = "Repository URL doesn't point to a valid Redmine installation with Redmine plugin 2.7 or higher";
+				String msg = Messages.ERRMSG_INVALID_REDMINE_URL;
 				throw new SAXException(msg, new RedmineApiRemoteException(msg));
 			}
 			

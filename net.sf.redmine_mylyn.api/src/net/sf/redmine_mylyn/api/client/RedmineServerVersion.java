@@ -77,7 +77,7 @@ public class RedmineServerVersion {
 		public void setVersionString(String versionString) {
 			this.versionString = versionString;
 
-			String[] parts = versionString.split("\\.");
+			String[] parts = versionString.split("\\."); //$NON-NLS-1$
 			if (parts != null && parts.length >= 3) {
 				try {
 					major = Integer.parseInt(parts[0]);
@@ -134,7 +134,7 @@ public class RedmineServerVersion {
 
 		@Override
 		public String toString() {
-			return String.format("%d.%d.%d", major, minor, tiny);
+			return String.format("%d.%d.%d", major, minor, tiny); //$NON-NLS-1$
 		}
 
 	}
@@ -142,7 +142,7 @@ public class RedmineServerVersion {
 	@Override
 	public String toString() {
 		if(redmine != null && plugin != null) {
-			return redmine.toString() + "-" + plugin.toString();
+			return redmine.toString() + "-" + plugin.toString(); //$NON-NLS-1$
 		}
 		return super.toString();
 	}

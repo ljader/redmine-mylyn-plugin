@@ -8,6 +8,7 @@ import net.sf.redmine_mylyn.api.query.QueryField;
 import net.sf.redmine_mylyn.api.query.QueryFilter;
 import net.sf.redmine_mylyn.core.RedmineRepositoryConnector;
 import net.sf.redmine_mylyn.core.RedmineUtil;
+import net.sf.redmine_mylyn.internal.ui.Messages;
 import net.sf.redmine_mylyn.ui.RedmineUiPlugin;
 
 import org.eclipse.core.runtime.IStatus;
@@ -37,10 +38,10 @@ public class RedmineRepositoryStoredQueryPage extends AbstractRedmineRepositoryQ
 	private boolean initialized;
 	
 	public RedmineRepositoryStoredQueryPage(TaskRepository repository, IRepositoryQuery query, RedmineRepositoryConnector connector, Configuration configuration) {
-		super("Select a predefined query", repository, query, connector, configuration);
+		super(Messages.SELECT_STORED_QUERY, repository, query, connector, configuration);
 
-		setTitle("Select a predefined query");
-		setDescription("Select a predefined query or select <<create a new query>> and use the next button");
+		setTitle(Messages.SELECT_STORED_QUERY);
+		setDescription(Messages.SELECT_OR_CREATE_QUERY);
 	}
 
 	@Override
@@ -50,9 +51,9 @@ public class RedmineRepositoryStoredQueryPage extends AbstractRedmineRepositoryQ
 		pageComposite.setLayout(new GridLayout(1, false));
 		
 		queryViewer = new ComboViewer(pageComposite, SWT.BORDER | SWT.READ_ONLY);
-		queryViewer.setContentProvider(new RedmineContentProvider("Create a new query"));
-		queryViewer.setLabelProvider(new RedmineLabelProvider("Create a new query"));
-		queryViewer.setInput("Create a new query");
+		queryViewer.setContentProvider(new RedmineContentProvider(Messages.CREATE_QUERY));
+		queryViewer.setLabelProvider(new RedmineLabelProvider(Messages.CREATE_QUERY));
+		queryViewer.setInput(Messages.CREATE_QUERY);
 		queryViewer.getControl().setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
 		queryViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			@Override
@@ -63,7 +64,7 @@ public class RedmineRepositoryStoredQueryPage extends AbstractRedmineRepositoryQ
 		});
 
 		Label titleLabel = new Label(pageComposite, SWT.NONE);
-		titleLabel.setText("Query Title");
+		titleLabel.setText(Messages.QUERY_TITLE);
 
 		titleText = new Text(pageComposite, SWT.BORDER);
 		titleText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL	| GridData.GRAB_HORIZONTAL));
@@ -111,15 +112,15 @@ public class RedmineRepositoryStoredQueryPage extends AbstractRedmineRepositoryQ
 		Query query = new Query();
 		net.sf.redmine_mylyn.api.model.Query selectedQuery = getSelectedQuery();
 
-		query.addFilter(QueryField.STOREDQUERY, CompareOperator.IS, ""+selectedQuery.getId());
+		query.addFilter(QueryField.STOREDQUERY, CompareOperator.IS, ""+selectedQuery.getId()); //$NON-NLS-1$
 		if(selectedQuery.getProjectId()>=1) {
-			query.addFilter(QueryField.PROJECT, CompareOperator.IS, ""+selectedQuery.getProjectId());
+			query.addFilter(QueryField.PROJECT, CompareOperator.IS, ""+selectedQuery.getProjectId()); //$NON-NLS-1$
 		}
 		
 		try {
 			repositoryQuery.setUrl(query.toUrl(getTaskRepository().getCharacterEncoding()));
 		} catch (RedmineApiErrorException e) {
-			IStatus status = RedmineUiPlugin.toStatus(e, "Creation of Query failed");
+			IStatus status = RedmineUiPlugin.toStatus(e, Messages.ERRMSG_QUERY_CREATION_FAILED);
 			StatusHandler.log(status);
 			setErrorMessage(status.getMessage());
 		}
@@ -154,7 +155,7 @@ public class RedmineRepositoryStoredQueryPage extends AbstractRedmineRepositoryQ
 			}
 		
 		} catch (IndexOutOfBoundsException e) {
-			IStatus status = RedmineUiPlugin.toStatus(e, "Restore of Query failed");
+			IStatus status = RedmineUiPlugin.toStatus(e, Messages.ERRMSG_QUERY_RESTORING_FAILED);
 			StatusHandler.log(status);
 			setErrorMessage(status.getMessage());
 		}

@@ -10,6 +10,7 @@ import net.sf.redmine_mylyn.api.model.Project;
 import net.sf.redmine_mylyn.core.IRedmineConstants;
 import net.sf.redmine_mylyn.core.RedmineAttribute;
 import net.sf.redmine_mylyn.core.RedmineUtil;
+import net.sf.redmine_mylyn.internal.ui.Messages;
 
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskData;
@@ -66,7 +67,7 @@ public class TaskDataValidator {
 				
 				taskAttr = rootAttr.getAttribute(redmineAttribute.getTaskKey());
 				if (taskAttr==null || taskAttr.getValue().trim().isEmpty()) {
-					collector.add(taskAttr, String.format("%s is required", redmineAttribute.getLabel()));
+					collector.add(taskAttr, String.format(Messages.ERRMSG_X_REQUIRED, redmineAttribute.getLabel()));
 				}
 			}
 		}
@@ -79,7 +80,7 @@ public class TaskDataValidator {
 				try {
 					Double.valueOf(attribute.getValue().trim());
 				} catch (NumberFormatException e) {
-					collector.add(attribute, RedmineAttribute.ESTIMATED.getLabel() + " must be a float");
+					collector.add(attribute, RedmineAttribute.ESTIMATED.getLabel() + Messages.ERRMSG_FLOAT);
 				}
 			}
 		}
@@ -92,12 +93,12 @@ public class TaskDataValidator {
 				try {
 					Double.valueOf(attribute.getValue().trim());
 				} catch (NumberFormatException e) {
-					collector.add(attribute, RedmineAttribute.TIME_ENTRY_HOURS.getLabel() + " must be a float");
+					collector.add(attribute, RedmineAttribute.TIME_ENTRY_HOURS.getLabel() + Messages.ERRMSG_FLOAT);
 				}
 
 				attribute = taskData.getRoot().getAttribute(RedmineAttribute.TIME_ENTRY_ACTIVITY.getTaskKey());
 				if(attribute==null || attribute.getValue().isEmpty()) {
-					collector.add(attribute, RedmineAttribute.TIME_ENTRY_ACTIVITY.getLabel() + " is required");
+					collector.add(attribute, RedmineAttribute.TIME_ENTRY_ACTIVITY.getLabel() + Messages.ERRMSG_REQUIRED);
 				}
 			}
 		}
@@ -105,9 +106,9 @@ public class TaskDataValidator {
 	
 	protected void validateParentTask(TaskData taskData, ErrorMessageCollector collector) {
 		TaskAttribute attribute = taskData.getRoot().getAttribute(RedmineAttribute.PARENT.getTaskKey());
-		if (attribute != null) {
-			if (!attribute.getValue().trim().matches("^\\d*$")) {
-				collector.add(attribute, RedmineAttribute.PARENT.getLabel() + " must be single Task ID");
+		if (attribute != null && !attribute.getValue().isEmpty()) {
+			if (!attribute.getValue().trim().matches(IRedmineConstants.REGEX_INTEGER)) {
+				collector.add(attribute, RedmineAttribute.PARENT.getLabel() + Messages.ERRMSG_SINGLE_TASK_ID);
 			}
 		}
 	}
@@ -135,31 +136,31 @@ public class TaskDataValidator {
 		String value = taskAttribute.getValue();
 		
 		if(customField.isRequired() && value.trim().isEmpty()) {
-			collector.add(taskAttribute, String.format("%s is required", customField.getLabel()));
+			collector.add(taskAttribute, String.format(Messages.ERRMSG_X_REQUIRED, customField.getLabel()));
 			return;
 		}
 		
 		if(!value.isEmpty()) {
 			if(!validateCustomAttributeType(value, customField)) {
-				collector.add(taskAttribute, String.format("%s must be a %s", customField.getLabel(), customField.getFieldFormat().getLabel()));
+				collector.add(taskAttribute, String.format(Messages.ERRMSG_X_CUSTOM_TYPE_X, customField.getLabel(), customField.getFieldFormat().getLabel()));
 				return;
 			}
 			
 			int max = customField.getMaxLength(); 
 			if (max>0 && max<value.length()) {
-				collector.add(taskAttribute, String.format("%s: maximum length of %d exceeded", customField.getLabel(), customField.getMaxLength()));
+				collector.add(taskAttribute, String.format(Messages.ERRMSG_X_MAX_LENGTH_X, customField.getLabel(), customField.getMaxLength()));
 				return;
 			}
 			
 			int min = customField.getMinLength();
 			if (min>0 && min>value.length()) {
-				collector.add(taskAttribute, String.format("%s: minimum length of %d below", customField.getLabel(), customField.getMinLength()));
+				collector.add(taskAttribute, String.format(Messages.ERRMSG_X_MIN_LENGTH_X, customField.getLabel(), customField.getMinLength()));
 				return;
 			} 
 			
 			String pattern = customField.getRegexp();
 			if (pattern!=null && !pattern.isEmpty() && !Pattern.matches(pattern, value)) {
-				collector.add(taskAttribute, String.format("%s: dosn't match %s", customField.getLabel(), customField.getRegexp()));
+				collector.add(taskAttribute, String.format(Messages.ERRMSG_X_REGEX_X, customField.getLabel(), customField.getRegexp()));
 				return;
 			}
 		}

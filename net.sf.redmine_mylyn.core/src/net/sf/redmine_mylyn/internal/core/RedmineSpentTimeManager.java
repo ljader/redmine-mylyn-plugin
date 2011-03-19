@@ -16,9 +16,9 @@ import org.eclipse.mylyn.tasks.core.TaskActivityAdapter;
 
 public class RedmineSpentTimeManager implements IRedmineSpentTimeManager {
 
-	private final static String ELAPSED_TIME = "RedmineSpentTimeManager.elapsedTime";
+	private final static String ELAPSED_TIME = "RedmineSpentTimeManager.elapsedTime"; //$NON-NLS-1$
 
-	private final static String UNCAPTURED_SPENT_TIME = "RedmineSpentTimeManager.uncapturedSpentTime";
+	private final static String UNCAPTURED_SPENT_TIME = "RedmineSpentTimeManager.uncapturedSpentTime"; //$NON-NLS-1$
 	
 	private final ITaskActivityManager taskActivityManager;
 	
@@ -154,7 +154,7 @@ public class RedmineSpentTimeManager implements IRedmineSpentTimeManager {
 			try {
 				val = Long.parseLong(stringVal);
 			} catch(NumberFormatException e) {
-				RedmineCorePlugin.getDefault().getLogService(this.getClass()).error(e, "Invalid Long-Value", stringVal);
+				RedmineCorePlugin.getDefault().getLogService(this.getClass()).error(e, Messages.ERRMSG_INVALID_LONG, stringVal);
 			}
 		}
 		return val;

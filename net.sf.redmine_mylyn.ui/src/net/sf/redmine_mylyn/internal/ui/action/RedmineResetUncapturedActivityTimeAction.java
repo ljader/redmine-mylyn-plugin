@@ -1,6 +1,7 @@
 package net.sf.redmine_mylyn.internal.ui.action;
 
 import net.sf.redmine_mylyn.internal.ui.Images;
+import net.sf.redmine_mylyn.internal.ui.Messages;
 import net.sf.redmine_mylyn.ui.RedmineUiPlugin;
 
 import org.eclipse.jface.action.Action;
@@ -27,7 +28,7 @@ public class RedmineResetUncapturedActivityTimeAction extends Action {
 	
 	@Override
 	public String getToolTipText() {
-		return "Reset uncaptured active time";
+		return Messages.RESET_UNCAPTURED_ACTIVETIME;
 	}
 	
 	@Override
