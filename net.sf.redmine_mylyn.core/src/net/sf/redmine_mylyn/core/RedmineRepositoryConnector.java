@@ -10,8 +10,8 @@ import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.Issue;
 import net.sf.redmine_mylyn.api.model.IssueStatus;
 import net.sf.redmine_mylyn.api.query.Query;
-import net.sf.redmine_mylyn.common.logging.ILogService;
 import net.sf.redmine_mylyn.core.client.IClient;
+import net.sf.redmine_mylyn.internal.core.Messages;
 import net.sf.redmine_mylyn.internal.core.RedmineAttachmentHandler;
 import net.sf.redmine_mylyn.internal.core.RedmineTaskMapper;
 import net.sf.redmine_mylyn.internal.core.client.ClientManager;
@@ -48,15 +48,11 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 	
 	private ClientManager clientManager;
 	
-	private ILogService log;
-	
 	public RedmineRepositoryConnector() {
 		taskDataHandler = new RedmineTaskDataHandler(this);
-		log = RedmineCorePlugin.getDefault().getLogService(getClass());
-		
 	}
 
-	public synchronized ClientManager getClientManager() {
+	public synchronized IRedmineClientManager getClientManager() {
 		if (clientManager == null) {
 			IPath path = RedmineCorePlugin.getDefault().getRepostioryAttributeCachePath();
 			IPath path2 = RedmineCorePlugin.getDefault().getRepostioryAttributeCachePath2();
@@ -104,7 +100,7 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 
 	@Override
 	public String getLabel() {
-		return "Redmine (supports Redmine 1.0 with enabled REST-API and Mylyn-Pugin)";
+		return Messages.REDMINE_CONNECTOR_LABEL;
 	}
 
 	@Override
@@ -116,7 +112,7 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 	@Override
 	public TaskData getTaskData(TaskRepository repository, String taskId, IProgressMonitor monitor) throws CoreException {
 		monitor = Policy.monitorFor(monitor);
-		monitor.beginTask("Task Download", IProgressMonitor.UNKNOWN);
+		monitor.beginTask(Messages.PROGRESS_TASK_DOWNLOAD, IProgressMonitor.UNKNOWN);
 		
 		TaskData taskData = null;
 		
@@ -127,14 +123,14 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 			Issue issue = client.getIssue(id, monitor);
 
 			if(issue==null) {
-				IStatus status = new Status(IStatus.INFO, RedmineCorePlugin.PLUGIN_ID, "Can't find Issue #"+taskId);
+				IStatus status = new Status(IStatus.INFO, RedmineCorePlugin.PLUGIN_ID, Messages.ERRMSG_CANT_FIND_ISSUE+taskId);
 				throw new CoreException(status);
 			}
 			taskData = taskDataHandler.createTaskDataFromIssue(repository, issue, monitor);
 		} catch (OperationCanceledException e) {
-			throw new CoreException(new Status(IStatus.CANCEL, RedmineCorePlugin.PLUGIN_ID, "Operation canceled"));
+			throw new CoreException(new Status(IStatus.CANCEL, RedmineCorePlugin.PLUGIN_ID, Messages.OPERATION_CANCELED));
 		} catch(NumberFormatException e) {
-			throw new CoreException(RedmineCorePlugin.toStatus(e, "Invalid TaskId {0}", taskId));
+			throw new CoreException(RedmineCorePlugin.toStatus(e, Messages.ERRMSG_INVALID_TASKID_X, taskId));
 		} catch (RedmineStatusException e) {
 			throw new CoreException(e.getStatus());
 		} finally {
@@ -146,7 +142,7 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 
 	public TaskData[] getTaskData(TaskRepository repository, Set<String> taskIds, IProgressMonitor monitor) throws CoreException {
 		monitor = Policy.monitorFor(monitor);
-		monitor.beginTask("Task Download", IProgressMonitor.UNKNOWN);
+		monitor.beginTask(Messages.PROGRESS_TASK_DOWNLOAD, IProgressMonitor.UNKNOWN);
 
 		TaskData[] taskData = new TaskData[taskIds.size()];
 		
@@ -160,7 +156,7 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 				}
 			}
 		} catch (OperationCanceledException e) {
-			throw new CoreException(new Status(IStatus.CANCEL, RedmineCorePlugin.PLUGIN_ID, "Operation canceled"));
+			throw new CoreException(new Status(IStatus.CANCEL, RedmineCorePlugin.PLUGIN_ID, Messages.OPERATION_CANCELED));
 		} catch (RedmineStatusException e) {
 			throw new CoreException(e.getStatus());
 		} finally {
@@ -201,10 +197,10 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 	@Override
 	public boolean canSynchronizeTask(TaskRepository taskRepository, ITask task) {
 		//WORKAROUND: http://sourceforge.net/tracker/index.php?func=detail&aid=3069723&group_id=228995&atid=1075435
-		if (task.getConnectorKind().equals("redmine")) {
+		if (task.getConnectorKind().equals("redmine")) { //$NON-NLS-1$
 			if(task instanceof TaskTask) {
 				try {
-					Field f = TaskTask.class.getDeclaredField("connectorKind");
+					Field f = TaskTask.class.getDeclaredField("connectorKind"); //$NON-NLS-1$
 					f.setAccessible(true);
 					f.set(task, RedmineCorePlugin.REPOSITORY_KIND);
 				} catch (Exception e) {
@@ -229,8 +225,8 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 				
 				// UpdatedOn should never be null
 				if(updated==null) {
-					IStatus status = new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, "Datum für updatedon fehlt");
-					collector.failed(""+partialIssue.getId(), status);
+					IStatus status = new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, Messages.ERRMSG_MISSING_UPDATEDON);
+					collector.failed(""+partialIssue.getId(), status); //$NON-NLS-1$
 					continue;
 				}
 
@@ -247,7 +243,7 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 			StatusHandler.log(status);
 			return status;
 		} catch (RedmineApiErrorException e) {
-			IStatus status = RedmineCorePlugin.toStatus(e, "Syncronization failed");
+			IStatus status = RedmineCorePlugin.toStatus(e, Messages.ERRMSG_SYNCRONIZATION_FAILED);
 			StatusHandler.log(status);
 			return status;
 		} catch (CoreException e) {
@@ -264,7 +260,7 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 		}
 
 		monitor = Policy.monitorFor(monitor);
-		monitor.beginTask("Checking for changed tasks", 1);
+		monitor.beginTask(Messages.PROGRESS_CHECKING_CHANGED_TASKS, 1);
 		
 		TaskRepository repository = session.getTaskRepository();
 		if(repository.getSynchronizationTimeStamp()==null || repository.getSynchronizationTimeStamp().isEmpty()) {
@@ -298,9 +294,9 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 	public void postSynchronization(ISynchronizationSession event, IProgressMonitor monitor) throws CoreException {
 		monitor = Policy.monitorFor(monitor);
 		try {
-			monitor.beginTask("", 1);
+			monitor.beginTask("", 1); //$NON-NLS-1$
 			if (event.isFullSynchronization() && event.getStatus() == null) {
-				event.getTaskRepository().setSynchronizationTimeStamp(""+getSynchronizationTimestamp(event));
+				event.getTaskRepository().setSynchronizationTimeStamp(""+getSynchronizationTimestamp(event)); //$NON-NLS-1$
 			} else {
 				
 			}
@@ -332,7 +328,7 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 		TaskAttribute attribute = taskData.getRoot().getMappedAttribute(RedmineAttribute.STATUS.getTaskKey());
 		IssueStatus issueStatus = configuration.getIssueStatuses().getById(RedmineUtil.parseIntegerId(attribute.getValue()));
 		if(issueStatus==null) {
-			IStatus status = new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, "Missing IssueStatus #"+attribute.getValue());
+			IStatus status = new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, Messages.ERRMSG_MISSING_ISSUE_STATUS+attribute.getValue());
 			StatusHandler.log(status);
 		} else {
 			if(issueStatus.isClosed()) {
@@ -341,7 +337,7 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 				try {
 					date = new Date(Long.parseLong(attribute.getValue()));
 				} catch(NumberFormatException e) {
-					IStatus status = RedmineCorePlugin.toStatus(e, "Invalid Timestamp {0}", attribute.getValue());
+					IStatus status = RedmineCorePlugin.toStatus(e, Messages.ERRMSG_INVALID_TIMESTAMP_X, attribute.getValue());
 					StatusHandler.log(status);
 					date = new Date(0);
 				}

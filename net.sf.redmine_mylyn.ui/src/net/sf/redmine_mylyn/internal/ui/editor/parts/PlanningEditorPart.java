@@ -5,6 +5,7 @@ import java.util.Set;
 
 import net.sf.redmine_mylyn.core.RedmineAttribute;
 import net.sf.redmine_mylyn.core.RedmineUtil;
+import net.sf.redmine_mylyn.internal.ui.Messages;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.mylyn.tasks.core.ITask;
@@ -22,7 +23,8 @@ import org.eclipse.ui.forms.widgets.Section;
 
 public class PlanningEditorPart extends AbstractTaskEditorPart {
 
-	public final static String PART_ID = "net.sf.redmine_mylyn.ui.editor.part.planning";
+	public final static String PART_ID = "net.sf.redmine_mylyn.ui.editor.part.planning"; //$NON-NLS-1$
+
 
 	private final static Set<RedmineAttribute> PLANNING_ATTRIBUTES = EnumSet.of(RedmineAttribute.DATE_START, RedmineAttribute.DATE_DUE,RedmineAttribute.ESTIMATED);
 
@@ -32,26 +34,13 @@ public class PlanningEditorPart extends AbstractTaskEditorPart {
 	
 	public PlanningEditorPart() {
 		super();
-		setPartName("Planning");
+		setPartName(Messages.PLANNING_PART);
 	}
 	
 	@Override
 	public void createControl(Composite parent, FormToolkit toolkit) {
 		initialize();
 		Section timeSection = createSection(parent, toolkit, hasIncoming);
-
-//		GridLayout gl = new GridLayout();
-//		GridData gd = new GridData(SWT.FILL, SWT.NONE, false, false);
-//		gd.horizontalSpan = 4;
-//		timeSection.setLayout(gl);
-//		timeSection.setLayoutData(gd);
-
-//		Composite timeComposite = toolkit.createComposite(timeSection);
-//		gl = new GridLayout(6, false);
-//		timeComposite.setLayout(gl);
-//		gd = new GridData();
-//		gd.horizontalSpan = 4;
-//		timeComposite.setLayoutData(gd);
 
 		Composite timeComposite = toolkit.createComposite(timeSection);
 		timeComposite.setLayout(new GridLayout(6, false));
@@ -91,9 +80,8 @@ public class PlanningEditorPart extends AbstractTaskEditorPart {
 		toolkit.paintBordersFor(timeComposite);
 		timeSection.setClient(timeComposite);
 		setSection(toolkit, timeSection);
-
 	}
-
+	
 	@Override
 	public void commit(boolean onSave) {
 		ITask task = getModel().getTask();

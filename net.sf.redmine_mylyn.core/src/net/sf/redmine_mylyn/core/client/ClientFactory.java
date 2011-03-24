@@ -6,6 +6,7 @@ import net.sf.redmine_mylyn.api.client.RedmineApiClientFactory;
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.core.RedmineCorePlugin;
 import net.sf.redmine_mylyn.core.RedmineStatusException;
+import net.sf.redmine_mylyn.internal.core.Messages;
 import net.sf.redmine_mylyn.internal.core.client.ApiWebHelper;
 import net.sf.redmine_mylyn.internal.core.client.Client;
 
@@ -29,7 +30,7 @@ public class ClientFactory {
 		IRedmineApiClient apiClient = RedmineApiClientFactory.createClient(new ApiWebHelper(location, repository), null, null, initialConfiguration);
 		
 		if(apiClient==null) {
-			IStatus status = new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, "No client available for this version of Redmine");
+			IStatus status = new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, Messages.ERRMSG_NO_MATCHING_CLIENT_VERSION);
 			throw new RedmineStatusException(status);
 		}
 		

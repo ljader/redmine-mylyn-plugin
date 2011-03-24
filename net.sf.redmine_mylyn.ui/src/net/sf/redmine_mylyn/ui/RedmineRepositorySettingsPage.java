@@ -8,6 +8,7 @@ import net.sf.redmine_mylyn.core.RedmineCorePlugin;
 import net.sf.redmine_mylyn.core.RedmineStatusException;
 import net.sf.redmine_mylyn.core.client.ClientFactory;
 import net.sf.redmine_mylyn.core.client.IClient;
+import net.sf.redmine_mylyn.internal.ui.Messages;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -48,7 +49,7 @@ public class RedmineRepositorySettingsPage extends AbstractRepositorySettingsPag
 	
 	public RedmineRepositorySettingsPage(TaskRepository taskRepository) {
 		
-		super("Redmine Repository Settings", "Example: http://www.your-domain.de/redmine", taskRepository);
+		super(Messages.SETTINGS_PAGE_TITLE, Messages.SETTINGS_PAGE_EXAMPLE_URL, taskRepository);
 
 		//TODO configure
 		requiredVersion = new RedmineServerVersion(Release.REDMINE_1_0, Release.PLUGIN_2_7);
@@ -93,7 +94,7 @@ public class RedmineRepositorySettingsPage extends AbstractRepositorySettingsPag
 					detectedVersion = client.checkClientConnection(monitor);
 				} catch (RedmineStatusException e) {
 					if(e.getCause() instanceof RedmineApiAuthenticationException) {
-						throw new CoreException(new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, "Invalid credentials"));
+						throw new CoreException(new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, Messages.INVALID_CREDENTIALS));
 					}
 					throw new CoreException(e.getStatus());
 				}
@@ -104,7 +105,7 @@ public class RedmineRepositorySettingsPage extends AbstractRepositorySettingsPag
 
 				detectedVersionString = detectedVersion.toString();
 
-				String msg = "Test of connection was successful - Redmine %s with Mylyn-Plugin %s";
+				String msg = Messages.SUCCESSFUL_CONNECTION_TEST_X_X;
 				msg = String.format(msg, detectedVersion.redmine.toString(), detectedVersion.plugin.toString());
 				this.setStatus(new Status(IStatus.OK, RedmineCorePlugin.PLUGIN_ID, msg));
 			}
@@ -119,9 +120,9 @@ public class RedmineRepositorySettingsPage extends AbstractRepositorySettingsPag
 			
 			protected void validateVersion(RedmineServerVersion required, RedmineServerVersion detected) throws CoreException {
 				if (detected==null || detected.redmine==null || detected.plugin==null) {
-					throw new CoreException(new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, "Can't detect the version of Redmine"));
+					throw new CoreException(new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, Messages.ERRMSG_CONNECTION_TEST_FAILED_UNKNOWN_VERSION));
 				} else if (detected.redmine.compareTo(required.redmine)<0 || detected.plugin.compareTo(required.plugin)<0) {
-					String msg = "Redmine %s with Mylyn-Plugin %s is required, found Version %s with %s";
+					String msg = Messages.ERRMSG_CONNECTION_TEST_FAILED_WRONG_VERSION;
 					msg = String.format(msg, required.redmine.toString(), required.plugin.toString(), detected.redmine.toString(), detected.plugin.toString());
 					throw new CoreException(new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, msg));
 				}
@@ -149,7 +150,7 @@ public class RedmineRepositorySettingsPage extends AbstractRepositorySettingsPag
 
 		//REPOSITORY_SETTING_API_KEY
 		apiKeyLabel = new Label(parent, SWT.NONE);
-		apiKeyLabel.setText("API-Key");
+		apiKeyLabel.setText(Messages.LBL_APIKEY);
 
 		apiKeyText = new Text(parent, SWT.BORDER);
 		apiKeyText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
@@ -166,7 +167,7 @@ public class RedmineRepositorySettingsPage extends AbstractRepositorySettingsPag
 		}
 		
 		apiKeyEnableButton = new Button(parent, SWT.CHECK);
-		apiKeyEnableButton.setText("Enable");
+		apiKeyEnableButton.setText(Messages.LBL_ENABLE);
 		apiKeyEnableButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -191,11 +192,11 @@ public class RedmineRepositorySettingsPage extends AbstractRepositorySettingsPag
 		String errorMessage = null;
 		
 		if(isMissingApiKey()) {
-			errorMessage = "Enter a valid API-Key";
+			errorMessage = Messages.ERRMSG_INVALID_APIKEY;
 		}
 		
 		if(isMissingApiKeyUsage()) {
-			errorMessage = "Additional HTTP-Auth needs an API-Key instead of Username and Password.";
+			errorMessage = Messages.ERRMSG_HTTPAUTH_CREDENTIALS_MISMATCH;
 		}
 		
 		if(errorMessage!=null) {

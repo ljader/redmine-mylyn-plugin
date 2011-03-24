@@ -11,12 +11,12 @@ import javax.xml.bind.annotation.XmlList;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
+import net.sf.redmine_mylyn.api.client.RedmineApiIssueProperty;
 import net.sf.redmine_mylyn.api.model.container.Attachments;
 import net.sf.redmine_mylyn.api.model.container.CustomValues;
 import net.sf.redmine_mylyn.api.model.container.Journals;
 import net.sf.redmine_mylyn.api.model.container.TimeEntries;
 import net.sf.redmine_mylyn.internal.api.client.IssuePropertyMapping;
-import net.sf.redmine_mylyn.internal.api.client.RedmineApiIssueProperty;
 import net.sf.redmine_mylyn.internal.api.parser.adapter.type.WatchersType;
 
 @XmlRootElement

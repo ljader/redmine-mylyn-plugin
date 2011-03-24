@@ -4,8 +4,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-
 import net.sf.redmine_mylyn.api.model.CustomField;
+import net.sf.redmine_mylyn.internal.core.Messages;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.mylyn.commons.core.StatusHandler;
@@ -13,10 +13,10 @@ import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 
 public class RedmineUtil {
 	
-	private final static SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+	private final static SimpleDateFormat df = new SimpleDateFormat(IRedmineConstants.DATE_FORMAT);
 	
 	public static boolean isInteger(String  val) {
-		return val.matches("^\\d+$");
+		return val.matches(IRedmineConstants.REGEX_INTEGER);
 	}
 	
 	public static int parseIntegerId(String intVal) {
@@ -24,7 +24,7 @@ public class RedmineUtil {
 			try {
 				return Integer.parseInt(intVal);
 			} catch(NumberFormatException e) {
-				IStatus status = RedmineCorePlugin.toStatus(e, "Parameter `{0}` isn't a valid Integer value", intVal);
+				IStatus status = RedmineCorePlugin.toStatus(e, Messages.ERRMSG_X_VALID_INTEGER, intVal);
 				StatusHandler.log(status);
 			}
 		}
@@ -32,7 +32,7 @@ public class RedmineUtil {
 	} 
 
 	public static Boolean parseBoolean(String value) {
-		return value!=null && value.trim().equals("1") ? Boolean.TRUE : Boolean.parseBoolean(value);
+		return value!=null && value.trim().equals(IRedmineConstants.BOOLEAN_TRUE_SUBMIT_VALUE) ? Boolean.TRUE : Boolean.parseBoolean(value);
 	}
 	
 	public static String formatDate(Date date) {
@@ -65,7 +65,7 @@ public class RedmineUtil {
 					//try formated date
 					return df.parse(value);
 				} catch (ParseException e1) {
-					IStatus status = RedmineCorePlugin.toStatus(e, "Parameter `{0}` isn't a valid unixtime(long) or formated date(yyyy-MM-dd )", value);
+					IStatus status = RedmineCorePlugin.toStatus(e, Messages.ERRMSG_X_VALID_UNIXTIME_DATE, value);
 					StatusHandler.log(status);
 				}
 			}

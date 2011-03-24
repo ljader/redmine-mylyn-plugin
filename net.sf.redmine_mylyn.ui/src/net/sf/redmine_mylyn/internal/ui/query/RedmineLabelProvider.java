@@ -4,6 +4,7 @@ import java.text.MessageFormat;
 
 import net.sf.redmine_mylyn.api.model.Property;
 import net.sf.redmine_mylyn.api.model.Query;
+import net.sf.redmine_mylyn.internal.ui.Messages;
 
 import org.eclipse.jface.viewers.LabelProvider;
 
@@ -24,9 +25,9 @@ public class RedmineLabelProvider extends LabelProvider {
 		if(element instanceof Query) {
 			Query storedQuery = (Query)element;
 			if(storedQuery.getProjectId()<1) {
-				return MessageFormat.format("{0} (all projects)", storedQuery.getName());
+				return MessageFormat.format(Messages.LBL_X_ALL_PROJECTS, storedQuery.getName());
 			} else {
-				return MessageFormat.format("{0} (Project {1})", storedQuery.getName(), storedQuery.getProjectId());
+				return MessageFormat.format(Messages.LBL_X_PROJECT_X, storedQuery.getName(), storedQuery.getProjectId());
 			}
 		}
 		
@@ -36,7 +37,7 @@ public class RedmineLabelProvider extends LabelProvider {
 		}
 		
 		if(element==title) {
-			return MessageFormat.format("<< {0} >>", title);
+			return MessageFormat.format(Messages.LBL_SPECIAL_QUERY_PARAM_X, title);
 		}
 		
 		return super.getText(element);

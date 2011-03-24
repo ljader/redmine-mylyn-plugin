@@ -14,21 +14,22 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import net.sf.redmine_mylyn.api.model.Configuration;
+import net.sf.redmine_mylyn.core.IRedmineClientManager;
 import net.sf.redmine_mylyn.core.RedmineCorePlugin;
 import net.sf.redmine_mylyn.core.RedmineStatusException;
 import net.sf.redmine_mylyn.core.client.ClientFactory;
 import net.sf.redmine_mylyn.core.client.IClient;
+import net.sf.redmine_mylyn.internal.core.Messages;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.mylyn.commons.core.StatusHandler;
-import org.eclipse.mylyn.tasks.core.IRepositoryListener;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.core.TaskRepositoryLocationFactory;
 
-public class ClientManager implements IRepositoryListener {
+public class ClientManager implements IRedmineClientManager {
 
-	private final static char[] ILLEGAL_ZIP_ENTRY_CHARS = "/*\\".toCharArray();
+	private final static char[] ILLEGAL_ZIP_ENTRY_CHARS = "/*\\".toCharArray(); //$NON-NLS-1$
 	
 	private Map<String, IClient> clientByUrl = new HashMap<String, IClient>();
 
@@ -47,6 +48,7 @@ public class ClientManager implements IRepositoryListener {
 		readCache();
 	}
 	
+	@Override
 	public IClient getClient(TaskRepository repository) throws RedmineStatusException {
 		
 		synchronized(clientByUrl) {
@@ -118,7 +120,7 @@ public class ClientManager implements IRepositoryListener {
 						String name = zipEntry.getName();
 						name = name.substring(0, name.length()-4); //.xml
 						for (char chr : ILLEGAL_ZIP_ENTRY_CHARS) {
-							name = name.replace("0x"+Integer.toHexString(chr), ""+chr);
+							name = name.replace("0x"+Integer.toHexString(chr), ""+chr); //$NON-NLS-1$ //$NON-NLS-2$
 						}
 						
 						confByUrl.put(name, Configuration.fromStream(zip));
@@ -130,7 +132,7 @@ public class ClientManager implements IRepositoryListener {
 					}
 				}
 			} catch (Exception e) {
-				IStatus status = new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, "The Redmine respository data cache could not be read", e);
+				IStatus status = new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, Messages.ERRMSG_CANT_READ_CACHEDATA, e);
 				RedmineCorePlugin.getDefault().getLog().log(status);
 
 				confByUrl.clear();
@@ -148,7 +150,7 @@ public class ClientManager implements IRepositoryListener {
 				}
 			} catch (Throwable e) {
 				StatusHandler.log(new Status(IStatus.WARNING, RedmineCorePlugin.PLUGIN_ID,
-						"The Redmine respository data cache could not be read", e));
+						Messages.ERRMSG_CANT_READ_CACHEDATA, e));
 			} finally {
 				if (in != null) {
 					try {
@@ -176,9 +178,9 @@ public class ClientManager implements IRepositoryListener {
 					for(Entry<String, Configuration>  entry : confByUrl.entrySet()) {
 						String name = entry.getKey();
 						for (char chr : ILLEGAL_ZIP_ENTRY_CHARS) {
-							name = name.replace(""+chr, "0x"+Integer.toHexString(chr));
+							name = name.replace(""+chr, "0x"+Integer.toHexString(chr)); //$NON-NLS-1$ //$NON-NLS-2$
 						}
-						zip.putNextEntry(new ZipEntry(name + ".xml"));
+						zip.putNextEntry(new ZipEntry(name + ".xml")); //$NON-NLS-1$
 						entry.getValue().write(zip);
 						zip.closeEntry();
 					}
@@ -189,7 +191,7 @@ public class ClientManager implements IRepositoryListener {
 					}
 				}
 			} catch (Exception e) {
-				IStatus status = new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, "The Redmine respository data cache could not be written", e);
+				IStatus status = new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, Messages.ERRMSG_CANT_WRITE_CACHEDATA, e);
 				RedmineCorePlugin.getDefault().getLog().log(status);
 				
 				if(zipedCacheFile.exists()) {

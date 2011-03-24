@@ -3,6 +3,7 @@ package net.sf.redmine_mylyn.internal.ui.query;
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.core.RedmineCorePlugin;
 import net.sf.redmine_mylyn.core.RedmineRepositoryConnector;
+import net.sf.redmine_mylyn.internal.ui.Messages;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -69,7 +70,7 @@ public class RedmineRepositoryQueryWizard extends RepositoryQueryWizard {
 			((GridLayout) buttonBar.getLayout()).numColumns++;
 
 			updateButton = new Button(buttonBar, SWT.PUSH);
-			updateButton.setText("Update Attributes from Repository");
+			updateButton.setText(Messages.UPDATE_ATTRIBUTES);
 			updateButton.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
 			updateButton.moveAbove(buttonBar.getChildren()[buttonBar.getChildren().length - 2]);
 			updateButton.addSelectionListener(new SelectionAdapter() {
@@ -80,8 +81,8 @@ public class RedmineRepositoryQueryWizard extends RepositoryQueryWizard {
 					} else {
 						MessageDialog.openInformation(Display.getCurrent()
 							.getActiveShell(),
-							"Update Attributes Failed",
-							"No repository available, please add one using the Task Repositories view.");
+							Messages.ERRMSG_UPDATING_ATTRIBUTES_FAILED,
+							Messages.ERRMSG_NO_REPOSITORY_AVAILABLE);
 					}
 				}
 			});

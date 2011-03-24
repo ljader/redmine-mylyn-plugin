@@ -52,7 +52,7 @@ public class IssueMapper {
 					try {
 						setValue(taskAttribute, field.get(issue));
 					} catch (Exception e) {
-						IStatus status = RedmineCorePlugin.toStatus(e, "Reading of property {0} failed - Should never happen", redmineAttribute.name());
+						IStatus status = RedmineCorePlugin.toStatus(e, Messages.ERRMSG_CANT_READ_PROPERTY_X, redmineAttribute.name());
 						ILogService log = RedmineCorePlugin.getDefault().getLogService(IssueMapper.class);
 						log.error(e, status.getMessage());
 						throw new CoreException(status);
@@ -87,7 +87,7 @@ public class IssueMapper {
 			int jrnlCount=1;
 			for (Journal journal : issue.getJournals().getAll()) {
 				TaskCommentMapper mapper = new TaskCommentMapper();
-				mapper.setAuthor(repository.createPerson(""+journal.getUserId()));
+				mapper.setAuthor(repository.createPerson(""+journal.getUserId())); //$NON-NLS-1$
 				mapper.setCreationDate(journal.getCreatedOn());
 				mapper.setText(journal.getNotes());
 				String issueUrl = RedmineRepositoryConnector.getTaskUrl(repository.getUrl(), issue.getId());
@@ -105,7 +105,7 @@ public class IssueMapper {
 			for (Attachment	attachment : issue.getAttachments().getAll()) {
 				TaskAttachmentMapper mapper = new TaskAttachmentMapper();
 				mapper.setAttachmentId("" + attachment.getId()); //$NON-NLS-1$
-				mapper.setAuthor(repository.createPerson(""+attachment.getAuthorId()));
+				mapper.setAuthor(repository.createPerson(""+attachment.getAuthorId())); //$NON-NLS-1$
 				mapper.setDescription(attachment.getDescription());
 				mapper.setCreationDate(attachment.getCreatedOn());
 				mapper.setContentType(attachment.getContentType());
@@ -123,13 +123,13 @@ public class IssueMapper {
 			taskAttribute = taskData.getRoot().createAttribute(IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY_TOTAL);
 			
 			if(issue.getTimeEntries()!=null) {
-				taskAttribute.setValue(""+issue.getTimeEntries().getSum());
+				taskAttribute.setValue(""+issue.getTimeEntries().getSum()); //$NON-NLS-1$
 				
 				
 				for (TimeEntry timeEntry : issue.getTimeEntries().getAll()) {
 					RedmineTaskTimeEntryMapper mapper = new RedmineTaskTimeEntryMapper();
 					mapper.setTimeEntryId(timeEntry.getId());
-					mapper.setUser(repository.createPerson(""+timeEntry.getUserId()));
+					mapper.setUser(repository.createPerson(""+timeEntry.getUserId())); //$NON-NLS-1$
 					mapper.setActivityId(timeEntry.getActivityId());
 					mapper.setHours(timeEntry.getHours());
 					mapper.setSpentOn(timeEntry.getSpentOn());
@@ -207,7 +207,12 @@ public class IssueMapper {
 				timeEntry = new TimeEntry();
 				
 				/* Default Attributes */
-				timeEntry.setHours(Float.parseFloat(val));
+				long milisec = Long.parseLong(val);
+				long minutes = milisec/60000;
+				float hours = minutes/60;
+				hours += ((float)(minutes%60))/60.0;
+				
+				timeEntry.setHours(hours);
 				timeEntry.setActivityId(Integer.parseInt(getValue(taskData, RedmineAttribute.TIME_ENTRY_ACTIVITY)));
 				timeEntry.setComments(getValue(taskData, RedmineAttribute.TIME_ENTRY_COMMENTS));
 				
@@ -224,7 +229,7 @@ public class IssueMapper {
 			}
 		} catch (NumberFormatException e) {
 			timeEntry = null;
-			IStatus status = RedmineCorePlugin.toStatus(e, "Illegal Attribute Value");
+			IStatus status = RedmineCorePlugin.toStatus(e, Messages.ERRMSG_ILLEGAL_ATTRIBUTE_VALUE);
 			StatusHandler.log(status);
 		}
 		
@@ -235,8 +240,8 @@ public class IssueMapper {
 		CustomField field = cfg.getCustomFields().getById(customFieldId);
 		if(field!=null) {
 			switch(field.getFieldFormat()) {
-			case DATE: value = value.isEmpty() ? "" : RedmineUtil.formatDate(RedmineUtil.parseDate(value)); break;
-			case BOOL: value = Boolean.parseBoolean(value) ? "1" : "0";
+			case DATE: value = value.isEmpty() ? "" : RedmineUtil.formatDate(RedmineUtil.parseDate(value)); break; //$NON-NLS-1$
+			case BOOL: value = Boolean.parseBoolean(value) ? IRedmineConstants.BOOLEAN_TRUE_SUBMIT_VALUE : IRedmineConstants.BOOLEAN_FALSE_SUBMIT_VALUE;
 			}
 		}
 		return value;
@@ -248,12 +253,12 @@ public class IssueMapper {
 	
 	private static String getValue(TaskData taskData, String taskKey) {
 		TaskAttribute attribute = taskData.getRoot().getAttribute(taskKey);
-		return attribute==null ? "" : attribute.getValue();
+		return attribute==null ? "" : attribute.getValue(); //$NON-NLS-1$
 	}
 	
 	private static void setValue(TaskAttribute attribute, Object value) {
 		if(value==null) {
-			setValue(attribute, "");
+			setValue(attribute, ""); //$NON-NLS-1$
 		} else if(value instanceof String) {
 			setValue(attribute, (String)value);
 		} else if(value instanceof Date) {
@@ -267,7 +272,7 @@ public class IssueMapper {
 
 	private static void setValue(TaskAttribute attribute, String value) {
 		if(value==null) {
-			attribute.setValue("");
+			attribute.setValue(""); //$NON-NLS-1$
 		} else if(attribute.getMetaData().getType()==null) {
 			attribute.setValue(value);
 		} else if(attribute.getMetaData().getType().equals(TaskAttribute.TYPE_BOOLEAN)) {
@@ -282,19 +287,19 @@ public class IssueMapper {
 
 	private static void setValue(TaskAttribute attribute, Date value) {
 		if(value==null) {
-			attribute.setValue("");
+			attribute.setValue(""); //$NON-NLS-1$
 		} else {
-			attribute.setValue(""+value.getTime());
+			attribute.setValue(""+value.getTime()); //$NON-NLS-1$
 		}
 	}
 	
 	private static void setValue(TaskAttribute attribute, int value) {
 		if (attribute.getId().equals(RedmineAttribute.PROGRESS.getTaskKey()) && attribute.getMetaData().getType()==null) {
-			attribute.setValue("");
+			attribute.setValue(""); //$NON-NLS-1$
 		} else if((attribute.getMetaData().getType()!=null && attribute.getMetaData().getType().equals(TaskAttribute.TYPE_SINGLE_SELECT) || attribute.getId().equals(RedmineAttribute.PARENT.getTaskKey())) && value<1) {
-			attribute.setValue("");
+			attribute.setValue(""); //$NON-NLS-1$
 		} else {
-			attribute.setValue(""+value);
+			attribute.setValue(""+value); //$NON-NLS-1$
 		}
 	}
 	
@@ -328,7 +333,7 @@ public class IssueMapper {
 						}
 					}
 				} catch (Exception e) {
-					IStatus status = RedmineCorePlugin.toStatus(e, "Reading of property {0} failed - Should never happen", redmineAttribute.name());
+					IStatus status = RedmineCorePlugin.toStatus(e, Messages.ERRMSG_CANT_READ_PROPERTY_X, redmineAttribute.name());
 					ILogService log = RedmineCorePlugin.getDefault().getLogService(IssueMapper.class);
 					log.error(e, status.getMessage());
 					throw new CoreException(status);

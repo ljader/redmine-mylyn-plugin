@@ -11,7 +11,7 @@ public class ProgressValues extends Property {
 	
 	private ProgressValues(int value) {
 		id = value;
-		name = value + " %";
+		name = value + " %"; //$NON-NLS-1$
 	}
 
 	private static final long serialVersionUID = 1L;

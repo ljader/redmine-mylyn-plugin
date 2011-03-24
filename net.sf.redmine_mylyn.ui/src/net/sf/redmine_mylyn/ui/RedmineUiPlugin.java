@@ -1,23 +1,19 @@
 package net.sf.redmine_mylyn.ui;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
 
 import net.sf.redmine_mylyn.common.logging.ILogService;
 import net.sf.redmine_mylyn.common.logging.LogServiceImpl;
+import net.sf.redmine_mylyn.core.IRedmineSpentTimeManager;
 import net.sf.redmine_mylyn.core.RedmineCorePlugin;
 import net.sf.redmine_mylyn.core.RedmineRepositoryConnector;
-import net.sf.redmine_mylyn.internal.IRedmineAttributeChangedListener;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.mylyn.tasks.core.AbstractRepositoryConnector;
-import org.eclipse.mylyn.tasks.core.ITask;
-import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.ui.TaskRepositoryLocationUiFactory;
 import org.eclipse.mylyn.tasks.ui.TasksUi;
 import org.eclipse.ui.ISelectionListener;
@@ -26,7 +22,9 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.statushandlers.StatusManager;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogEntry;
 import org.osgi.service.log.LogListener;
@@ -35,7 +33,7 @@ import org.osgi.service.log.LogService;
 
 public class RedmineUiPlugin extends AbstractUIPlugin implements LogListener {
 
-	public static final String PLUGIN_ID = "net.sf.redmine_mylyn.ui";
+	public static final String PLUGIN_ID = "net.sf.redmine_mylyn.ui"; //$NON-NLS-1$
 
 	private static RedmineUiPlugin plugin;
 
@@ -43,7 +41,7 @@ public class RedmineUiPlugin extends AbstractUIPlugin implements LogListener {
 	
 	private IStructuredSelection taskListSelection;
 	
-	private List<IRedmineAttributeChangedListener> attributeListeners;
+	private IRedmineSpentTimeManager spentTimeManager;
 	
 	private ServiceReference logReaderServiceReference;
 	
@@ -61,8 +59,6 @@ public class RedmineUiPlugin extends AbstractUIPlugin implements LogListener {
 				}
 			}
 		};
-		
-		attributeListeners = new ArrayList<IRedmineAttributeChangedListener>();
 	}
 	
 	@Override
@@ -92,6 +88,21 @@ public class RedmineUiPlugin extends AbstractUIPlugin implements LogListener {
 			ISelectionService selServive = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService();
 			selServive.addSelectionListener(taskListSelectionListener);
 		} catch (NullPointerException e) {}
+		
+		spentTimeManager = RedmineCorePlugin.getDefault().getSpentTimeManager(TasksUi.getTaskActivityManager());
+		
+		
+		//Workaround for a bundle with experimental addons
+		Bundle extrasBundle = Platform.getBundle("net.sf.redmine_mylyn.ui.extras"); //$NON-NLS-1$
+		if(extrasBundle!=null) {
+			try {
+				extrasBundle.start(Bundle.START_TRANSIENT);
+			} catch (BundleException e ) {
+				getLogService(this.getClass()).error(e, "Can't start bundle net.sf.redmine_mylyn.ui.extras"); //$NON-NLS-1$
+			} catch (IllegalStateException e ) {
+				getLogService(this.getClass()).error(e, "Can't start bundle net.sf.redmine_mylyn.ui.extras"); //$NON-NLS-1$
+			}
+		}
 	}
 
 	
@@ -118,7 +129,7 @@ public class RedmineUiPlugin extends AbstractUIPlugin implements LogListener {
 	
 	@Override
 	public void logged(LogEntry entry) {
-		if (entry.getBundle().getSymbolicName().startsWith("net.sf.redmine_mylyn.")) {
+		if (entry.getBundle().getSymbolicName().startsWith("net.sf.redmine_mylyn.")) { //$NON-NLS-1$
 			IStatus status = buildStatus(entry);
 
 			getLog().log(buildStatus(entry));
@@ -140,32 +151,10 @@ public class RedmineUiPlugin extends AbstractUIPlugin implements LogListener {
 		return taskListSelection;
 	}
 
-	public void addAttributeChangedListener(IRedmineAttributeChangedListener listener) {
-		synchronized (attributeListeners) {
-			if(!attributeListeners.contains(listener)) {
-				attributeListeners.add(listener);
-			}
-		}
-	}
-
-	public void removeAttributeChangedListener(IRedmineAttributeChangedListener listener) {
-		synchronized (attributeListeners) {
-			if(attributeListeners.contains(listener)) {
-				attributeListeners.remove(listener);
-			}
-		}
+	public IRedmineSpentTimeManager getSpentTimeManager() {
+		return spentTimeManager;
 	}
 	
-	public void notifyAttributeChanged(ITask task, TaskAttribute attribute) {
-		Assert.isNotNull(task);
-		Assert.isNotNull(attribute);
-		Assert.isTrue(task.getConnectorKind().equals(RedmineCorePlugin.REPOSITORY_KIND));
-		
-		for (IRedmineAttributeChangedListener listener : attributeListeners) {
-			listener.attributeChanged(task, attribute);
-		}
-	}
-
 	public static ILogService getLogService(Class<?> clazz) {
 		return plugin==null ? LogServiceImpl.getInstance() : LogServiceImpl.getInstance(plugin.getBundle(), clazz);
 	}

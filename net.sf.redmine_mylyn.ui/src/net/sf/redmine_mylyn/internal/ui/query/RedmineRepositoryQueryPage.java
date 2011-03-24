@@ -19,6 +19,7 @@ import net.sf.redmine_mylyn.api.query.IQueryField;
 import net.sf.redmine_mylyn.api.query.Query;
 import net.sf.redmine_mylyn.api.query.QueryField;
 import net.sf.redmine_mylyn.core.RedmineRepositoryConnector;
+import net.sf.redmine_mylyn.internal.ui.Messages;
 import net.sf.redmine_mylyn.ui.RedmineUiPlugin;
 
 import org.eclipse.core.runtime.Assert;
@@ -48,9 +49,9 @@ import org.eclipse.swt.widgets.Text;
 
 public class RedmineRepositoryQueryPage extends AbstractRedmineRepositoryQueryPage {
 
-	private static final String TITLE = "Create a new query";
+	private static final String TITLE = Messages.CREATE_QUERY;
 	
-	private static final String DESCRIPTION = "Enter the query parameters.";
+	private static final String DESCRIPTION = Messages.ENTER_QUERY_PARAMETER;
 
 	private final Configuration configuration;
 	
@@ -138,7 +139,7 @@ public class RedmineRepositoryQueryPage extends AbstractRedmineRepositoryQueryPa
 		}
 
 		Label titleLabel = new Label(control, SWT.NONE);
-		titleLabel.setText("Query Title");
+		titleLabel.setText(Messages.QUERY_TITLE);
 
 		titleText = new Text(control, SWT.BORDER);
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL	| GridData.GRAB_HORIZONTAL);
@@ -198,7 +199,7 @@ public class RedmineRepositoryQueryPage extends AbstractRedmineRepositoryQueryPa
 			queryText.put(queryField, text);
 
 			if (definition.isBooleanType()) {
-				text.setText("yes");
+				text.setText(Messages.YES);
 				text.setEditable(false);
 			}
 		}
@@ -208,7 +209,7 @@ public class RedmineRepositoryQueryPage extends AbstractRedmineRepositoryQueryPa
 	private ComboViewer createOperatorComboViewer(Composite parent, QueryField definition, final IQueryField queryField) {
 		ComboViewer combo = new ComboViewer(parent, SWT.READ_ONLY | SWT.DROP_DOWN);
 
-		String defaultValue = definition.isRequired() ? null : "Disabled";
+		String defaultValue = definition.isRequired() ? null : Messages.DISABLED;
 		combo.setContentProvider(new RedmineContentProvider(defaultValue));
 		combo.setLabelProvider(new RedmineLabelProvider());
 		combo.setInput(definition.getCompareOperators());
@@ -487,7 +488,7 @@ public class RedmineRepositoryQueryPage extends AbstractRedmineRepositoryQueryPa
 		try {
 			repositoryQuery.setUrl(query.toUrl(getTaskRepository().getCharacterEncoding()));
 		} catch (RedmineApiErrorException e) {
-			IStatus status = RedmineUiPlugin.toStatus(e, "Creation of Query failed");
+			IStatus status = RedmineUiPlugin.toStatus(e, Messages.ERRMSG_QUERY_CREATION_FAILED);
 			StatusHandler.log(status);
 			setErrorMessage(status.getMessage());
 		}
@@ -496,7 +497,7 @@ public class RedmineRepositoryQueryPage extends AbstractRedmineRepositoryQueryPa
 
 	@Override
 	public String getQueryTitle() {
-		return (titleText != null) ? titleText.getText() : "<search>";
+		return (titleText != null) ? titleText.getText() : Messages.QUERY_TITLE_FALLBACK;
 	}
 	
 }
