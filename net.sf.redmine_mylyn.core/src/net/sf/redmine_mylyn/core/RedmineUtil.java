@@ -94,4 +94,24 @@ public class RedmineUtil {
 		return type;
 	}
 
+	public static String formatUserPresentation (String login, String name) {
+		if (login!=null && !login.isEmpty()) {
+			return name + " <" + login + ">"; //$NON-NLS-1$ //$NON-NLS-2$
+			
+		}
+		return name;
+	}
+	
+	public static String findUserLogin(String userPresentation) {
+		if (userPresentation!=null && !userPresentation.isEmpty()) {
+			int ltr = userPresentation.lastIndexOf('<');
+			int rtr = userPresentation.lastIndexOf('>');
+			
+			if (ltr>-1 && rtr>ltr+1) {
+				return userPresentation.substring(ltr+1, rtr);
+			}
+			
+		}
+		return null;
+	}
 }

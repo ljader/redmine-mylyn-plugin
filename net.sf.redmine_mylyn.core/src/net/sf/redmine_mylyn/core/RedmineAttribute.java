@@ -32,7 +32,7 @@ public enum RedmineAttribute {
 	@PropertyAccessor
 	DESCRIPTION(Messages.DESCRIPTION, TaskAttribute.DESCRIPTION, RedmineApiIssueProperty.DESCRIPTION, TaskAttribute.TYPE_LONG_RICH_TEXT, Flag.HIDDEN, Flag.REQUIRED),
 	@PropertyAccessor("assignedToId")
-	ASSIGNED_TO(Messages.ASSIGNED_TO, TaskAttribute.USER_ASSIGNED, RedmineApiIssueProperty.ASSIGNED_TO,  TaskAttribute.TYPE_SINGLE_SELECT),
+	ASSIGNED_TO(Messages.ASSIGNED_TO, TaskAttribute.USER_ASSIGNED, RedmineApiIssueProperty.ASSIGNED_TO,  IRedmineConstants.EDITOR_TYPE_PERSON),
 	@PropertyAccessor("createdOn")
 	DATE_SUBMITTED(Messages.SUBMITTED, TaskAttribute.DATE_CREATION, null, TaskAttribute.TYPE_DATE, Flag.HIDDEN, Flag.READ_ONLY),
 	@PropertyAccessor("updatedOn")

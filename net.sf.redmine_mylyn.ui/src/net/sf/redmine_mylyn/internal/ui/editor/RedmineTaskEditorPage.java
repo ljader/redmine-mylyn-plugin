@@ -180,10 +180,12 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 				if(IRedmineConstants.EDITOR_TYPE_ESTIMATED.equals(type)) {
 					editor = new EstimatedEditor(getModel(), taskAttribute);
 				} else if(IRedmineConstants.EDITOR_TYPE_DURATION.equals(type)) {
-						editor = new DurationEditor(getModel(), taskAttribute);
+					editor = new DurationEditor(getModel(), taskAttribute);
 				} else if(IRedmineConstants.EDITOR_TYPE_PARENTTASK.equals(type)) {
 					editor = super.createEditor(TaskAttribute.TYPE_TASK_DEPENDENCY, taskAttribute);
 					editor.setLayoutHint(new LayoutHint(RowSpan.SINGLE, ColumnSpan.SINGLE));
+				} else if(IRedmineConstants.EDITOR_TYPE_PERSON.equals(type)) {
+					editor = new RedminePersonEditor(getModel(), taskAttribute);
 				} else {
 					editor = super.createEditor(type, taskAttribute);
 //						if(taskAttribute.getId().equals(RedmineAttribute.STATUS_CHG.getTaskKey())) {
