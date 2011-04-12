@@ -86,6 +86,7 @@ public class IssueRequestEntity extends StringRequestEntity {
 			writeValue(jsonWriter, "activity_id", ""+timeEntry.getActivityId()); //$NON-NLS-1$ //$NON-NLS-2$
 			writeValue(jsonWriter, "comments", ""+timeEntry.getComments()); //$NON-NLS-1$ //$NON-NLS-2$
 			writeCustomValues(jsonWriter, timeEntry.getCustomValues());
+			writeMappedValues(jsonWriter, timeEntry.getExtensionValues());
 			
 			jsonWriter.endObject();
 		} 
@@ -128,6 +129,20 @@ public class IssueRequestEntity extends StringRequestEntity {
 			}
 			
 			jsonWriter.endObject();
+		}
+	}
+	
+	
+	private static void writeMappedValues(JSONWriter jsonWriter, Map<String, String> values) throws JSONException {
+		if(values!=null && values.size()>0) {
+			
+			for (Entry<String, String> entry : values.entrySet()) {
+				if(!entry.getKey().isEmpty()) {
+					
+				}
+				writeValue(jsonWriter, entry.getKey(), entry.getValue());
+			}
+			
 		}
 	}
 	

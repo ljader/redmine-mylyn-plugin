@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Redmine-Mylyn-Connector API Test
 Bundle-SymbolicName: net.sf.redmine_mylyn.api-test
-Bundle-Version: 0.2.0.qualifier
+Bundle-Version: 0.2.99.qualifier
 Bundle-Vendor: Sven Krzyzak
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: net.sf.redmine_mylyn.api;bundle-version="0.2.0",
