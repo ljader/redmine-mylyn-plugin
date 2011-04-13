@@ -1,9 +1,14 @@
 package net.sf.redmine_mylyn.ui;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import net.sf.redmine_mylyn.api.client.RedmineServerVersion;
 import net.sf.redmine_mylyn.api.client.RedmineServerVersion.Release;
 import net.sf.redmine_mylyn.api.exception.RedmineApiAuthenticationException;
 import net.sf.redmine_mylyn.core.IRedmineConstants;
+import net.sf.redmine_mylyn.core.IRedmineExtensionManager;
 import net.sf.redmine_mylyn.core.RedmineCorePlugin;
 import net.sf.redmine_mylyn.core.RedmineStatusException;
 import net.sf.redmine_mylyn.core.client.ClientFactory;
@@ -47,6 +52,8 @@ public class RedmineRepositorySettingsPage extends AbstractRepositorySettingsPag
 	
 	private Button apiKeyEnableButton;
 	
+	private HashMap<String, Button> redmineExtensions;
+	
 	public RedmineRepositorySettingsPage(TaskRepository taskRepository) {
 		
 		super(Messages.SETTINGS_PAGE_TITLE, Messages.SETTINGS_PAGE_EXAMPLE_URL, taskRepository);
@@ -79,6 +86,11 @@ public class RedmineRepositorySettingsPage extends AbstractRepositorySettingsPag
 		} else {
 			repository.removeProperty(IRedmineConstants.REPOSITORY_SETTING_API_KEY);
 		}
+		
+		for (Entry<String, Button> entry : redmineExtensions.entrySet()) {
+			repository.setProperty(entry.getKey(), Boolean.toString(entry.getValue().getSelection()));
+		}
+		
 	}
 	
 	@Override
@@ -185,6 +197,36 @@ public class RedmineRepositorySettingsPage extends AbstractRepositorySettingsPag
 
 	@Override
 	protected void createAdditionalControls(Composite parent) {
+		IRedmineExtensionManager extMgr = RedmineCorePlugin.getDefault().getExtensionManager();
+		Map<String, String> extensions = extMgr.getExtensions();
+		
+		if(extensions.size()>0) {
+			
+			Label lbl = new Label(parent, SWT.NONE);
+			lbl.setText("Installed Redmine Plugins:");
+			
+			
+			redmineExtensions = new HashMap<String, Button>(extensions.size());
+			
+			boolean first = true;
+			for (Entry<String, String> entry : extensions.entrySet()) {
+				
+				if (first) {
+					first = false;
+				} else {
+					new Label(parent, SWT.NONE);
+				}
+				
+				Button btn = new Button(parent, SWT.CHECK);
+				btn.setText(entry.getValue());
+				
+				String oldValue = repository.getProperty(entry.getKey()); 
+				btn.setSelection(oldValue!=null && Boolean.parseBoolean(oldValue));
+				
+				redmineExtensions.put(entry.getKey(), btn);
+			}
+			
+		}
 	}
 
 	@Override
