@@ -9,6 +9,10 @@ public interface IRedmineSpentTimeManager {
 	public long getAndClearUncapturedSpentTime(ITask task);
 	
 	public void resetUncapturedSpentTime(ITask task);
+	
+	public long getLastActivationTimestamp(ITask task);
+
+	public long getLastDeactivationTimestamp(ITask task);
 
 	public void addRedmineSpentTimeManagerListener(IRedmineSpentTimeManagerListener listener);
 

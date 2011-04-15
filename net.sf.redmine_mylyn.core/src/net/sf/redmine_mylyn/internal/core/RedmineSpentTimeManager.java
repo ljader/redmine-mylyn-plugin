@@ -19,6 +19,10 @@ public class RedmineSpentTimeManager implements IRedmineSpentTimeManager {
 	private final static String ELAPSED_TIME = "RedmineSpentTimeManager.elapsedTime"; //$NON-NLS-1$
 
 	private final static String UNCAPTURED_SPENT_TIME = "RedmineSpentTimeManager.uncapturedSpentTime"; //$NON-NLS-1$
+
+	private final static String LAST_ACTIVATION_TIME = "RedmineSpentTimeManager.lastActivationTime"; //$NON-NLS-1$
+
+	private final static String LAST_DEACTIVATION_TIME = "RedmineSpentTimeManager.lastDeactivationTime"; //$NON-NLS-1$
 	
 	private final ITaskActivityManager taskActivityManager;
 	
@@ -35,9 +39,7 @@ public class RedmineSpentTimeManager implements IRedmineSpentTimeManager {
 			@Override
 			public void elapsedTimeUpdated(ITask task, long newElapsedTime) {
 				if(isUsableTask(task)) {
-					if(RedmineSpentTimeManager.this.taskActivityManager.isActive(task)) {
-						setActiveTask(task);
-					}
+					setActiveTask(task);
 				}
 			}
 		};
@@ -45,10 +47,18 @@ public class RedmineSpentTimeManager implements IRedmineSpentTimeManager {
 		taskActivationListener = new TaskActivationAdapter() {
 			@Override
 			public void taskActivated(ITask task) {
+				if(isUsableTask(task)) {
+					setLastActivationTime(task);
+				}
 			}
 			
 			@Override
 			public void taskDeactivated(ITask task) {
+				if(isUsableTask(task)) {
+					if(RedmineSpentTimeManager.this.taskActivityManager.isActive(task)) {
+						setLastDectivationTime(task);
+					}
+				}
 			}
 		};
 	}
@@ -86,6 +96,20 @@ public class RedmineSpentTimeManager implements IRedmineSpentTimeManager {
 		Assert.isNotNull(task);
 		Assert.isTrue(isUsableTask(task));
 		setUncapturedSpentTime(task, 0);
+	}
+	
+	@Override
+	public long getLastActivationTimestamp(ITask task) {
+		Assert.isNotNull(task);
+		Assert.isTrue(isUsableTask(task));
+		return readLongAttribute(task, LAST_ACTIVATION_TIME);
+	}
+	
+	@Override
+	public long getLastDeactivationTimestamp(ITask task) {
+		Assert.isNotNull(task);
+		Assert.isTrue(isUsableTask(task));
+		return readLongAttribute(task, LAST_DEACTIVATION_TIME);
 	}
 	
 	@Override
@@ -145,6 +169,14 @@ public class RedmineSpentTimeManager implements IRedmineSpentTimeManager {
 	
 	private void setActiveTask(ITask task) {
 		setElapsedTime(task, taskActivityManager.getElapsedTime(task));
+	}
+	
+	private void setLastActivationTime(ITask task) {
+		writeLongAttribute(task, LAST_ACTIVATION_TIME, System.currentTimeMillis());
+	}
+
+	private void setLastDectivationTime(ITask task) {
+		writeLongAttribute(task, LAST_DEACTIVATION_TIME, System.currentTimeMillis());
 	}
 	
 	private long readLongAttribute(ITask task, String attribute) {

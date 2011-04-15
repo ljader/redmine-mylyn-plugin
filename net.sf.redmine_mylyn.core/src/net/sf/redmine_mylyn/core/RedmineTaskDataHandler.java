@@ -17,7 +17,6 @@ import net.sf.redmine_mylyn.core.client.IClient;
 import net.sf.redmine_mylyn.internal.core.IssueMapper;
 import net.sf.redmine_mylyn.internal.core.Messages;
 import net.sf.redmine_mylyn.internal.core.ProgressValues;
-import net.sf.redmine_mylyn.internal.core.RedmineExtensionManager;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
