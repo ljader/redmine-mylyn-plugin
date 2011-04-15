@@ -14,6 +14,7 @@ import net.sf.redmine_mylyn.api.model.Journal;
 import net.sf.redmine_mylyn.api.model.TimeEntry;
 import net.sf.redmine_mylyn.api.model.container.CustomValues;
 import net.sf.redmine_mylyn.common.logging.ILogService;
+import net.sf.redmine_mylyn.core.IRedmineExtensionField;
 import net.sf.redmine_mylyn.core.IRedmineConstants;
 import net.sf.redmine_mylyn.core.RedmineAttribute;
 import net.sf.redmine_mylyn.core.RedmineCorePlugin;
@@ -210,6 +211,14 @@ public class IssueMapper {
 						customValues.setCustomValue(customField.getId(), formatCustomValue(value, customField.getId(), cfg));
 					}
 				}
+				
+				/* Extension/Additional Attributes */
+				IRedmineExtensionField additionalFields[] = RedmineCorePlugin.getDefault().getExtensionManager().getAdditionalTimeEntryFields(repository);
+				for (IRedmineExtensionField additionalField : additionalFields) {
+					String value = getValue(taskData, IRedmineConstants.TASK_KEY_PREFIX_TIMEENTRY_EX+additionalField.getTaskKey());
+					timeEntry.addExtensionValue(additionalField.getSubmitKey(), value);
+				}
+				
 			}
 		} catch (NumberFormatException e) {
 			timeEntry = null;

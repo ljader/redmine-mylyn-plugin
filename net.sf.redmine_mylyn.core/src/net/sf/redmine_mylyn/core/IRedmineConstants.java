@@ -28,6 +28,8 @@ public interface IRedmineConstants {
 
 	public final static String TASK_KEY_PREFIX_ISSUE_CF = "task.redmine.custom."; //$NON-NLS-1$
 	public final static String TASK_KEY_PREFIX_TIMEENTRY_CF = "task.redmine.timeentry.custom."; //$NON-NLS-1$
+	public final static String TASK_KEY_PREFIX_ISSUE_EX = "task.redmine.extension.field."; //$NON-NLS-1$
+	public final static String TASK_KEY_PREFIX_TIMEENTRY_EX = "task.redmine.timeentry.extension.field."; //$NON-NLS-1$
 	
 	public final static String REPOSITORY_SETTING_API_KEY = "API_KEY"; //$NON-NLS-1$
 	
