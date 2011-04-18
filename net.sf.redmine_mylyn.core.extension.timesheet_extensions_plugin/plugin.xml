@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         id="net.sf.redmine_mylyn.core.extension.timesheetextensions"
+         name="Timesheet Extensions Plugin"
+         point="net.sf.redmine_mylyn.core.redmineextension">
+      <timeEntryFields>
+         <fieldDescriptor
+               fieldDescriptor="net.sf.redmine_mylyn.core.extension.internal.timesheetextension.StartTimeHourField">
+         </fieldDescriptor>
+         <fieldDescriptor
+               fieldDescriptor="net.sf.redmine_mylyn.core.extension.internal.timesheetextension.StartTimeMinuteField">
+         </fieldDescriptor>
+         <fieldDescriptor
+               fieldDescriptor="net.sf.redmine_mylyn.core.extension.internal.timesheetextension.EndTimeHourField">
+         </fieldDescriptor>
+         <fieldDescriptor
+               fieldDescriptor="net.sf.redmine_mylyn.core.extension.internal.timesheetextension.EndTimeMinuteField">
+         </fieldDescriptor>
+      </timeEntryFields>
+   </extension>
+
+</plugin>
