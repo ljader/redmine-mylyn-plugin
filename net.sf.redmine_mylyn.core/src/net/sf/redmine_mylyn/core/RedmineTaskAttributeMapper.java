@@ -52,4 +52,20 @@ public class RedmineTaskAttributeMapper extends TaskAttributeMapper {
 		return super.getBooleanValue(attribute);
 	}
 	
+@Override
+public void setValue(TaskAttribute attribute, String value) {
+	
+	if (attribute.getMetaData().getKind()!=null && attribute.getMetaData().getKind().equals(TaskAttribute.KIND_PEOPLE)) {
+		if (!value.isEmpty() && !value.matches(IRedmineConstants.REGEX_INTEGER)) {
+			User user = configuration.getUsers().getByLogin(value);
+			if(user!=null) {
+				super.setValue(attribute, ""+user.getId()); //$NON-NLS-N$
+				return;
+			}
+		}
+	}
+	
+	super.setValue(attribute, value);
+}
+	
 }

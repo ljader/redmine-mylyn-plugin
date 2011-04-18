@@ -26,5 +26,14 @@ public class Users extends AbstractPropertyContainer<User> {
 		}
 		return users;
 	}
+	
+	public User getByLogin(String login) {
+		for (User user : users) {
+			if(user.getLogin().equals(login)) {
+				return user;
+			}
+		}
+		return null;
+	}
 
 }
