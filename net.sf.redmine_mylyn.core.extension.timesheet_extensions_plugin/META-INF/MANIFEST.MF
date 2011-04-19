@@ -4,7 +4,7 @@ Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: net.sf.redmine_mylyn.core.extension.timesheet_extensions_plugin;singleton:=true
 Bundle-Version: 0.1.0.qualifier
 Require-Bundle: org.eclipse.mylyn.tasks.core;bundle-version="3.5.0",
- net.sf.redmine_mylyn.core;bundle-version="0.2.0"
+ net.sf.redmine_mylyn.core;bundle-version="0.2.99"
 Bundle-Localization: plugin
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
