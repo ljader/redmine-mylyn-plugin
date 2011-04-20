@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="net.sf.redmine_mylyn.extensions.feature"
+      label="%Feature-Name"
+      version="0.1.0.qualifier"
+      provider-name="%Feature-Vendor">
+
+   <description url="http://www.example.com/description">
+      %description
+   </description>
+
+   <copyright url="epl-v10.html">
+      %copyright
+   </copyright>
+
+   <license url="license.html">
+      %license
+   </license>
+
+   <url>
+      <update label="%updateSiteName" url="http://redmin-mylyncon.sourceforge.net/update-site/N/"/>
+   </url>
+
+   <requires>
+      <import plugin="org.eclipse.mylyn.tasks.core" version="3.5.0" match="greaterOrEqual"/>
+      <import plugin="net.sf.redmine_mylyn.core" version="0.2.99" match="greaterOrEqual"/>
+   </requires>
+
+   <plugin
+         id="net.sf.redmine_mylyn.core.extension.timesheet_extensions_plugin"
+         download-size="0"
+         install-size="0"
+         version="0.1.0.qualifier"
+         unpack="false"/>
+
+</feature>
