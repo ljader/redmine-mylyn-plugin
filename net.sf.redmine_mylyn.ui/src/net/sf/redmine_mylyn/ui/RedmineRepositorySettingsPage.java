@@ -220,8 +220,10 @@ public class RedmineRepositorySettingsPage extends AbstractRepositorySettingsPag
 				Button btn = new Button(parent, SWT.CHECK);
 				btn.setText(entry.getValue());
 				
-				String oldValue = repository.getProperty(entry.getKey()); 
-				btn.setSelection(oldValue!=null && Boolean.parseBoolean(oldValue));
+				if (repository!=null) {
+					String oldValue = repository.getProperty(entry.getKey()); 
+					btn.setSelection(oldValue!=null && Boolean.parseBoolean(oldValue));
+				}
 				
 				redmineExtensions.put(entry.getKey(), btn);
 			}
