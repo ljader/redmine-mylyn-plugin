@@ -93,14 +93,14 @@ public class RedmineUiPlugin extends AbstractUIPlugin implements LogListener {
 		
 		
 		//Workaround for a bundle with experimental addons
-		Bundle extrasBundle = Platform.getBundle("net.sf.redmine_mylyn.ui.extras"); //$NON-NLS-1$
+		Bundle extrasBundle = Platform.getBundle("org.tigase.redmine_mylyn.ui.extras"); //$NON-NLS-1$
 		if(extrasBundle!=null) {
 			try {
 				extrasBundle.start(Bundle.START_TRANSIENT);
 			} catch (BundleException e ) {
-				getLogService(this.getClass()).error(e, "Can't start bundle net.sf.redmine_mylyn.ui.extras"); //$NON-NLS-1$
+				getLogService(this.getClass()).error(e, "Can't start bundle org.tigase.redmine_mylyn.ui.extras"); //$NON-NLS-1$
 			} catch (IllegalStateException e ) {
-				getLogService(this.getClass()).error(e, "Can't start bundle net.sf.redmine_mylyn.ui.extras"); //$NON-NLS-1$
+				getLogService(this.getClass()).error(e, "Can't start bundle org.tigase.redmine_mylyn.ui.extras"); //$NON-NLS-1$
 			}
 		}
 	}
