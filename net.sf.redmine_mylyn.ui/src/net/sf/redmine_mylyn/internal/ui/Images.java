@@ -20,6 +20,10 @@ public class Images {
 
 	public final static String PERSON_NARROW = "/icons/etool16/person-narrow.gif"; //$NON-NLS-1$
 
+	public static final String PERSON = "/icons/etool16/person.gif"; //$NON-NLS-1$
+
+	public static final String PERSON_ME = "/icons/etool16/person-me.gif"; //$NON-NLS-1$
+
 	public static ImageDescriptor getImageDescriptor(String key) {
 		ImageDescriptor imageDescriptor = RedmineUiPlugin.imageDescriptorFromPlugin("org.eclipse.mylyn.commons.ui", key); //$NON-NLS-1$
 		

@@ -44,12 +44,11 @@ public class RedminePersonContentProposal implements IContentProposal, Comparabl
 	}
 
 	public Image getImage() {
-//		if (isCurrentUser) {
-//			return CommonImages.getImage(CommonImages.PERSON_ME);
-//		} else {
-//			return CommonImages.getImage(CommonImages.PERSON);
-//		}
-		return null;
+		if (isCurrentUser) {
+			return Images.getImage(Images.PERSON_ME);
+		} else {
+			return Images.getImage(Images.PERSON);
+		}
 	}
 
 	public int compareTo(RedminePersonContentProposal otherContentProposal) {

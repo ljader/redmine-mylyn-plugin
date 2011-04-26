@@ -7,9 +7,9 @@ public class RedminePersonProposalLabelProvider extends LabelProvider {
 
 	@Override
 	public Image getImage(Object element) {
-//		if (element instanceof PersonContentProposal) {
-//			return ((PersonContentProposal) element).getImage();
-//		}
+		if (element instanceof RedminePersonContentProposal) {
+			return ((RedminePersonContentProposal) element).getImage();
+		}
 		return null;
 	}
 

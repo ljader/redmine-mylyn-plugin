@@ -28,6 +28,8 @@ public class RedminePersonProposalProvider implements IContentProposalProvider {
 	private String connectorKind;
 
 	private Map<String, String> proposals;
+	
+//	private Configuration configuration;
 
 	public RedminePersonProposalProvider(ITask task, TaskData taskData) {
 		if (task != null) {
@@ -40,6 +42,16 @@ public class RedminePersonProposalProvider implements IContentProposalProvider {
 
 		if (repositoryUrl != null && connectorKind != null) {
 			TaskRepository repository = TasksUi.getRepositoryManager().getRepository(connectorKind, repositoryUrl);
+			
+//			AbstractRepositoryConnector connector = TasksUi.getRepositoryConnector(connectorKind);
+//			if (connector!=null && connector instanceof RedmineRepositoryConnector) {
+//				try {
+//					configuration = ((RedmineRepositoryConnector)connector).getClientManager().getClient(repository).getConfiguration();
+//				} catch (RedmineStatusException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//			}
 
 			if (repository != null) {
 				AuthenticationCredentials credentials = repository.getCredentials(AuthenticationType.REPOSITORY);
@@ -97,6 +109,14 @@ public class RedminePersonProposalProvider implements IContentProposalProvider {
 				
 				String name = entry.getValue();
 				if (name!=null && !name.isEmpty()) {
+//					User user = null;
+//					String login = null;
+//					
+//					if (configuration!=null) {
+//						user = configuration.getUsers().getById(RedmineUtil.parseIntegerId(entry.getKey()));
+//						login = user.getLogin();
+//					}
+					
 					addressSet.add(RedmineUtil.formatUserPresentation(entry.getKey(), name));
 				}
 			}
