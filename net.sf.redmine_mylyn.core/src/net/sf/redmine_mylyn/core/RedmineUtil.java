@@ -9,6 +9,7 @@ import net.sf.redmine_mylyn.internal.core.Messages;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.mylyn.commons.core.StatusHandler;
+import org.eclipse.mylyn.tasks.core.IRepositoryPerson;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 
 public class RedmineUtil {
@@ -94,8 +95,12 @@ public class RedmineUtil {
 		return type;
 	}
 
+	public static String formatUserPresentation (IRepositoryPerson person) {
+		return formatUserPresentation(person.getPersonId(), person.getName());
+	}
+	
 	public static String formatUserPresentation (String login, String name) {
-		if (login!=null && !login.isEmpty()) {
+		if (login!=null && !login.isEmpty() && !login.equals("0") ) { //$NON-NLS-1$
 			return name + " <" + login + ">"; //$NON-NLS-1$ //$NON-NLS-2$
 			
 		}
