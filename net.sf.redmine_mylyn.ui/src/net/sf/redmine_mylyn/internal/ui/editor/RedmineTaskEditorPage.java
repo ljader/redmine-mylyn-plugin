@@ -22,6 +22,7 @@ import net.sf.redmine_mylyn.internal.ui.editor.TaskDataValidator.ErrorMessageCol
 import net.sf.redmine_mylyn.internal.ui.editor.helper.AttributePartLayoutHelper;
 import net.sf.redmine_mylyn.internal.ui.editor.parts.NewTimeEntryEditorPart;
 import net.sf.redmine_mylyn.internal.ui.editor.parts.PlanningEditorPart;
+import net.sf.redmine_mylyn.internal.ui.editor.parts.RedminePeoplePart;
 import net.sf.redmine_mylyn.internal.ui.editor.parts.TimeEntryEditorPart;
 import net.sf.redmine_mylyn.ui.RedmineUiPlugin;
 
@@ -144,6 +145,13 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 			}.setPath(PATH_COMMENTS));
 		}
 		
+		descriptors.add(new TaskEditorPartDescriptor(RedminePeoplePart.PART_ID) {
+			@Override
+			public AbstractTaskEditorPart createPart() {
+				return new RedminePeoplePart();
+			}
+		}.setPath(PATH_COMMENTS));
+		
 		return descriptors;
 	}
 	
@@ -184,6 +192,8 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 				} else if(IRedmineConstants.EDITOR_TYPE_PARENTTASK.equals(type)) {
 					editor = super.createEditor(TaskAttribute.TYPE_TASK_DEPENDENCY, taskAttribute);
 					editor.setLayoutHint(new LayoutHint(RowSpan.SINGLE, ColumnSpan.SINGLE));
+				} else if(IRedmineConstants.EDITOR_TYPE_WATCHERS.equals(type)) {
+					editor = new RedmineWatchersEditor(cfg, getModel(), taskAttribute);
 				} else if(IRedmineConstants.EDITOR_TYPE_PERSON.equals(type)) {
 					editor = new RedminePersonEditor(getModel(), taskAttribute);
 				} else {

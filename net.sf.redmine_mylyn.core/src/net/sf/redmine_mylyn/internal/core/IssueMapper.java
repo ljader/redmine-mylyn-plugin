@@ -45,10 +45,11 @@ public class IssueMapper {
 				continue;
 			}
 			
-			Field field = redmineAttribute.getAttributeField();
 			taskAttribute = root.getAttribute(taskKey);
-			if(field!=null) {
-				if(taskAttribute !=null ) {
+			if (taskAttribute!=null) {
+				Field field = redmineAttribute.getAttributeField();
+				
+				if(field!=null) {
 					try {
 						setValue(taskAttribute, field.get(issue));
 					} catch (Exception e) {
@@ -57,18 +58,18 @@ public class IssueMapper {
 						log.error(e, status.getMessage());
 						throw new CoreException(status);
 					}
-				}
-			} else {
-				switch (redmineAttribute) {
-				case WATCHERS:
-					for(int watcherId : issue.getWatcherIds()) {
-						taskAttribute.addValue(Integer.toString(watcherId));
+				} else {
+					switch (redmineAttribute) {
+					case WATCHERS:
+						for(int watcherId : issue.getWatcherIds()) {
+							taskAttribute.addValue(Integer.toString(watcherId));
+						}
+						break;
+					default:
+						break;
 					}
-					break;
-				default:
-					break;
+					
 				}
-				
 			}
 		}
 		

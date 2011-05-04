@@ -13,11 +13,15 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.mylyn.tasks.core.IRepositoryPerson;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskDataModel;
+import org.eclipse.mylyn.tasks.core.data.TaskDataModelEvent;
+import org.eclipse.mylyn.tasks.core.data.TaskDataModelListener;
 import org.eclipse.mylyn.tasks.ui.editors.AbstractAttributeEditor;
 import org.eclipse.mylyn.tasks.ui.editors.LayoutHint;
 import org.eclipse.mylyn.tasks.ui.editors.LayoutHint.ColumnSpan;
 import org.eclipse.mylyn.tasks.ui.editors.LayoutHint.RowSpan;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.widgets.Composite;
@@ -29,10 +33,25 @@ import org.eclipse.ui.texteditor.ITextEditorActionDefinitionIds;
 public class RedminePersonEditor extends AbstractAttributeEditor {
 
 	private Text text;
-	
+
+	private final TaskDataModelListener modelListener;
+
 	public RedminePersonEditor(TaskDataModel manager, TaskAttribute taskAttribute) {
 		super(manager, taskAttribute);
 		setLayoutHint(new LayoutHint(RowSpan.SINGLE, ColumnSpan.SINGLE));
+
+		modelListener = new TaskDataModelListener() {
+			@Override
+			public void attributeChanged(TaskDataModelEvent event) {
+				if(event.getTaskAttribute().getId().equals(getTaskAttribute().getId())) {
+					IRepositoryPerson person = getAttributeMapper().getRepositoryPerson(event.getTaskAttribute());
+					String personString = RedmineUtil.formatUserPresentation(person); 
+					if (!text.getText().equals(personString)) {
+						text.setText(personString);
+					}
+				}
+			}
+		};
 	}
 	
 	@Override
@@ -55,7 +74,15 @@ public class RedminePersonEditor extends AbstractAttributeEditor {
 		setControl(text);
 		
 		attachContentProposalProvider();
-	}
+
+		text.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				getModel().removeModelListener(modelListener);
+			}
+		});
+		getModel().addModelListener(modelListener);
+}
 
 	public String getValue() {
 		return RedmineUtil.formatUserPresentation(getAttributeMapper().getRepositoryPerson(getTaskAttribute()));

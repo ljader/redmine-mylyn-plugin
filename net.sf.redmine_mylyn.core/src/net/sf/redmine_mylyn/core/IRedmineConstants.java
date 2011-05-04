@@ -9,7 +9,7 @@ public interface IRedmineConstants {
 	public final static String EDITOR_TYPE_ESTIMATED = "estimated"; //$NON-NLS-1$
 	public final static String EDITOR_TYPE_PARENTTASK = "parenttask"; //$NON-NLS-1$
 	public final static String EDITOR_TYPE_DURATION = "duration"; //$NON-NLS-1$
-	//public final static String EDITOR_TYPE_WATCHERS = "watchers"; //$NON-NLS-1$
+	public final static String EDITOR_TYPE_WATCHERS = "watchers"; //$NON-NLS-1$
 	public final static String EDITOR_TYPE_PERSON = "redmine_person"; //$NON-NLS-1$
 	
 	public final static String TASK_ATTRIBUTE_TIMEENTRY = "task.redmine.timeentry"; //$NON-NLS-1$

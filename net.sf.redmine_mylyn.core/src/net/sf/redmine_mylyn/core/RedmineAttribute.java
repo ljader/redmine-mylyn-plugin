@@ -62,7 +62,10 @@ public enum RedmineAttribute {
 	PROGRESS(Messages.DONE_RATIO, RedmineAttribute.TASK_KEY_PROGRESS, RedmineApiIssueProperty.DONE_RATIO, TaskAttribute.TYPE_SINGLE_SELECT),
 	@PropertyAccessor("estimatedHours")
 	ESTIMATED(Messages.ESTIMATED_HOURS, RedmineAttribute.TASK_KEY_ESTIMATE, RedmineApiIssueProperty.ESTIMATED_HOURS, IRedmineConstants.EDITOR_TYPE_ESTIMATED, Flag.HIDDEN),
-	WATCHERS("Watchers ", RedmineAttribute.TASK_KEY_WATCHERS, null, TaskAttribute.TYPE_PERSON, Flag.HIDDEN),
+	WATCHERS("Watchers ", RedmineAttribute.TASK_KEY_WATCHERS, null, IRedmineConstants.EDITOR_TYPE_WATCHERS, Flag.HIDDEN),
+
+	WATCHERS_ADD("Add watcher", RedmineAttribute.TASK_KEY_WATCHERS_ADD, null, IRedmineConstants.EDITOR_TYPE_PERSON, Flag.HIDDEN),
+	WATCHERS_REMOVE(null, RedmineAttribute.TASK_KEY_WATCHERS_REMOVE, null, null, Flag.HIDDEN),
 	
 	TIME_ENTRY_TOTAL(Messages.TOTAL_HOURS, TASK_ATTRIBUTE_TIMEENTRY_TOTAL, null, IRedmineConstants.EDITOR_TYPE_DURATION, Flag.HIDDEN, Flag.READ_ONLY),
 	TIME_ENTRY_HOURS(Messages.SPENT_TIME, TASK_ATTRIBUTE_TIMEENTRY_HOURS, null, IRedmineConstants.EDITOR_TYPE_DURATION, Flag.HIDDEN),
@@ -77,7 +80,9 @@ public enum RedmineAttribute {
 	public final static String TASK_KEY_PROGRESS = "task.redmine.progress"; //$NON-NLS-1$
 	public final static String TASK_KEY_ESTIMATE = "task.redmine.estimate"; //$NON-NLS-1$
 	public final static String TASK_KEY_STARTDATE = "task.redmine.startdate"; //$NON-NLS-1$
-	public final static String TASK_KEY_WATCHERS = "task.redmine.watchers"; //$NON-NLS-N$
+	public final static String TASK_KEY_WATCHERS = "task.redmine.watchers"; //$NON-NLS-1$
+	public final static String TASK_KEY_WATCHERS_ADD = "task.redmine.watchers.add"; //$NON-NLS-1$
+	public final static String TASK_KEY_WATCHERS_REMOVE = "task.redmine.watchers.remove"; //$NON-NLS-1$
 	
 	private final String prettyName;
 
