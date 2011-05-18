@@ -2,6 +2,7 @@ package net.sf.redmine_mylyn.internal.core;
 
 import java.lang.reflect.Field;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -158,6 +159,35 @@ public class IssueMapper {
 			}
 		}
 
+		
+		/* Watcher */
+		TaskAttribute watchersAttribute = root.getAttribute(RedmineAttribute.WATCHERS.getTaskKey());
+		LinkedHashSet<String> watchers = new LinkedHashSet<String>(watchersAttribute.getValues());
+
+		TaskAttribute newWatcherAttribute = watchersAttribute.getAttribute(RedmineAttribute.WATCHERS_ADD.getTaskKey());
+		if (newWatcherAttribute !=null && !newWatcherAttribute.getMetaData().isReadOnly()) {
+			for (String newWatcher : newWatcherAttribute.getValues()) {
+				watchers.add(newWatcher);
+			}
+		}
+
+		TaskAttribute oldWatcherAttribute = watchersAttribute.getAttribute(RedmineAttribute.WATCHERS_REMOVE.getTaskKey());
+		if (oldWatcherAttribute !=null && !oldWatcherAttribute.getMetaData().isReadOnly()) {
+			for (String oldWatcher : oldWatcherAttribute.getValues()) {
+				watchers.remove(oldWatcher);
+			}
+		}
+		
+		if (watchers.size()>0) {
+			int[] watcherIds = new int[watchers.size()];
+			int lv = 0;
+			for (String idVal : watchers) {
+				watcherIds[lv++] = Integer.parseInt(idVal);
+			}
+			issue.setWatcherIds(watcherIds);
+		}
+
+		
 		/* Custom Attributes */
 		int[] customFieldIds = cfg.getProjects().getById(issue.getProjectId()).getCustomFieldIdsByTrackerId(issue.getTrackerId());
 		if(customFieldIds!=null && customFieldIds.length>0) {
@@ -170,6 +200,7 @@ public class IssueMapper {
 				}
 			}
 		}
+		
 		
 		/* Operations */
 		taskAttribute = root.getMappedAttribute(TaskAttribute.OPERATION);
@@ -195,6 +226,7 @@ public class IssueMapper {
 				}
 			}
 		}
+		
 		
 		return issue;
 	}
@@ -297,7 +329,7 @@ public class IssueMapper {
 	private static void setValue(TaskAttribute attribute, int value) {
 		if (attribute.getId().equals(RedmineAttribute.PROGRESS.getTaskKey()) && attribute.getMetaData().getType()==null) {
 			attribute.setValue(""); //$NON-NLS-1$
-		} else if((attribute.getMetaData().getType()!=null && attribute.getMetaData().getType().equals(TaskAttribute.TYPE_SINGLE_SELECT) || attribute.getId().equals(RedmineAttribute.PARENT.getTaskKey())) && value<1) {
+		} else if((attribute.getMetaData().getType()!=null && attribute.getMetaData().getType().equals(TaskAttribute.TYPE_SINGLE_SELECT) || attribute.getMetaData().getType().equals(TaskAttribute.TYPE_PERSON) || attribute.getMetaData().getType().equals(IRedmineConstants.EDITOR_TYPE_PERSON) || attribute.getId().equals(RedmineAttribute.PARENT.getTaskKey())) && value<1) {
 			attribute.setValue(""); //$NON-NLS-1$
 		} else {
 			attribute.setValue(""+value); //$NON-NLS-1$
@@ -320,7 +352,7 @@ public class IssueMapper {
 							field.setFloat(issue, Float.parseFloat(taskAttribute.getValue()));
 						break;
 					default:
-						if(redmineAttribute.getType().equals(TaskAttribute.TYPE_SINGLE_SELECT) || redmineAttribute.getType().equals(TaskAttribute.TYPE_PERSON) || redmineAttribute==RedmineAttribute.PARENT) {
+						if(redmineAttribute.getType().equals(TaskAttribute.TYPE_SINGLE_SELECT) || redmineAttribute.getType().equals(TaskAttribute.TYPE_PERSON) || redmineAttribute.getType().equals(IRedmineConstants.EDITOR_TYPE_PERSON) || redmineAttribute==RedmineAttribute.PARENT) {
 							int idVal = RedmineUtil.parseIntegerId(taskAttribute.getValue());
 							if(idVal>0) {
 								field.setInt(issue, idVal);

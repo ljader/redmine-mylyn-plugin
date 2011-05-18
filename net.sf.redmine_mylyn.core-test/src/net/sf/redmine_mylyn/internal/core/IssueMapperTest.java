@@ -81,6 +81,8 @@ public class IssueMapperTest {
 		assertEquals(""+issue.getPriorityId(), root.getAttribute(RedmineAttribute.PRIORITY.getTaskKey()).getValue());
 		//TODO watched
 		assertEquals("[1, 3]", Arrays.toString(root.getAttribute(RedmineAttribute.WATCHERS.getTaskKey()).getValues().toArray(new String[2])));
+		assertEquals("", root.getAttribute(RedmineAttribute.WATCHERS.getTaskKey()).getAttribute(RedmineAttribute.WATCHERS_ADD.getTaskKey()).getValue());
+		assertEquals("", root.getAttribute(RedmineAttribute.WATCHERS.getTaskKey()).getAttribute(RedmineAttribute.WATCHERS_REMOVE.getTaskKey()).getValue());
 		assertEquals(""+issue.getStartDate().getTime(), root.getAttribute(RedmineAttribute.DATE_START.getTaskKey()).getValue());
 		assertEquals("", root.getAttribute(RedmineAttribute.DATE_DUE.getTaskKey()).getValue());
 		assertEquals(""+issue.getDoneRatio(), root.getAttribute(RedmineAttribute.PROGRESS.getTaskKey()).getValue());
@@ -118,7 +120,6 @@ public class IssueMapperTest {
 		assertEquals(""+journal.getId(), attribute.getValue());
 		assertEquals("1", attribute.getAttribute(TaskAttribute.COMMENT_NUMBER).getValue());
 		assertEquals(""+journal.getUserId(), attribute.getAttribute(TaskAttribute.COMMENT_AUTHOR).getValue());
-		assertEquals(cfg.getUsers().getById(journal.getUserId()).getName(), attribute.getAttribute(TaskAttribute.COMMENT_AUTHOR).getAttribute(TaskAttribute.PERSON_NAME).getValue());
 		assertEquals(""+journal.getCreatedOn().getTime(), attribute.getAttribute(TaskAttribute.COMMENT_DATE).getValue());
 		assertEquals(""+journal.getNotes(), attribute.getAttribute(TaskAttribute.COMMENT_TEXT).getValue());
 		assertEquals(URL + "/issues/show/" + issue.getId() + "#note-3", attribute.getAttribute(TaskAttribute.COMMENT_URL).getValue());
@@ -130,7 +131,6 @@ public class IssueMapperTest {
 		assertNotNull(attribute);
 		assertEquals(""+attachment.getId(), attribute.getValue());
 		assertEquals(""+attachment.getAuthorId(), attribute.getAttribute(TaskAttribute.ATTACHMENT_AUTHOR).getValue());
-		assertEquals(cfg.getUsers().getById(attachment.getAuthorId()).getName(), attribute.getAttribute(TaskAttribute.ATTACHMENT_AUTHOR).getAttribute(TaskAttribute.PERSON_NAME).getValue());
 		assertEquals(""+attachment.getCreatedOn().getTime(), attribute.getAttribute(TaskAttribute.ATTACHMENT_DATE).getValue());
 		assertEquals(attachment.getFilename(), attribute.getAttribute(TaskAttribute.ATTACHMENT_FILENAME).getValue());
 		assertEquals(""+attachment.getFilesize(), attribute.getAttribute(TaskAttribute.ATTACHMENT_SIZE).getValue());
@@ -218,7 +218,6 @@ public class IssueMapperTest {
 		assertEquals(2, issue.getTrackerId());
 		assertEquals(2, issue.getStatusId());
 		assertEquals(1, issue.getParentId());
-		//TODO change parent and validate again
 		assertEquals(5, issue.getPriorityId());
 		assertEquals(0, issue.getCategoryId());
 		assertEquals(3, issue.getAssignedToId());
@@ -227,7 +226,6 @@ public class IssueMapperTest {
 		assertNull(issue.getDueDate());
 		assertEquals(3.5f, issue.getEstimatedHours(), 0.0);
 		assertEquals(10, issue.getDoneRatio());
-		//TODO parentId
 
 		//CustomValues
 		CustomValues customValues = issue.getCustomValues();
@@ -239,7 +237,6 @@ public class IssueMapperTest {
 		assertEquals("Oracle", customValues.getByCustomFieldId(1).getValue());
 		assertEquals("2009-12-01", customValues.getByCustomFieldId(9).getValue());
 		
-		fail("Not finished yet implemented");
 	}
 
 	@Test
@@ -259,6 +256,29 @@ public class IssueMapperTest {
 		
 		assertEquals(2, issue.getId());
 		assertEquals(4, issue.getStatusId());
+	}
+	
+	@Test
+	public void createIssue_watchersChanged() throws Exception {
+		TaskData taskData = buildEmptyTaskData(TestData.issue2);
+		fillTaskData(taskData, TestData.issue2);
+
+		//Old watchers
+		TaskAttribute watchers = taskData.getRoot().getAttribute(RedmineAttribute.WATCHERS.getTaskKey());
+		watchers.setValue("1");
+		watchers.addValue("2");
+		
+		//Add a new watcher
+		watchers.getAttribute(RedmineAttribute.WATCHERS_ADD.getTaskKey()).setValue("3");
+
+		//Remove a watcher
+		watchers.getAttribute(RedmineAttribute.WATCHERS_REMOVE.getTaskKey()).setValue("1");
+		
+		//expected 2,3
+		Issue issue = IssueMapper.createIssue(repository, taskData, null, cfg);
+		assertNotNull(issue);
+
+		assertEquals("[2, 3]", Arrays.toString(issue.getWatcherIds()));
 	}
 	
 	@Test
@@ -320,7 +340,7 @@ public class IssueMapperTest {
 //		setAttributeValue(root, RedmineAttribute.COMMENT, "");
 		
 		//new time entry
-		root.getAttribute(RedmineAttribute.TIME_ENTRY_HOURS.getTaskKey()).setValue("1.5");
+		root.getAttribute(RedmineAttribute.TIME_ENTRY_HOURS.getTaskKey()).setValue("5400000");
 		root.getAttribute(RedmineAttribute.TIME_ENTRY_ACTIVITY.getTaskKey()).setValue("1");
 		root.getAttribute(RedmineAttribute.TIME_ENTRY_COMMENTS.getTaskKey()).setValue("hard work");
 		root.getAttribute(IRedmineConstants.TASK_KEY_PREFIX_TIMEENTRY_CF+"7").setValue("TRUE");
