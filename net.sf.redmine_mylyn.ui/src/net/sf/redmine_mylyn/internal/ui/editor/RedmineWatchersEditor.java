@@ -1,8 +1,5 @@
 package net.sf.redmine_mylyn.internal.ui.editor;
 
-import java.util.Collections;
-import java.util.List;
-
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.User;
 import net.sf.redmine_mylyn.api.model.container.Users;
@@ -77,13 +74,16 @@ public class RedmineWatchersEditor extends AbstractAttributeEditor {
 			}
 		}
 		
-		for (String userId : getAddValues()) {
-			User user = users.getById(RedmineUtil.parseIntegerId(userId));
-			
-			if (user!=null) {
-				TableItem item = new TableItem(table, SWT.NONE);
-				item.setText(COLUMN_IDX_ID, userId);
-				item.setText(COLUMN_IDX_NAME, RedmineUtil.formatUserPresentation(user.getLogin(), user.getName()));
+		TaskAttribute addAttribute = getTaskAttribute().getAttribute(RedmineAttribute.WATCHERS_ADD.getTaskKey());
+		if (addAttribute!=null) {
+			for (String userId : addAttribute.getValues()) {
+				User user = users.getById(RedmineUtil.parseIntegerId(userId));
+				
+				if (user!=null) {
+					TableItem item = new TableItem(table, SWT.NONE);
+					item.setText(COLUMN_IDX_ID, userId);
+					item.setText(COLUMN_IDX_NAME, RedmineUtil.formatUserPresentation(user.getLogin(), user.getName()));
+				}
 			}
 		}
 		
@@ -104,17 +104,16 @@ public class RedmineWatchersEditor extends AbstractAttributeEditor {
 	
 	public void addWatcher(IRepositoryPerson person) {
 		User user = users.getByLogin(person.getPersonId());
-		if (user!=null) {
+		TaskAttribute attribute = getTaskAttribute().getAttribute(RedmineAttribute.WATCHERS_ADD.getTaskKey());
+		if (user!=null && attribute!=null) {
 			
 			String userId = ""+user.getId(); //$NON-NLS-1$
-			TaskAttribute attribute = getTaskAttribute().getAttribute(RedmineAttribute.WATCHERS_ADD.getTaskKey());
-			
-			if (attribute!=null && !getAddValues().contains(userId)) {
+			if (!attribute.getValues().contains(userId) && !getTaskAttribute().getValues().contains(userId)) {
 				attribute.addValue(userId);
 				
 				TableItem item = new TableItem(table, SWT.NONE);
 				item.setText(COLUMN_IDX_ID, userId);
-				item.setText(COLUMN_IDX_NAME, person.getName());
+				item.setText(COLUMN_IDX_NAME, RedmineUtil.formatUserPresentation(user.getLogin(), user.getName()));
 				
 				updateMarker();
 				attributeChanged();
@@ -124,35 +123,40 @@ public class RedmineWatchersEditor extends AbstractAttributeEditor {
 	}
 	
 	private boolean markForRemove(String userId) {
-		if(getAddValues().contains(userId)) {
-			getTaskAttribute().getAttribute(RedmineAttribute.WATCHERS_ADD.getTaskKey()).removeValue(userId);
+		TaskAttribute attribute = getTaskAttribute().getAttribute(RedmineAttribute.WATCHERS_ADD.getTaskKey()); 
+		if(attribute!=null && attribute.getValues().contains(userId)) {
+			attribute.removeValue(userId);
 			return true;
 		} else {
-			TaskAttribute attribute = getTaskAttribute().getAttribute(RedmineAttribute.WATCHERS_REMOVE.getTaskKey()); 
-			if (attribute!=null && !getRemoveValues().contains(userId)) {
-				getTaskAttribute().getAttribute(RedmineAttribute.WATCHERS_REMOVE.getTaskKey()).addValue(userId);
+			attribute = getTaskAttribute().getAttribute(RedmineAttribute.WATCHERS_REMOVE.getTaskKey()); 
+			if (attribute!=null && !attribute.getValues().contains(userId)) {
+				attribute.getAttribute(RedmineAttribute.WATCHERS_REMOVE.getTaskKey()).addValue(userId);
 			}
 		}
 		return false;
 	}
 	
 	private void unmarkFromRemove(String userId) {
-		if (getRemoveValues().contains(userId)) {
-			getTaskAttribute().getAttribute(RedmineAttribute.WATCHERS_REMOVE.getTaskKey()).removeValue(userId);
+		TaskAttribute attribute = getTaskAttribute().getAttribute(RedmineAttribute.WATCHERS_REMOVE.getTaskKey()); 
+		if (attribute!=null && attribute.getValues().contains(userId)) {
+			attribute.removeValue(userId);
 		}
 		
 	}
 	
 	private void updateMarker() {
+		TaskAttribute addAttribute = getTaskAttribute().getAttribute(RedmineAttribute.WATCHERS_ADD.getTaskKey());
+		TaskAttribute removeAttribute = getTaskAttribute().getAttribute(RedmineAttribute.WATCHERS_REMOVE.getTaskKey());
+		
 		for(TableItem item : table.getItems()) {
 			String userId = item.getText(COLUMN_IDX_ID);
 			if(userId==null || userId.isEmpty()) {
 				continue;
 			}
 			
-			if (getAddValues().contains(userId)) {
+			if (addAttribute!=null && addAttribute.getValues().contains(userId)) {
 				item.setText(COLUMN_IDX_MARKER, "(+)");
-			} else if (getRemoveValues()!=null && getRemoveValues().contains(userId)) {
+			} else if (removeAttribute!=null && removeAttribute.getValues().contains(userId)) {
 				item.setText(COLUMN_IDX_MARKER, "(-)");
 			} else {
 				item.setText(COLUMN_IDX_MARKER, "");
@@ -161,20 +165,6 @@ public class RedmineWatchersEditor extends AbstractAttributeEditor {
 		
 		table.getColumn(COLUMN_IDX_NAME).pack();
 		table.getColumn(COLUMN_IDX_MARKER).pack();
-	}
-	
-	private List<String> getAddValues() {
-		if (getTaskAttribute().getAttribute(RedmineAttribute.WATCHERS_ADD.getTaskKey())==null) {
-			return Collections.emptyList();
-		}
-		return getTaskAttribute().getAttribute(RedmineAttribute.WATCHERS_ADD.getTaskKey()).getValues();
-	}
-	
-	private List<String> getRemoveValues() {
-		if (getTaskAttribute().getAttribute(RedmineAttribute.WATCHERS_REMOVE.getTaskKey())==null) {
-			return Collections.emptyList();
-		}
-		return getTaskAttribute().getAttribute(RedmineAttribute.WATCHERS_REMOVE.getTaskKey()).getValues();
 	}
 	
 	private Menu buildContextMenu(Control parent) {
