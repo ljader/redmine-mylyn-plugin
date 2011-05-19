@@ -72,7 +72,7 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 	private Configuration cfg;
 	
 	Map<TaskAttribute, AbstractAttributeEditor> attributeEditors = new HashMap<TaskAttribute, AbstractAttributeEditor>();
-//	
+
 	Map<String, CustomField> customFields = new HashMap<String, CustomField>();
 	
 	public RedmineTaskEditorPage(TaskEditor editor) {
@@ -118,6 +118,14 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 	protected Set<TaskEditorPartDescriptor> createPartDescriptors() {
 		Set<TaskEditorPartDescriptor> descriptors = super.createPartDescriptors();
 
+		// remove unnecessary default editor parts
+		for (TaskEditorPartDescriptor taskEditorPartDescriptor : descriptors) {
+			if (taskEditorPartDescriptor.getId().equals(ID_PART_PEOPLE)) {
+				descriptors.remove(taskEditorPartDescriptor);
+				break;
+			}
+		}
+
 		TaskAttribute rootAttribute = getModel().getTaskData().getRoot();
 		
 		descriptors.add(new TaskEditorPartDescriptor(PlanningEditorPart.PART_ID) {
@@ -150,7 +158,7 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 			public AbstractTaskEditorPart createPart() {
 				return new RedminePeoplePart();
 			}
-		}.setPath(PATH_COMMENTS));
+		}.setPath(PATH_ACTIONS));
 		
 		return descriptors;
 	}
