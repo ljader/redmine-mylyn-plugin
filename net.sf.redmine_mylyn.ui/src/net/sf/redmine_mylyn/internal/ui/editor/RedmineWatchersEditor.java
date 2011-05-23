@@ -130,7 +130,7 @@ public class RedmineWatchersEditor extends AbstractAttributeEditor {
 		} else {
 			attribute = getTaskAttribute().getAttribute(RedmineAttribute.WATCHERS_REMOVE.getTaskKey()); 
 			if (attribute!=null && !attribute.getValues().contains(userId)) {
-				attribute.getAttribute(RedmineAttribute.WATCHERS_REMOVE.getTaskKey()).addValue(userId);
+				attribute.addValue(userId);
 			}
 		}
 		return false;

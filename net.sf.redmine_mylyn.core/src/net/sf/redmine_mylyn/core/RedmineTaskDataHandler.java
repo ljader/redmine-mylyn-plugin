@@ -264,8 +264,8 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 				attribute = createAttribute(data, RedmineAttribute.WATCHERS, cfg.getUsers().getAll());
 				
 				if(issue.isWatchersAddAllowed()) {
-					createAttribute(data, RedmineAttribute.WATCHERS_ADD, cfg.getUsers().getById(project.getMemberIds()), true);
-					attribute.createAttribute(RedmineAttribute.WATCHERS_ADD.getTaskKey());
+					TaskAttribute addWatcherAttribute = attribute.createAttribute(RedmineAttribute.WATCHERS_ADD.getTaskKey());
+					addOptions(addWatcherAttribute, cfg.getUsers().getById(project.getMemberIds()));
 				}
 
 				if(issue.isWatchersDeleteAllowed()) {
@@ -295,11 +295,16 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 			if (allowEmtpy) {
 				attr.putOption("", ""); //$NON-NLS-1$ //$NON-NLS-2$
 			}
-			for (Property property : properties) {
-				attr.putOption(String.valueOf(property.getId()), property.getName());
-			}
+			addOptions(attr, properties);
 		}
 		return attr;
+	}
+	
+	private static TaskAttribute addOptions(TaskAttribute attribute, List<? extends Property> properties) {
+		for (Property property : properties) {
+			attribute.putOption(String.valueOf(property.getId()), property.getName());
+		}
+		return attribute;
 	}
 
 	private static void createCustomAttributes(TaskData taskData, Issue issue , List<CustomField> customFields, String prefix, boolean hidden) throws RedmineStatusException {
