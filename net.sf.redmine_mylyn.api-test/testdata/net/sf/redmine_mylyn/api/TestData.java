@@ -35,9 +35,14 @@ public class TestData {
 
 	static SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 	
-	public final static Configuration cfg = buildConfiguration();
+	public static Configuration cfg = buildConfiguration();
 	
-	public final static Issue issue2 = buildIssue2();
+	public static Issue issue2 = buildIssue2();
+	
+	public static void reset() {
+		cfg = buildConfiguration();
+		issue2 = buildIssue2();
+	} 
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	static Issue buildIssue2() {

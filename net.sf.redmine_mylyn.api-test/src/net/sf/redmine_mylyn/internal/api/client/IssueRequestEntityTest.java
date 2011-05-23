@@ -12,6 +12,7 @@ import net.sf.redmine_mylyn.api.client.RedmineApiIssueProperty;
 import net.sf.redmine_mylyn.api.model.Issue;
 import net.sf.redmine_mylyn.api.model.TimeEntry;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -43,6 +44,7 @@ public class IssueRequestEntityTest {
 		issueValues.put("assigned_to_id", ""+TestData.issue2.getAssignedToId());
 		issueValues.put("fixed_version_id", ""+TestData.issue2.getFixedVersionId());
 		issueValues.put("parent_issue_id", "1");
+		issueValues.put("watcher_user_ids", "[1,3]");
 		
 		issueCustomValues = new LinkedHashMap<String, String>();
 		issueCustomValues.put("2", TestData.issue2.getCustomValues().get(5).getValue());
@@ -68,6 +70,11 @@ public class IssueRequestEntityTest {
 		writeIssueMethod2 = IssueRequestEntity.class.getDeclaredMethod("writeIssue", Map.class, String.class, TimeEntry.class);
 		writeIssueMethod2.setAccessible(true);
 	}
+
+	@After
+	public void tearDown() {
+		TestData.reset();
+	}
 	
 	@Test
 	public void testWriteIssueIssue() throws Exception{
@@ -81,9 +88,12 @@ public class IssueRequestEntityTest {
 		String result = (String)writeIssueMethod.invoke(null, TestData.issue2, null, null);
 		assertEquals(builder.toString(), result);
 	}
-
+	
 	@Test
 	public void testWriteIssueMap() throws Exception{
+		LinkedHashMap<String, String> issueValues = new LinkedHashMap<String, String>(IssueRequestEntityTest.issueValues);
+		issueValues.remove("watcher_user_ids");
+		
 		StringBuilder builder = new StringBuilder();
 		builder.append("{\"issue\":{");
 		append(builder, issueValues);
@@ -133,6 +143,24 @@ public class IssueRequestEntityTest {
 		
 	}
 
+	@Test
+	public void testWriteIssueIssue_watchersReadOnly() throws Exception{
+		LinkedHashMap<String, String> issueValues = new LinkedHashMap<String, String>(IssueRequestEntityTest.issueValues);
+		issueValues.remove("watcher_user_ids");
+		TestData.issue2.setWatchersAddAllowed(false);
+		TestData.issue2.setWatchersDeleteAllowed(false);
+
+		StringBuilder builder = new StringBuilder();
+		builder.append("{\"issue\":{");
+		append(builder, issueValues);
+		builder.append(",\"custom_field_values\":{");
+		append(builder, issueCustomValues);
+		builder.append("}}}");
+		
+		String result = (String)writeIssueMethod.invoke(null, TestData.issue2, null, null);
+		assertEquals(builder.toString(), result);
+	}
+	
 	static void append(StringBuilder builder, LinkedHashMap<String, String> values) {
 		for (Entry<String, String> entry : values.entrySet()) {
 			append(builder, entry.getKey(), entry.getValue());
@@ -142,10 +170,18 @@ public class IssueRequestEntityTest {
 	}
 
 	static void append(StringBuilder builder, String key, String value) {
-		builder.append("\"").append(key).append("\":\"");
+		builder.append("\"").append(key).append("\":");
+		
+		if (value==null || !(value.startsWith("[") && value.endsWith("]"))) {
+			builder.append("\"");
+		}
+
 		if(value!=null) {
 			builder.append(value);
 		}
-		builder.append("\"");
+
+		if (value==null || !(value.startsWith("[") && value.endsWith("]"))) {
+			builder.append("\"");
+		}
 	}
 }

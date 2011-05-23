@@ -104,6 +104,14 @@ public class IssueRequestEntity extends StringRequestEntity {
 			}
 		}
 		
+		if (issue.isWatchersAddAllowed() || issue.isWatchersDeleteAllowed() ) {
+			jsonWriter.key("watcher_user_ids").array();
+			for (int userId : issue.getWatcherIds()) {
+				jsonWriter.value(userId);
+			}
+			jsonWriter.endArray();
+		}
+
 		writeCustomValues(jsonWriter, issue.getCustomValues());
 		
 		jsonWriter.endObject();

@@ -166,6 +166,7 @@ public class IssueMapper {
 
 		TaskAttribute newWatcherAttribute = watchersAttribute.getAttribute(RedmineAttribute.WATCHERS_ADD.getTaskKey());
 		if (newWatcherAttribute !=null && !newWatcherAttribute.getMetaData().isReadOnly()) {
+			issue.setWatchersAddAllowed(true);
 			for (String newWatcher : newWatcherAttribute.getValues()) {
 				watchers.add(newWatcher);
 			}
@@ -173,6 +174,7 @@ public class IssueMapper {
 
 		TaskAttribute oldWatcherAttribute = watchersAttribute.getAttribute(RedmineAttribute.WATCHERS_REMOVE.getTaskKey());
 		if (oldWatcherAttribute !=null && !oldWatcherAttribute.getMetaData().isReadOnly()) {
+			issue.setWatchersDeleteAllowed(true);
 			for (String oldWatcher : oldWatcherAttribute.getValues()) {
 				watchers.remove(oldWatcher);
 			}
