@@ -12,12 +12,6 @@
          <fieldDescriptor
                fieldDescriptor="net.sf.redmine_mylyn.core.extension.internal.timesheetextension.StartTimeMinuteField">
          </fieldDescriptor>
-         <fieldDescriptor
-               fieldDescriptor="net.sf.redmine_mylyn.core.extension.internal.timesheetextension.EndTimeHourField">
-         </fieldDescriptor>
-         <fieldDescriptor
-               fieldDescriptor="net.sf.redmine_mylyn.core.extension.internal.timesheetextension.EndTimeMinuteField">
-         </fieldDescriptor>
       </timeEntryFields>
    </extension>
 
