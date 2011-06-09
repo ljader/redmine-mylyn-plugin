@@ -73,6 +73,7 @@ public class RedmineUiPlugin extends AbstractUIPlugin implements LogListener {
 			
 			redmineConnector.setTaskRepositoryLocationFactory(new TaskRepositoryLocationUiFactory());
 			TasksUi.getRepositoryManager().addListener(redmineConnector.getClientManager());
+			TasksUi.getRepositoryManager().addListener(RedmineCorePlugin.getDefault().getExtensionManager());
 			
 			RedmineCorePlugin.getDefault().setConnector(redmineConnector);
 		}

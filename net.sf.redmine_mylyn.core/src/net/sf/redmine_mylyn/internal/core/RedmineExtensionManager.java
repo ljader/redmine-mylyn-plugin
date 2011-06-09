@@ -99,4 +99,26 @@ public class RedmineExtensionManager implements IRedmineExtensionManager {
 		return timeEntryFieldsByRepository.get(repositoryUrl);
 	}
 
+	@Override
+	public void repositoryAdded(TaskRepository repository) {
+	}
+
+	@Override
+	public void repositoryRemoved(TaskRepository repository) {
+		synchronized (this) {
+			timeEntryFieldsByRepository.remove(repository.getRepositoryUrl());
+		}
+	}
+
+	@Override
+	public void repositorySettingsChanged(TaskRepository repository) {
+		synchronized (this) {
+			timeEntryFieldsByRepository.remove(repository.getRepositoryUrl());
+		}
+	}
+
+	@Override
+	public void repositoryUrlChanged(TaskRepository repository, String oldUrl) {
+	}
+
 }
