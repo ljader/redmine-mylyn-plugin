@@ -1,6 +1,8 @@
 package net.sf.redmine_mylyn.api.model;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -29,6 +31,8 @@ public class TimeEntry implements IModel {
 	private String comments;
 	
 	private CustomValues customValues;
+	
+	private Map<String, String> extensionValues;
 
 	public float getHours() {
 		return hours;
@@ -80,6 +84,20 @@ public class TimeEntry implements IModel {
 
 	public int getId() {
 		return id;
+	}
+	
+	public void addExtensionValue(String submitKey, String value) {
+		if (extensionValues==null) {
+			extensionValues = new HashMap<String, String>();
+		}
+		extensionValues.put(submitKey, value);
+	}
+	
+	public Map<String, String> getExtensionValues() {
+		if (extensionValues==null) {
+			extensionValues = new HashMap<String, String>();
+		}
+		return extensionValues;
 	}
 	
 }

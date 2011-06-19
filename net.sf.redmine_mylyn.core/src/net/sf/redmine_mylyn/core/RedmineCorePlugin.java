@@ -4,6 +4,7 @@ import java.text.MessageFormat;
 
 import net.sf.redmine_mylyn.common.logging.ILogService;
 import net.sf.redmine_mylyn.common.logging.LogServiceImpl;
+import net.sf.redmine_mylyn.internal.core.RedmineExtensionManager;
 import net.sf.redmine_mylyn.internal.core.RedmineSpentTimeManager;
 import net.sf.redmine_mylyn.internal.core.client.ClientManager;
 
@@ -28,6 +29,8 @@ public class RedmineCorePlugin extends Plugin /*implements BundleActivator*/ {
 	private RedmineRepositoryConnector connector;
 	
 	private RedmineSpentTimeManager spentTimeManager;
+	
+	private RedmineExtensionManager extensionManager;
 	
 	static BundleContext getContext() {
 		return context;
@@ -95,6 +98,13 @@ public class RedmineCorePlugin extends Plugin /*implements BundleActivator*/ {
 		}
 		
 		return spentTimeManager;
+	}
+	
+	public IRedmineExtensionManager getExtensionManager() {
+		if(extensionManager==null) {
+			extensionManager = RedmineExtensionManager.getInstance();
+		}
+		return extensionManager;
 	}
 	
 	public ILogService getLogService(Class<?> clazz) {

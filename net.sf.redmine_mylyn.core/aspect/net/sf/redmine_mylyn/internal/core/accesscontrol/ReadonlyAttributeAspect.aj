@@ -7,8 +7,11 @@ import java.util.Map;
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.CustomField;
 import net.sf.redmine_mylyn.api.model.Issue;
+import net.sf.redmine_mylyn.core.IRedmineExtensionField;
 import net.sf.redmine_mylyn.core.RedmineAttribute;
 import net.sf.redmine_mylyn.core.RedmineTaskDataHandler;
+
+import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskData;
 
@@ -72,8 +75,8 @@ public aspect ReadonlyAttributeAspect {
 
 	/* Default Attributes */
 	pointcut createDefaultAttributes(Issue issue, Configuration configuration) : 
-		execution(private static void RedmineTaskDataHandler.createDefaultAttributes(TaskData, Issue, Configuration))
-		&& args(TaskData, issue, configuration);
+		execution(private static void RedmineTaskDataHandler.createDefaultAttributes(TaskRepository, TaskData, Issue, Configuration))
+		&& args(TaskRepository, TaskData, issue, configuration);
 	
 	pointcut createDefaultAttribute(RedmineAttribute redmineAttribute, Issue issue) :
 		call(private static TaskAttribute RedmineTaskDataHandler.createAttribute(..))
@@ -90,6 +93,17 @@ public aspect ReadonlyAttributeAspect {
 	after(RedmineAttribute redmineAttribute, Issue issue) returning(TaskAttribute attr) : createDefaultAttribute(redmineAttribute, issue) {
 		checkForReadonly(attr, redmineAttribute, issue);
 	};
+
+	/* Extension Attributes */
+	pointcut createExtensionAttribute(TaskData taskData) :
+		call(private static TaskAttribute RedmineTaskDataHandler.createAttribute(TaskData, IRedmineExtensionField, String))
+		&& withincode(private static void RedmineTaskDataHandler.createDefaultAttributes(..))
+		&& args(taskData, IRedmineExtensionField, String);
+
+	after(TaskData taskData) returning(TaskAttribute attr) : createExtensionAttribute(taskData) {
+		TaskAttribute referenceAttribute = taskData.getRoot().getMappedAttribute(RedmineAttribute.CATEGORY.getTaskKey());
+		attr.getMetaData().setReadOnly(referenceAttribute.getMetaData().isReadOnly());
+	}
 
 	/* Custom Attributes */
 	pointcut createCustomAttribute(TaskData taskData) :

@@ -1,6 +1,7 @@
 package net.sf.redmine_mylyn.core;
 
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import net.sf.redmine_mylyn.api.model.Configuration;
@@ -112,7 +113,7 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 		Configuration conf = connector.getRepositoryConfiguration(repository);
 		
 		try {
-			createAttributes(taskData, issue, conf);
+			createAttributes(repository, taskData, issue, conf);
 			createOperations(taskData, issue, conf);
 			
 			/* Default-Values */
@@ -172,7 +173,7 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 		Configuration configuration = connector.getRepositoryConfiguration(repository);
 		try {
 			TaskData taskData = new TaskData(getAttributeMapper(repository), RedmineCorePlugin.REPOSITORY_KIND, repository.getRepositoryUrl(), issue.getId() + ""); //$NON-NLS-1$
-			createAttributes(taskData, issue, configuration);
+			createAttributes(repository, taskData, issue, configuration);
 			createOperations(taskData, issue, configuration);
 
 			IssueMapper.updateTaskData(repository, taskData, configuration, issue);
@@ -183,12 +184,12 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 		}
 	}
 
-	private void createAttributes(TaskData data, Issue issue,  Configuration configuration) throws RedmineStatusException {
-		createDefaultAttributes(data, issue, configuration);
+	private void createAttributes(TaskRepository repository, TaskData data, Issue issue,  Configuration configuration) throws RedmineStatusException {
+		createDefaultAttributes(repository, data, issue, configuration);
 		createCustomAttributes(data, issue, configuration.getCustomFields().getIssueCustomFields(), IRedmineConstants.TASK_KEY_PREFIX_ISSUE_CF, false);
 	}
 	
-	private static void createDefaultAttributes(TaskData data, Issue issue , Configuration cfg) throws RedmineStatusException {
+	private static void createDefaultAttributes(TaskRepository repository, TaskData data, Issue issue , Configuration cfg) throws RedmineStatusException {
 		boolean existingTask = issue.getId()>0;
 		Project project = cfg.getProjects().getById(issue.getProjectId());
 
@@ -254,6 +255,11 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 				createAttribute(data, RedmineAttribute.TIME_ENTRY_HOURS);
 				createAttribute(data, RedmineAttribute.TIME_ENTRY_ACTIVITY, project.getTimeEntryActivities().getAll());
 				createAttribute(data, RedmineAttribute.TIME_ENTRY_COMMENTS);
+				
+				for (IRedmineExtensionField additionalField : RedmineCorePlugin.getDefault().getExtensionManager().getAdditionalTimeEntryFields(repository)) {
+					createAttribute(data, additionalField, IRedmineConstants.TASK_KEY_PREFIX_TIMEENTRY_EX);
+				}
+				
 				createCustomAttributes(data, issue, cfg.getCustomFields().getTimeEntryCustomFields(), IRedmineConstants.TASK_KEY_PREFIX_TIMEENTRY_CF, true);
 			}
 		}
@@ -331,6 +337,24 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 		attr.getMetaData().setKind(TaskAttribute.KIND_DEFAULT);
 		attr.getMetaData().setLabel(customField.getName());
 		attr.getMetaData().setReadOnly(false);
+		return attr;
+	}
+	
+	private static TaskAttribute createAttribute(TaskData taskData, IRedmineExtensionField  additionalField, String prefix) {
+		TaskAttribute attr = taskData.getRoot().createAttribute(prefix + additionalField.getTaskKey());
+		attr.getMetaData().setType(additionalField.getEditorType());
+		attr.getMetaData().setLabel(additionalField.getLabel());
+		attr.getMetaData().setReadOnly(false);
+		
+		if (additionalField.getOptions()!=null) {
+			if (!additionalField.isRequired()) {
+				attr.putOption("", ""); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			for (Entry<String, String> entry : additionalField.getOptions().entrySet()) {
+				attr.putOption(entry.getKey(), entry.getValue());
+			}
+			
+		}
 		return attr;
 	}
 	

@@ -137,6 +137,18 @@ public class NewTimeEntryEditorPart extends AbstractTaskEditorPart {
 		}
 
 		for (TaskAttribute childAttribute : root.getAttributes().values()) {
+			if(childAttribute.getId().startsWith(IRedmineConstants.TASK_KEY_PREFIX_TIMEENTRY_EX)) {
+				attributeList.add(childAttribute.getId());
+				attributeEditor = createAttributeEditor(childAttribute);
+				attributeEditor.createLabelControl(composite, toolkit);
+				attributeEditor.createControl(composite, toolkit);
+				attributeEditor.setDecorationEnabled(false);
+				layoutHelper.setLayoutData(attributeEditor);
+				editorToolkit.adapt(attributeEditor);
+			}
+		}
+		
+		for (TaskAttribute childAttribute : root.getAttributes().values()) {
 			if(childAttribute.getId().startsWith(IRedmineConstants.TASK_KEY_PREFIX_TIMEENTRY_CF)) {
 				attributeList.add(childAttribute.getId());
 				attributeEditor = createAttributeEditor(childAttribute);

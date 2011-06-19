@@ -60,6 +60,8 @@ public class IssueRequestEntityTest {
 		
 		timeCutomValues = new LinkedHashMap<String, String>();
 		timeCutomValues.put("7", timeEntry.getCustomValues().get(5).getValue());
+		
+		timeEntry.addExtensionValue("extKey", "extVal");
 	}
 
 	@Before
@@ -136,7 +138,7 @@ public class IssueRequestEntityTest {
 		append(builder, timeValues);
 		builder.append(",\"custom_field_values\":{");
 		append(builder, timeCutomValues);
-		builder.append("}}}");
+		builder.append("},\"extKey\":\"extVal\"}}");
 		
 		String result = (String)writeIssueMethod.invoke(null, TestData.issue2, comment, timeEntry);
 		assertEquals(builder.toString(), result);
