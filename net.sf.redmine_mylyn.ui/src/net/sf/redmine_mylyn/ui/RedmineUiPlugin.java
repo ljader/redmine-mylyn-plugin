@@ -26,6 +26,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.Version;
 import org.osgi.service.log.LogEntry;
 import org.osgi.service.log.LogListener;
 import org.osgi.service.log.LogReaderService;
@@ -46,9 +47,13 @@ public class RedmineUiPlugin extends AbstractUIPlugin implements LogListener {
 	private ServiceReference logReaderServiceReference;
 	
 	private LogReaderService logReaderService;
+	
+	private boolean isEclipseVersionLesserThan37 = false;
 
 	public RedmineUiPlugin() {
 		super();
+		
+		isEclipseVersionLesserThan37 = Platform.getBundle("org.eclipse.core.runtime").getVersion().compareTo(new Version(3, 7, 0)) < 0;
 		
 		taskListSelectionListener = new ISelectionListener() {
 			@Override
@@ -133,7 +138,10 @@ public class RedmineUiPlugin extends AbstractUIPlugin implements LogListener {
 		if (entry.getBundle().getSymbolicName().startsWith("net.sf.redmine_mylyn.")) { //$NON-NLS-1$
 			IStatus status = buildStatus(entry);
 
-			getLog().log(buildStatus(entry));
+			if (isEclipseVersionLesserThan37) {
+				getLog().log(buildStatus(entry));
+			}
+			
 
 			if(status.getSeverity()==IStatus.ERROR) {
 				StatusManager.getManager().handle(status, StatusManager.SHOW);
