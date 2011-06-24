@@ -87,8 +87,10 @@ public class RedmineRepositorySettingsPage extends AbstractRepositorySettingsPag
 			repository.removeProperty(IRedmineConstants.REPOSITORY_SETTING_API_KEY);
 		}
 		
-		for (Entry<String, Button> entry : redmineExtensions.entrySet()) {
-			repository.setProperty(entry.getKey(), Boolean.toString(entry.getValue().getSelection()));
+		if (redmineExtensions!=null) {
+			for (Entry<String, Button> entry : redmineExtensions.entrySet()) {
+				repository.setProperty(entry.getKey(), Boolean.toString(entry.getValue().getSelection()));
+			}
 		}
 		
 	}
