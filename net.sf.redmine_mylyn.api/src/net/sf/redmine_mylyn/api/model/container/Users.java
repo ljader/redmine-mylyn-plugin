@@ -41,7 +41,7 @@ public class Users extends AbstractPropertyContainer<User> {
 	}
 
 	public User getByLogin(String login) {
-		return usersByLogin.get(login);
+		return usersByLogin==null ? null : usersByLogin.get(login);
 	}
 
 	protected HashMap<String, User> getUsersByLogin() {

@@ -53,7 +53,9 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 	public void getMultiTaskData(TaskRepository repository, Set<String> taskIds, TaskDataCollector collector, IProgressMonitor monitor) throws CoreException {
 		TaskData[] taskData = connector.getTaskData(repository, taskIds, monitor);
 		for (TaskData data : taskData) {
-			collector.accept(data);
+			if (data!=null) {
+				collector.accept(data);
+			}
 		}
 	}
 	
