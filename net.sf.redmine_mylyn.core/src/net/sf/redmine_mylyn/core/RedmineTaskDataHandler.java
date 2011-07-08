@@ -273,6 +273,7 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 				
 				if(issue.isWatchersAddAllowed()) {
 					TaskAttribute addWatcherAttribute = attribute.createAttribute(RedmineAttribute.WATCHERS_ADD.getTaskKey());
+					addWatcherAttribute.getMetaData().setLabel(RedmineAttribute.WATCHERS_ADD.getLabel());
 					addOptions(addWatcherAttribute, cfg.getUsers().getById(project.getMemberIds()));
 				}
 

@@ -20,8 +20,6 @@ public class RedminePeoplePart extends AbstractTaskEditorPart {
 
 	public final static String PART_ID = "net.sf.redmine_mylyn.ui.editor.part.people";
 
-	private RedminePersonEditor personEditor;
-	
 	private RedmineWatchersEditor watchersEditor;
 	
 	public RedminePeoplePart() {
@@ -65,7 +63,7 @@ public class RedminePeoplePart extends AbstractTaskEditorPart {
 			attribute = attribute.getAttribute(RedmineAttribute.WATCHERS_ADD.getTaskKey()); 
 			if (attribute != null) {
 				
-				personEditor = new RedminePersonEditor(getModel(), attribute) {
+				RedminePersonEditor personEditor = new RedminePersonEditor(getModel(), attribute) {
 					@Override
 					public void setValue(String value) {
 						value = RedmineUtil.findUserLogin(value);
@@ -82,13 +80,14 @@ public class RedminePeoplePart extends AbstractTaskEditorPart {
 					};
 					
 				};
+				
+				personEditor.createLabelControl(composite, toolkit);
+				personEditor.createControl(composite, toolkit);
+				personEditor.setDecorationEnabled(false);
+				layoutHelper.setLayoutData(personEditor);
+				getTaskEditorPage().getAttributeEditorToolkit().adapt(personEditor);
 			}
 
-			personEditor.createLabelControl(composite, toolkit);
-			personEditor.createControl(composite, toolkit);
-			personEditor.setDecorationEnabled(false);
-			layoutHelper.setLayoutData(personEditor);
-			getTaskEditorPage().getAttributeEditorToolkit().adapt(personEditor);
 
 			editor.createLabelControl(composite, toolkit);
 			editor.createControl(composite, toolkit);
