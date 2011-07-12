@@ -163,43 +163,45 @@ public class IssueMapper {
 		
 		/* Watcher */
 		TaskAttribute watchersAttribute = root.getAttribute(RedmineAttribute.WATCHERS.getTaskKey());
-		LinkedHashSet<String> watchers = new LinkedHashSet<String>(watchersAttribute.getValues());
-
-		TaskAttribute newWatcherAttribute = watchersAttribute.getAttribute(RedmineAttribute.WATCHERS_ADD.getTaskKey());
-		if (newWatcherAttribute !=null && !newWatcherAttribute.getMetaData().isReadOnly()) {
-			issue.setWatchersAddAllowed(true);
-			for (String newWatcher : newWatcherAttribute.getValues()) {
-				watchers.add(newWatcher);
+		if (watchersAttribute!=null) {
+			LinkedHashSet<String> watchers = new LinkedHashSet<String>(watchersAttribute.getValues());
+			
+			TaskAttribute newWatcherAttribute = watchersAttribute.getAttribute(RedmineAttribute.WATCHERS_ADD.getTaskKey());
+			if (newWatcherAttribute !=null && !newWatcherAttribute.getMetaData().isReadOnly()) {
+				issue.setWatchersAddAllowed(true);
+				for (String newWatcher : newWatcherAttribute.getValues()) {
+					watchers.add(newWatcher);
+				}
 			}
-		}
-
-		TaskAttribute oldWatcherAttribute = watchersAttribute.getAttribute(RedmineAttribute.WATCHERS_REMOVE.getTaskKey());
-		if (oldWatcherAttribute !=null && !oldWatcherAttribute.getMetaData().isReadOnly()) {
-			issue.setWatchersDeleteAllowed(true);
-			for (String oldWatcher : oldWatcherAttribute.getValues()) {
-				watchers.remove(oldWatcher);
+			
+			TaskAttribute oldWatcherAttribute = watchersAttribute.getAttribute(RedmineAttribute.WATCHERS_REMOVE.getTaskKey());
+			if (oldWatcherAttribute !=null && !oldWatcherAttribute.getMetaData().isReadOnly()) {
+				issue.setWatchersDeleteAllowed(true);
+				for (String oldWatcher : oldWatcherAttribute.getValues()) {
+					watchers.remove(oldWatcher);
+				}
 			}
-		}
-		
-		if (watchers.size()>0) {
-			int[] watcherIds = new int[watchers.size()];
-			int lv = 0;
-			for (String idVal : watchers) {
-				watcherIds[lv++] = Integer.parseInt(idVal);
+			
+			if (watchers.size()>0) {
+				int[] watcherIds = new int[watchers.size()];
+				int lv = 0;
+				for (String idVal : watchers) {
+					watcherIds[lv++] = Integer.parseInt(idVal);
+				}
+				issue.setWatcherIds(watcherIds);
 			}
-			issue.setWatcherIds(watcherIds);
-		}
-
-		
-		/* Custom Attributes */
-		int[] customFieldIds = cfg.getProjects().getById(issue.getProjectId()).getCustomFieldIdsByTrackerId(issue.getTrackerId());
-		if(customFieldIds!=null && customFieldIds.length>0) {
-			CustomValues customValues = new CustomValues();
-			issue.setCustomValues(customValues);
-			for (int customFieldId : customFieldIds) {
-				taskAttribute = root.getAttribute(IRedmineConstants.TASK_KEY_PREFIX_ISSUE_CF + customFieldId);
-				if(taskAttribute!=null) {
-					customValues.setCustomValue(customFieldId, formatCustomValue(taskAttribute.getValue(), customFieldId, cfg));
+			
+			
+			/* Custom Attributes */
+			int[] customFieldIds = cfg.getProjects().getById(issue.getProjectId()).getCustomFieldIdsByTrackerId(issue.getTrackerId());
+			if(customFieldIds!=null && customFieldIds.length>0) {
+				CustomValues customValues = new CustomValues();
+				issue.setCustomValues(customValues);
+				for (int customFieldId : customFieldIds) {
+					taskAttribute = root.getAttribute(IRedmineConstants.TASK_KEY_PREFIX_ISSUE_CF + customFieldId);
+					if(taskAttribute!=null) {
+						customValues.setCustomValue(customFieldId, formatCustomValue(taskAttribute.getValue(), customFieldId, cfg));
+					}
 				}
 			}
 		}
