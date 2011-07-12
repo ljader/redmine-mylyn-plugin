@@ -186,7 +186,7 @@ public class RedmineSpentTimeManager implements IRedmineSpentTimeManager {
 			try {
 				val = Long.parseLong(stringVal);
 			} catch(NumberFormatException e) {
-				RedmineCorePlugin.getDefault().getLogService(this.getClass()).error(e, Messages.ERRMSG_INVALID_LONG, stringVal);
+				RedmineCorePlugin.getLogService(this.getClass()).error(e, Messages.ERRMSG_INVALID_LONG, stringVal);
 			}
 		}
 		return val;

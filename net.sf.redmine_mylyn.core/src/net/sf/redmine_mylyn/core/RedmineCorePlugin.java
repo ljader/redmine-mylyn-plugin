@@ -107,8 +107,8 @@ public class RedmineCorePlugin extends Plugin /*implements BundleActivator*/ {
 		return extensionManager;
 	}
 	
-	public ILogService getLogService(Class<?> clazz) {
-		return LogServiceImpl.getInstance(getBundle(), clazz);
+	public static ILogService getLogService(Class<?> clazz) {
+		return LogServiceImpl.getInstance((plugin==null ? null : plugin.getBundle()), clazz);
 	}
 	
 	public static IStatus toStatus(Throwable e, String message) {

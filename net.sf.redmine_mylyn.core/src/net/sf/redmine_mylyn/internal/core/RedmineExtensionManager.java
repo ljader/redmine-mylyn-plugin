@@ -85,7 +85,7 @@ public class RedmineExtensionManager implements IRedmineExtensionManager {
 									}
 								}
 							} catch (CoreException e) {
-								RedmineCorePlugin.getDefault().getLogService(this.getClass()).error(e, "Instantiation of IRedmineExtensionField failed");
+								RedmineCorePlugin.getLogService(this.getClass()).error(e, "Instantiation of IRedmineExtensionField failed");
 							}
 						}
 					}

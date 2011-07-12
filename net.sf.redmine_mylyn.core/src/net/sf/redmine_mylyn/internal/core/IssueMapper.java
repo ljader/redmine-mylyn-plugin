@@ -56,7 +56,7 @@ public class IssueMapper {
 						setValue(taskAttribute, field.get(issue));
 					} catch (Exception e) {
 						IStatus status = RedmineCorePlugin.toStatus(e, Messages.ERRMSG_CANT_READ_PROPERTY_X, redmineAttribute.name());
-						ILogService log = RedmineCorePlugin.getDefault().getLogService(IssueMapper.class);
+						ILogService log = RedmineCorePlugin.getLogService(IssueMapper.class);
 						log.error(e, status.getMessage());
 						throw new CoreException(status);
 					}
@@ -378,7 +378,7 @@ public class IssueMapper {
 					}
 				} catch (Exception e) {
 					IStatus status = RedmineCorePlugin.toStatus(e, Messages.ERRMSG_CANT_READ_PROPERTY_X, redmineAttribute.name());
-					ILogService log = RedmineCorePlugin.getDefault().getLogService(IssueMapper.class);
+					ILogService log = RedmineCorePlugin.getLogService(IssueMapper.class);
 					log.error(e, status.getMessage());
 					throw new CoreException(status);
 				}

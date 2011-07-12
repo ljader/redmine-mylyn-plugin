@@ -165,7 +165,7 @@ public class RedmineUiPlugin extends AbstractUIPlugin implements LogListener {
 	}
 	
 	public static ILogService getLogService(Class<?> clazz) {
-		return plugin==null ? LogServiceImpl.getInstance() : LogServiceImpl.getInstance(plugin.getBundle(), clazz);
+		return LogServiceImpl.getInstance((plugin==null ? null : plugin.getBundle()), clazz);
 	}
 
 	public static IStatus toStatus(Throwable e, String message) {
