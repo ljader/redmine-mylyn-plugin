@@ -38,13 +38,8 @@ public class RedminePersonProposalProvider implements IContentProposalProvider {
 	private Configuration configuration;
 
 	public RedminePersonProposalProvider(ITask task, TaskData taskData) {
-		if (task != null) {
-			repositoryUrl = task.getRepositoryUrl();
-			connectorKind = task.getConnectorKind();
-		} else if (taskData != null) {
-			repositoryUrl = taskData.getRepositoryUrl();
-			connectorKind = taskData.getConnectorKind();
-		}
+		repositoryUrl = taskData.getRepositoryUrl();
+		connectorKind = taskData.getConnectorKind();
 
 		if (repositoryUrl != null && connectorKind != null) {
 
