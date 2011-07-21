@@ -191,17 +191,17 @@ public class IssueMapper {
 				issue.setWatcherIds(watcherIds);
 			}
 			
-			
-			/* Custom Attributes */
-			int[] customFieldIds = cfg.getProjects().getById(issue.getProjectId()).getCustomFieldIdsByTrackerId(issue.getTrackerId());
-			if(customFieldIds!=null && customFieldIds.length>0) {
-				CustomValues customValues = new CustomValues();
-				issue.setCustomValues(customValues);
-				for (int customFieldId : customFieldIds) {
-					taskAttribute = root.getAttribute(IRedmineConstants.TASK_KEY_PREFIX_ISSUE_CF + customFieldId);
-					if(taskAttribute!=null) {
-						customValues.setCustomValue(customFieldId, formatCustomValue(taskAttribute.getValue(), customFieldId, cfg));
-					}
+		}
+
+		/* Custom Attributes */
+		int[] customFieldIds = cfg.getProjects().getById(issue.getProjectId()).getCustomFieldIdsByTrackerId(issue.getTrackerId());
+		if(customFieldIds!=null && customFieldIds.length>0) {
+			CustomValues customValues = new CustomValues();
+			issue.setCustomValues(customValues);
+			for (int customFieldId : customFieldIds) {
+				taskAttribute = root.getAttribute(IRedmineConstants.TASK_KEY_PREFIX_ISSUE_CF + customFieldId);
+				if(taskAttribute!=null) {
+					customValues.setCustomValue(customFieldId, formatCustomValue(taskAttribute.getValue(), customFieldId, cfg));
 				}
 			}
 		}
