@@ -71,9 +71,6 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 	
 	@Override
 	public boolean initializeSubTaskData(TaskRepository repository, TaskData taskData, TaskData parentTaskData, IProgressMonitor monitor) throws CoreException {
-		System.out.println("Parent-Project: " + parentTaskData.getRoot().getAttribute(RedmineAttribute.PROJECT.getTaskKey()).getValue()); //$NON-NLS-1$
-		System.out.println("Parent-Tracker: " + parentTaskData.getRoot().getAttribute(RedmineAttribute.TRACKER.getTaskKey()).getValue()); //$NON-NLS-1$
-		
 		Issue issue = new Issue();
 		
 		TaskAttribute parentRoot = parentTaskData.getRoot();
