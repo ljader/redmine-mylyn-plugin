@@ -305,9 +305,9 @@ public class IssueMapperTest {
 	TaskData buildEmptyTaskData(Issue issue) throws Exception {
 		TaskData taskData = new TaskData(new RedmineTaskAttributeMapper(repository, cfg), RedmineCorePlugin.REPOSITORY_KIND, repository.getUrl(), "" + issue.getId());
 	
-		Method m = RedmineTaskDataHandler.class.getDeclaredMethod("createAttributes", TaskData.class, Issue.class, Configuration.class);
+		Method m = RedmineTaskDataHandler.class.getDeclaredMethod("createAttributes", TaskRepository.class, TaskData.class, Issue.class, Configuration.class);
 		m.setAccessible(true);
-		m.invoke(taskDataHandler, taskData, issue, cfg);
+		m.invoke(taskDataHandler, repository, taskData, issue, cfg);
 		
 		m = RedmineTaskDataHandler.class.getDeclaredMethod("createOperations", TaskData.class, Issue.class, Configuration.class);
 		m.setAccessible(true);

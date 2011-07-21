@@ -123,7 +123,8 @@ public class IssueRequestEntityTest {
 	
 	@Test
 	public void testWriteIssueIssueStringTimeEntry() throws Exception {
-		TimeEntry timeEntry = TestData.issue2.getTimeEntries().getAll().get(0); 
+		TimeEntry timeEntry = TestData.issue2.getTimeEntries().getAll().get(0);
+		timeEntry.addExtensionValue("extKey", "extVal");
 		String comment = "comment without content";
 
 		StringBuilder builder = new StringBuilder();
@@ -142,7 +143,8 @@ public class IssueRequestEntityTest {
 		
 		String result = (String)writeIssueMethod.invoke(null, TestData.issue2, comment, timeEntry);
 		assertEquals(builder.toString(), result);
-		
+
+		TestData.reset();
 	}
 
 	@Test
