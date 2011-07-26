@@ -2,7 +2,7 @@
 <feature
       id="net.sf.redmine_mylyn.feature"
       label="%Feature-Name"
-      version="0.2.99.qualifier"
+      version="0.3.0.qualifier"
       provider-name="%Feature-Vendor"
       plugin="net.sf.redmine_mylyn">
 
@@ -31,10 +31,10 @@
       <import plugin="org.eclipse.osgi"/>
       <import plugin="org.eclipse.mylyn.tasks.core" version="3.5.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.mylyn.commons.core" version="3.5.0" match="greaterOrEqual"/>
-      <import plugin="net.sf.redmine_mylyn.api" version="0.2.99" match="greaterOrEqual"/>
+      <import plugin="net.sf.redmine_mylyn.api" version="0.3.0" match="greaterOrEqual"/>
       <import plugin="org.aspectj.runtime" version="1.6.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.mylyn.tasks.ui" version="3.5.0" match="greaterOrEqual"/>
-      <import plugin="net.sf.redmine_mylyn.core" version="0.2.99" match="greaterOrEqual"/>
+      <import plugin="net.sf.redmine_mylyn.core" version="0.3.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.forms" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui" version="3.5.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.osgi.services" version="3.2.0" match="greaterOrEqual"/>

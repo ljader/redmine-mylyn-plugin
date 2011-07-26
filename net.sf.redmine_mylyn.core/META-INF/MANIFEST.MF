@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: net.sf.redmine_mylyn.core;singleton:=true
-Bundle-Version: 0.2.99.qualifier
+Bundle-Version: 0.3.0.qualifier
 Bundle-Activator: net.sf.redmine_mylyn.core.RedmineCorePlugin
 Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.core.runtime;bundle-version="3.5.0",
@@ -10,7 +10,7 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="3.5.0",
  org.eclipse.mylyn.commons.core;bundle-version="3.5.0",
  org.eclipse.mylyn.commons.net;bundle-version="3.5.0",
  net.sf.redmine_mylyn.common;bundle-version="0.1.0",
- net.sf.redmine_mylyn.api;bundle-version="0.2.99",
+ net.sf.redmine_mylyn.api;bundle-version="0.3.0",
  org.aspectj.runtime;bundle-version="1.6.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy

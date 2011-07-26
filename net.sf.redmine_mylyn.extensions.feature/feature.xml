@@ -23,7 +23,7 @@
 
    <requires>
       <import plugin="org.eclipse.mylyn.tasks.core" version="3.5.0" match="greaterOrEqual"/>
-      <import plugin="net.sf.redmine_mylyn.core" version="0.2.99" match="greaterOrEqual"/>
+      <import plugin="net.sf.redmine_mylyn.core" version="0.3.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
