@@ -81,6 +81,7 @@ public class RedmineUtil {
 			type = TaskAttribute.TYPE_LONG_TEXT;
 			break;
 		case LIST:
+		case VERSION:
 			type = TaskAttribute.TYPE_SINGLE_SELECT;
 			break;
 		case DATE:
@@ -88,6 +89,9 @@ public class RedmineUtil {
 			break;
 		case BOOL:
 			type = TaskAttribute.TYPE_BOOLEAN;
+			break;
+		case USER:
+			type = IRedmineConstants.EDITOR_TYPE_PERSON;
 			break;
 		default:
 			type = TaskAttribute.TYPE_SHORT_TEXT;

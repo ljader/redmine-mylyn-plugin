@@ -15,7 +15,7 @@ public class CustomFieldValidator {
 
 	public final static String RESOURCE_FILE = "/xmldata/customfields.xml";
 	
-	public final static int COUNT = 6;
+	public final static int COUNT = 8;
 	
 	public static void validate1(CustomField obj) {
 		assertNotNull(obj);

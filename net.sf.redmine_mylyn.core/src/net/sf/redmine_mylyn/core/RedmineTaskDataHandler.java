@@ -6,13 +6,15 @@ import java.util.Set;
 
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.CustomField;
-import net.sf.redmine_mylyn.api.model.CustomField.Format;
 import net.sf.redmine_mylyn.api.model.Issue;
 import net.sf.redmine_mylyn.api.model.IssuePriority;
 import net.sf.redmine_mylyn.api.model.IssueStatus;
+import net.sf.redmine_mylyn.api.model.Member;
 import net.sf.redmine_mylyn.api.model.Project;
 import net.sf.redmine_mylyn.api.model.Property;
 import net.sf.redmine_mylyn.api.model.TimeEntry;
+import net.sf.redmine_mylyn.api.model.User;
+import net.sf.redmine_mylyn.api.model.Version;
 import net.sf.redmine_mylyn.core.client.IClient;
 import net.sf.redmine_mylyn.internal.core.IssueMapper;
 import net.sf.redmine_mylyn.internal.core.Messages;
@@ -185,7 +187,7 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 
 	private void createAttributes(TaskRepository repository, TaskData data, Issue issue,  Configuration configuration) throws RedmineStatusException {
 		createDefaultAttributes(repository, data, issue, configuration);
-		createCustomAttributes(data, issue, configuration.getCustomFields().getIssueCustomFields(), IRedmineConstants.TASK_KEY_PREFIX_ISSUE_CF, false);
+		createCustomAttributes(data, configuration, issue, configuration.getCustomFields().getIssueCustomFields(), IRedmineConstants.TASK_KEY_PREFIX_ISSUE_CF, false);
 	}
 	
 	private static void createDefaultAttributes(TaskRepository repository, TaskData data, Issue issue , Configuration cfg) throws RedmineStatusException {
@@ -259,7 +261,7 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 					createAttribute(data, additionalField, IRedmineConstants.TASK_KEY_PREFIX_TIMEENTRY_EX);
 				}
 				
-				createCustomAttributes(data, issue, cfg.getCustomFields().getTimeEntryCustomFields(), IRedmineConstants.TASK_KEY_PREFIX_TIMEENTRY_CF, true);
+				createCustomAttributes(data, cfg, issue, cfg.getCustomFields().getTimeEntryCustomFields(), IRedmineConstants.TASK_KEY_PREFIX_TIMEENTRY_CF, true);
 			}
 		}
 
@@ -313,19 +315,39 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 		return attribute;
 	}
 
-	private static void createCustomAttributes(TaskData taskData, Issue issue , List<CustomField> customFields, String prefix, boolean hidden) throws RedmineStatusException {
+	private static void createCustomAttributes(TaskData taskData, Configuration configuration, Issue issue , List<CustomField> customFields, String prefix, boolean hidden) throws RedmineStatusException {
+		Project project = configuration.getProjects().getById(issue.getProjectId());
+		
 		for (CustomField customField : customFields) {
+			System.out.println(customField.getName());
 			TaskAttribute taskAttribute = createAttribute(taskData, customField, prefix);
 			if(hidden) {
 				taskAttribute.getMetaData().setKind(null);
 			}
-			if (customField.getFieldFormat()==Format.LIST) {
+			if (customField.getFieldFormat().isListType()) {
 				if (!customField.isRequired()) {
 					taskAttribute.putOption("", ""); //$NON-NLS-1$ //$NON-NLS-2$
 				}
-				for (String option : customField.getPossibleValues()) {
-					taskAttribute.putOption(option, option);
-				}
+				
+				switch (customField.getFieldFormat()) {
+				case VERSION:
+					for( Version version : configuration.getVersions().getById(project.getVersionIds()) ) {
+						taskAttribute.putOption(""+version.getId(), version.getName()); //$NON-NLS-1$
+					}
+					break;
+				case USER: 
+					for( Member member : project.getMembers() ) {
+						User user = configuration.getUsers().getById(member.getUserId());
+						if (user != null) {
+							taskAttribute.putOption(""+user.getId(), user.getName()); //$NON-NLS-1$
+						}
+					}
+					break;
+				default:
+					for (String option : customField.getPossibleValues()) {
+						taskAttribute.putOption(option, option);
+					}
+				} 
 			}
 			
 		}
