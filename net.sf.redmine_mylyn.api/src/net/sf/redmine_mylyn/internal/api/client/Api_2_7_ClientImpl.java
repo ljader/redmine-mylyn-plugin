@@ -348,6 +348,12 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 		monitor = Policy.monitorFor(monitor);
 		monitor.beginTask(Messages.PROGRESS_DOWNLOAD_ATTACHMENT, 1);
 		
+		//WOrkaround: Attachments::download dosn't support API-AUTH - this starts a session
+		String token = getAuthenticityToken(monitor);
+		if(token==null) {
+			throw new RedmineApiRemoteException(Messages.ERRMSG_AUTH_TOKEN_REQUEST_FAILED);
+		}
+		
 		GetMethod method = new GetMethod(String.format(URL_GET_ATTACHMENT, attachmentId, fileName));
 		InputStream attachment = executeMethod(method, attachmentParser, monitor, HttpStatus.SC_OK, HttpStatus.SC_NOT_FOUND);
 
