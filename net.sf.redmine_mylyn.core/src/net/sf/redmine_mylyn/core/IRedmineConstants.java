@@ -26,6 +26,7 @@ public interface IRedmineConstants {
 
 	public final static String TASK_ATTRIBUTE_STATUS_CHANGE = "task.redmine.status.change"; //$NON-NLS-1$
 	public final static String TASK_ATTRIBUTE_PARENT = "task.redmine.parent"; //$NON-NLS-1$
+	public final static String TASK_ATTRIBUTE_SUBTASKS = "task.redmine.subtasks"; //$NON-NLS-1$
 	public final static String TASK_ATTRIBUTE_OPERATION_RESTORE = "task.redmine.operation.restorevalue"; //$NON-NLS-1$
 
 	public final static String TASK_KEY_PREFIX_ISSUE_CF = "task.redmine.custom."; //$NON-NLS-1$

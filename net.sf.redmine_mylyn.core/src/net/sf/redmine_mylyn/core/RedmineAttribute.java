@@ -1,6 +1,7 @@
 package net.sf.redmine_mylyn.core;
 
 import static net.sf.redmine_mylyn.core.IRedmineConstants.TASK_ATTRIBUTE_PARENT;
+import static net.sf.redmine_mylyn.core.IRedmineConstants.TASK_ATTRIBUTE_SUBTASKS;
 import static net.sf.redmine_mylyn.core.IRedmineConstants.TASK_ATTRIBUTE_STATUS_CHANGE;
 import static net.sf.redmine_mylyn.core.IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY_ACTIVITY;
 import static net.sf.redmine_mylyn.core.IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY_COMMENTS;
@@ -57,6 +58,8 @@ public enum RedmineAttribute {
 	STATUS_CHG(Messages.STATUS,  TASK_ATTRIBUTE_STATUS_CHANGE, RedmineApiIssueProperty.STATUS, TaskAttribute.TYPE_SINGLE_SELECT, Flag.OPERATION),
 	@PropertyAccessor("parentId")
 	PARENT(Messages.PARENT,  TASK_ATTRIBUTE_PARENT, RedmineApiIssueProperty.PARENT, IRedmineConstants.EDITOR_TYPE_PARENTTASK),
+	@PropertyAccessor
+	SUBTASKS("Subtasks:",  TASK_ATTRIBUTE_SUBTASKS, null, TaskAttribute.TYPE_TASK_DEPENDENCY, Flag.READ_ONLY),
 	COMMENT(Messages.COMMENT, TaskAttribute.COMMENT_NEW, null, TaskAttribute.TYPE_LONG_RICH_TEXT, Flag.HIDDEN),
 	@PropertyAccessor("doneRatio")
 	PROGRESS(Messages.DONE_RATIO, RedmineAttribute.TASK_KEY_PROGRESS, RedmineApiIssueProperty.DONE_RATIO, TaskAttribute.TYPE_SINGLE_SELECT),

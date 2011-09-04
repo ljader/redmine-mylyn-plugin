@@ -214,6 +214,7 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 		}
 		
 		createAttribute(data, RedmineAttribute.PARENT);
+		createAttribute(data, RedmineAttribute.SUBTASKS);
 		createAttribute(data, RedmineAttribute.TRACKER, cfg.getTrackers().getById(project.getTrackerIds()));
 
 		if (existingTask) {

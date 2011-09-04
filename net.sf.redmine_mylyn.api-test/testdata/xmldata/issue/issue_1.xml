@@ -15,6 +15,7 @@
   <doneRatio>0</doneRatio>
   <authorId>2</authorId>
   <categoryId>1</categoryId>
+  <subtasks>2</subtasks>
   <availableStatus>1</availableStatus>
   <customValues>
     <customValue id="4" customFieldId="2">125</customValue>

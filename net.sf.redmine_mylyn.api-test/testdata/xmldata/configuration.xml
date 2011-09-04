@@ -219,6 +219,34 @@
 			<isFilter>true</isFilter>
 			<isForAll>false</isForAll>
 		</customField>
+		<customField id="11">
+			<name>users</name>
+			<type>IssueCustomField</type>
+			<fieldFormat>user</fieldFormat>
+			<minLength>0</minLength>
+			<maxLength>0</maxLength>
+			<regexp></regexp>
+			<possibleValues>
+			</possibleValues>
+			<defaultValue></defaultValue>
+			<isRequired>false</isRequired>
+			<isFilter>true</isFilter>
+			<isForAll>true</isForAll>
+		</customField>
+		<customField id="12">
+			<name>versions</name>
+			<type>IssueCustomField</type>
+			<fieldFormat>version</fieldFormat>
+			<minLength>0</minLength>
+			<maxLength>0</maxLength>
+			<regexp></regexp>
+			<possibleValues>
+			</possibleValues>
+			<defaultValue></defaultValue>
+			<isRequired>false</isRequired>
+			<isFilter>true</isFilter>
+			<isForAll>true</isForAll>
+		</customField>
 	</customFields>
 
 	<trackers>

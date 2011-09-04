@@ -160,6 +160,5 @@
 		<isRequired>false</isRequired>
 		<isFilter>true</isFilter>
 		<isForAll>true</isForAll>
-
 	</customField>
 </customFields>

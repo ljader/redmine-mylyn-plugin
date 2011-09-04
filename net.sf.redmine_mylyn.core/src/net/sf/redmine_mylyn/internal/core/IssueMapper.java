@@ -304,13 +304,17 @@ public class IssueMapper {
 	
 	private static void setValue(TaskAttribute attribute, Object value) {
 		if(value==null) {
-			setValue(attribute, ""); //$NON-NLS-1$
+			attribute.clearValues();
 		} else if(value instanceof String) {
 			setValue(attribute, (String)value);
 		} else if(value instanceof Date) {
 			setValue(attribute, (Date)value);
 		} else if(value instanceof Integer) {
 			setValue(attribute, ((Integer)value).intValue());
+		} else if(value instanceof int[]) {
+			for (int intVal : (int[])value) {
+				attribute.addValue(Integer.toString(intVal));
+			}
 		} else {
 			setValue(attribute, value.toString());
 		}

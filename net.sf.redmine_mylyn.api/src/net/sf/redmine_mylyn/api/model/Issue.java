@@ -91,6 +91,9 @@ public class Issue implements IModel {
 	@IssuePropertyMapping(RedmineApiIssueProperty.PARENT)
 	private int parentId;
 
+	@XmlList
+	private int [] subtasks;
+
 	private boolean closed;
 	
 	public Issue(){
@@ -309,6 +312,14 @@ public class Issue implements IModel {
 
 	public void setParentId(int parentId) {
 		this.parentId = parentId;
+	}
+
+	public int[] getSubtasks() {
+		return subtasks;
+	}
+
+	public void setSubtasks(int[] subtasks) {
+		this.subtasks = subtasks;
 	}
 
 	public int[] getAvailableStatusId() {

@@ -61,6 +61,7 @@ public class TestData {
 			issue.setProjectId(1);
 			issue.setStatusId(2);
 			issue.setPriorityId(5);
+			issue.setSubtasks(new int[]{3,4});
 			issue.setWatched(true);
 			issue.setWatcherIds(new int[]{1,3});
 			issue.setWatchersViewAllowed(true);

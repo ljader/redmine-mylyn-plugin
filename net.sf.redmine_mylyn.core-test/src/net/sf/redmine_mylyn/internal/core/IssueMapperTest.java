@@ -92,6 +92,7 @@ public class IssueMapperTest {
 		assertEquals(""+issue.getAssignedToId(), root.getAttribute(RedmineAttribute.ASSIGNED_TO.getTaskKey()).getValue());
 		assertEquals(""+issue.getFixedVersionId(), root.getAttribute(RedmineAttribute.VERSION.getTaskKey()).getValue());
 		assertEquals(""+issue.getParentId(), root.getAttribute(RedmineAttribute.PARENT.getTaskKey()).getValue());
+		assertEquals("[3, 4]", Arrays.toString(root.getAttribute(RedmineAttribute.SUBTASKS.getTaskKey()).getValues().toArray()));
 		//TODO available Status
 
 		/* CustomValues */
@@ -200,6 +201,7 @@ public class IssueMapperTest {
 		assertEquals("", root.getAttribute(RedmineAttribute.ASSIGNED_TO.getTaskKey()).getValue());
 		assertEquals("", root.getAttribute(RedmineAttribute.VERSION.getTaskKey()).getValue());
 		assertEquals("", root.getAttribute(RedmineAttribute.PARENT.getTaskKey()).getValue());
+		assertEquals("", root.getAttribute(RedmineAttribute.SUBTASKS.getTaskKey()).getValue());
 		//TODO available Status
 	}
 	

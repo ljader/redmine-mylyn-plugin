@@ -1,7 +1,9 @@
 package net.sf.redmine_mylyn.core;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
 
@@ -37,6 +39,7 @@ import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskData;
 import org.eclipse.mylyn.tasks.core.data.TaskDataCollector;
 import org.eclipse.mylyn.tasks.core.data.TaskMapper;
+import org.eclipse.mylyn.tasks.core.data.TaskRelation;
 import org.eclipse.mylyn.tasks.core.sync.ISynchronizationSession;
 
 
@@ -349,6 +352,33 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 
 	}
 
+	@Override
+	public Collection<TaskRelation> getTaskRelations(TaskData taskData) {
+
+		Collection<TaskRelation> relations = null;
+		
+		TaskAttribute parentAttribute = taskData.getRoot().getAttribute(RedmineAttribute.PARENT.getTaskKey());
+		if (parentAttribute!=null && !parentAttribute.getValue().isEmpty()) {
+			
+			relations = new ArrayList<TaskRelation>(1);
+			relations.add(TaskRelation.parentTask(parentAttribute.getValue()));
+		}
+		
+		TaskAttribute subtaskAttribute = taskData.getRoot().getAttribute(RedmineAttribute.SUBTASKS.getTaskKey());
+		if (subtaskAttribute!=null) {
+			if (relations==null) {
+				relations = new ArrayList<TaskRelation>();
+			}
+			
+			for(String stringVal : subtaskAttribute.getValues()) {
+				relations.add(TaskRelation.subtask(stringVal));
+			}
+		}
+		
+		return relations;
+	}
+	
+	
 	@Override
 	public AbstractTaskDataHandler getTaskDataHandler() {
 		return taskDataHandler;
