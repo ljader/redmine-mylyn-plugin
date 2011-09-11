@@ -29,7 +29,6 @@ final class TextVerifyListener implements Listener {
 				current = sb.toString();
 			}
 			
-			System.out.println(current);
 			event.doit = validator.isValid(current);
 		}
 	}

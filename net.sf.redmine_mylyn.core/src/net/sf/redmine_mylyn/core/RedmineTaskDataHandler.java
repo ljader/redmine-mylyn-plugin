@@ -320,7 +320,6 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 		Project project = configuration.getProjects().getById(issue.getProjectId());
 		
 		for (CustomField customField : customFields) {
-			System.out.println(customField.getName());
 			TaskAttribute taskAttribute = createAttribute(taskData, customField, prefix);
 			if(hidden) {
 				taskAttribute.getMetaData().setKind(null);
