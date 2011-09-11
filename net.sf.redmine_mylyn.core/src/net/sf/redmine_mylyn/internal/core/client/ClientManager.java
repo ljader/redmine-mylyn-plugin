@@ -170,33 +170,37 @@ public class ClientManager implements IRedmineClientManager {
 				zipedCacheFile.delete();
 			}
 			
-			ZipOutputStream zip = null;
-			try {
-				try {
-					zip = new ZipOutputStream(new FileOutputStream(zipedCacheFile));
-					
-					for(Entry<String, Configuration>  entry : confByUrl.entrySet()) {
-						String name = entry.getKey();
-						for (char chr : ILLEGAL_ZIP_ENTRY_CHARS) {
-							name = name.replace(""+chr, "0x"+Integer.toHexString(chr)); //$NON-NLS-1$ //$NON-NLS-2$
-						}
-						zip.putNextEntry(new ZipEntry(name + ".xml")); //$NON-NLS-1$
-						entry.getValue().write(zip);
-						zip.closeEntry();
-					}
-					
-				} finally {
-					if(zip!=null) {
-						zip.close();
-					}
-				}
-			} catch (Exception e) {
-				IStatus status = new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, Messages.ERRMSG_CANT_WRITE_CACHEDATA, e);
-				RedmineCorePlugin.getDefault().getLog().log(status);
+			if (confByUrl.size()>0) {
 				
-				if(zipedCacheFile.exists()) {
-					zipedCacheFile.delete();
+				ZipOutputStream zip = null;
+				try {
+					try {
+						zip = new ZipOutputStream(new FileOutputStream(zipedCacheFile));
+						
+						for(Entry<String, Configuration>  entry : confByUrl.entrySet()) {
+							String name = entry.getKey();
+							for (char chr : ILLEGAL_ZIP_ENTRY_CHARS) {
+								name = name.replace(""+chr, "0x"+Integer.toHexString(chr)); //$NON-NLS-1$ //$NON-NLS-2$
+							}
+							zip.putNextEntry(new ZipEntry(name + ".xml")); //$NON-NLS-1$
+							entry.getValue().write(zip);
+							zip.closeEntry();
+						}
+						
+					} finally {
+						if(zip!=null) {
+							zip.close();
+						}
+					}
+				} catch (Exception e) {
+					IStatus status = new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, Messages.ERRMSG_CANT_WRITE_CACHEDATA, e);
+					RedmineCorePlugin.getDefault().getLog().log(status);
+					
+					if(zipedCacheFile.exists()) {
+						zipedCacheFile.delete();
+					}
 				}
+				
 			}
 		}
 	}
