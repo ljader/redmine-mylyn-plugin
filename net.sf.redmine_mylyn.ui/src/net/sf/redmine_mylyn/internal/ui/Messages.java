@@ -49,6 +49,7 @@ public class Messages extends NLS {
 	public static String ERRMSG_HTTPAUTH_CREDENTIALS_MISMATCH;
 	public static String ERRMSG_INVALID_APIKEY;
 	public static String INVALID_CREDENTIALS;
+	public static String INVALID_SERVERURL;
 	public static String LBL_APIKEY;
 	public static String LBL_ENABLE;
 	public static String SETTINGS_PAGE_EXAMPLE_URL;

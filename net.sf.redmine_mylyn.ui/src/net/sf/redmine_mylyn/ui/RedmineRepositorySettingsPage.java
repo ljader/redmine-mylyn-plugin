@@ -100,6 +100,10 @@ public class RedmineRepositorySettingsPage extends AbstractRepositorySettingsPag
 		return new Validator() {
 			@Override
 			public void run(IProgressMonitor monitor) throws CoreException {
+				if (!isValidUrl(repository.getUrl())) {
+					throw new CoreException(new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, Messages.INVALID_SERVERURL));
+				}
+				
 				detectedVersionString = null;
 				
 				RedmineServerVersion detectedVersion = null;
@@ -254,8 +258,8 @@ public class RedmineRepositorySettingsPage extends AbstractRepositorySettingsPag
 	}
 
 	@Override
-	protected boolean isValidUrl(String arg0) {
-		return true;
+	protected boolean isValidUrl(String url) {
+		return url.matches("^https?://.+"); //$NON-NLS-1$
 	}
 	
 	@Override
