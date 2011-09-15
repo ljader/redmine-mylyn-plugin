@@ -90,7 +90,7 @@ public class RedminePersonProposalProvider implements IContentProposalProvider {
 		for (final String address : addressSet) {
 			result[i++] =  new RedminePersonContentProposal(
 					address,
-					address.contains(currentUser), 
+					currentUser != null && address.contains(currentUser), 
 					address,
 					address.length());
 		}
