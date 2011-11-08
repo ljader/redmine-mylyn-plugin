@@ -91,7 +91,13 @@ public class JaxbParser<T extends Object> {
 	
 	protected Unmarshaller getUnmarshaller() throws JAXBException {
 		if (ctx==null) {
+			Thread thread = Thread.currentThread();
+			ClassLoader classLoader = thread.getContextClassLoader();
+			
+			thread.setContextClassLoader(getClass().getClassLoader());
 			ctx = JAXBContext.newInstance(clazz);
+			
+			thread.setContextClassLoader(classLoader);
 		}
 		return ctx.createUnmarshaller();
 	}
