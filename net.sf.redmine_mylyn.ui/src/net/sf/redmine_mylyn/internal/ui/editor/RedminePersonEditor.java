@@ -7,7 +7,6 @@ import net.sf.redmine_mylyn.internal.ui.RedminePersonProposalLabelProvider;
 import net.sf.redmine_mylyn.internal.ui.RedminePersonProposalProvider;
 
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
-import org.eclipse.jface.fieldassist.IContentProposalProvider;
 import org.eclipse.jface.fieldassist.TextContentAdapter;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.mylyn.tasks.core.IRepositoryPerson;
@@ -30,6 +29,7 @@ public class RedminePersonEditor extends AbstractAttributeEditor {
 
 	protected Text text;
 
+	protected RedminePersonProposalProvider contentProposalProvider;
 //	private final TaskDataModelListener modelListener;
 
 	public RedminePersonEditor(TaskDataModel manager, TaskAttribute taskAttribute) {
@@ -100,10 +100,20 @@ public class RedminePersonEditor extends AbstractAttributeEditor {
 		}
 	}
 
+	@Override
+	public void refresh() {
+		Map<String, String> persons = getAttributeMapper().getOptions(getTaskAttribute());
+		contentProposalProvider.setProposals(persons);
+		
+		if (!persons.containsKey(getTaskAttribute().getValue())) {
+			text.setText("");
+		}
+	}
+	
 	private void attachContentProposalProvider() {
 		Map<String, String> persons = getAttributeMapper().getOptions(getTaskAttribute());
 		
-		IContentProposalProvider contentProposalProvider = new RedminePersonProposalProvider(getModel().getTask(), getTaskAttribute().getTaskData(), persons);
+		contentProposalProvider = new RedminePersonProposalProvider(getModel().getTask(), getTaskAttribute().getTaskData(), persons);
 		ILabelProvider labelPropsalProvider = new RedminePersonProposalLabelProvider();
 		
 		ContentAssistCommandAdapter adapter = new ContentAssistCommandAdapter(text,

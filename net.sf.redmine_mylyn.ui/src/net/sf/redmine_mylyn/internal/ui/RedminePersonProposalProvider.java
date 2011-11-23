@@ -69,6 +69,11 @@ public class RedminePersonProposalProvider implements IContentProposalProvider {
 		
 	}
 	
+	public void setProposals( Map<String, String> proposals ) {
+		this.proposals = proposals;
+		this.addressSet = null;
+	}
+	
 	public IContentProposal[] getProposals(String contents, int position) {
 		if (contents == null) {
 			throw new IllegalArgumentException();
