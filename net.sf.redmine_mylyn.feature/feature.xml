@@ -2,7 +2,7 @@
 <feature
       id="net.sf.redmine_mylyn.feature"
       label="%Feature-Name"
-      version="0.3.5.qualifier"
+      version="0.3.6.qualifier"
       provider-name="%Feature-Vendor"
       plugin="net.sf.redmine_mylyn">
 

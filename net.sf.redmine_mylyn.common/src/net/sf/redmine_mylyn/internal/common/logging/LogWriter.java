@@ -6,6 +6,7 @@ import net.sf.redmine_mylyn.common.logging.LogServiceImpl;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.equinox.log.ExtendedLogEntry;
+import org.osgi.framework.Bundle;
 import org.osgi.service.log.LogEntry;
 import org.osgi.service.log.LogListener;
 import org.osgi.service.log.LogReaderService;
@@ -60,7 +61,8 @@ public class LogWriter implements LogListener {
 	
 	@Override
 	public void logged(LogEntry entry) {
-		if (entry.getBundle().getSymbolicName().startsWith("net.sf.redmine_mylyn.")) { //$NON-NLS-1$
+		Bundle bundle = entry.getBundle();
+		if ( bundle.getState()==Bundle.ACTIVE && bundle.getSymbolicName().startsWith("net.sf.redmine_mylyn.")) { //$NON-NLS-1$
 			writeLog(entry);
 		}
 	}
