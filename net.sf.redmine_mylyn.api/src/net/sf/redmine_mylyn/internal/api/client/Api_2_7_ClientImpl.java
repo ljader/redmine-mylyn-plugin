@@ -169,10 +169,14 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 			return null;
 		}
 		
+		long unixtime = updatedSince.getTime()/1000l;
+		//workaround: bug in redmine plugin
+		unixtime += 1l;
+		
 		monitor = Policy.monitorFor(monitor);
 		monitor.beginTask(Messages.PROGRESS_SEARCH_UPDATED_ISSUES, 1);
 
-		String uri = String.format(URL_ISSUES_UPDATED, Arrays.toString(issues).replaceAll("[\\[\\] ]", ""), updatedSince.getTime()/1000l); //$NON-NLS-1$ //$NON-NLS-2$
+		String uri = String.format(URL_ISSUES_UPDATED, Arrays.toString(issues).replaceAll("[\\[\\] ]", ""), unixtime); //$NON-NLS-1$ //$NON-NLS-2$
 		GetMethod method = new GetMethod(uri);
 		
 		UpdatedIssuesType result = executeMethod(method, updatedIssuesParser, monitor);

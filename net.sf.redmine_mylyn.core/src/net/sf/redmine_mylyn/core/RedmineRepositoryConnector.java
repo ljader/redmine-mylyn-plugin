@@ -190,7 +190,8 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 		String repositoryDate = attribute.getValue();
 		Date localeDate = task.getModificationDate();
 		if (localeDate!=null) {
-			return RedmineUtil.parseDate(repositoryDate).compareTo(localeDate)<0;
+			//repo > local => 1
+			return RedmineUtil.parseDate(repositoryDate).compareTo(localeDate)>0;
 		}
 
 		return true;
