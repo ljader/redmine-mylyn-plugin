@@ -235,8 +235,6 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 				}
 
 				TaskData taskData = taskDataHandler.createTaskDataFromIssue(repository, partialIssue, monitor);
-
-				//TODO mark only new or changed taks partial
 				taskData.setPartial(true);
 				
 				collector.accept(taskData);
@@ -366,7 +364,7 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 		}
 		
 		TaskAttribute subtaskAttribute = taskData.getRoot().getAttribute(RedmineAttribute.SUBTASKS.getTaskKey());
-		if (subtaskAttribute!=null) {
+		if (subtaskAttribute!=null && subtaskAttribute.getValues().size()>0) {
 			if (relations==null) {
 				relations = new ArrayList<TaskRelation>();
 			}
