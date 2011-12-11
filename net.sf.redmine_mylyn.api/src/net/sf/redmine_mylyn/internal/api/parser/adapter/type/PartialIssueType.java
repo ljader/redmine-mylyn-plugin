@@ -83,7 +83,7 @@ public class PartialIssueType implements IModel {
 	
 	private static Field getIdField() {
 		try {
-			Field field = Issue.class.getDeclaredField("id");
+			Field field = Issue.class.getDeclaredField("id"); //$NON-NLS-1$
 			field.setAccessible(true);
 			return field;
 		} catch (Exception e) {

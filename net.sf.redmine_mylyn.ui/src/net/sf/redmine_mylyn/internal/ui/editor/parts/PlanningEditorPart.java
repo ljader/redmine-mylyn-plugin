@@ -5,6 +5,7 @@ import java.util.Set;
 
 import net.sf.redmine_mylyn.core.RedmineAttribute;
 import net.sf.redmine_mylyn.core.RedmineUtil;
+import net.sf.redmine_mylyn.internal.ui.Messages;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.mylyn.tasks.core.ITask;
@@ -22,7 +23,8 @@ import org.eclipse.ui.forms.widgets.Section;
 
 public class PlanningEditorPart extends AbstractTaskEditorPart {
 
-	public final static String PART_ID = "net.sf.redmine_mylyn.ui.editor.part.planning";
+	public final static String PART_ID = "net.sf.redmine_mylyn.ui.editor.part.planning"; //$NON-NLS-1$
+
 
 
 	private final static Set<RedmineAttribute> PLANNING_ATTRIBUTES = EnumSet.of(RedmineAttribute.DATE_START, RedmineAttribute.DATE_DUE,RedmineAttribute.ESTIMATED);
@@ -33,7 +35,7 @@ public class PlanningEditorPart extends AbstractTaskEditorPart {
 	
 	public PlanningEditorPart() {
 		super();
-		setPartName("Planning");
+		setPartName(Messages.PLANNING_PART);
 	}
 	
 	@Override

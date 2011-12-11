@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 
 import net.sf.redmine_mylyn.api.exception.RedmineApiErrorException;
 import net.sf.redmine_mylyn.api.model.Configuration;
+import net.sf.redmine_mylyn.internal.api.Messages;
 
 import org.apache.commons.httpclient.NameValuePair;
 
@@ -67,23 +68,23 @@ public class Query {
 	
 	public String toUrl(String encoding) throws RedmineApiErrorException {
 		if(encoding==null) {
-			encoding="UTF-8";
+			encoding="UTF-8"; //$NON-NLS-1$
 		}
 		StringBuilder builder = new StringBuilder();
 
 		try {
 			
 			for (NameValuePair nvp : getParams()) {
-				builder.append("&").append(nvp.getName());
-				builder.append("=").append(URLEncoder.encode(nvp.getValue(), encoding));
+				builder.append("&").append(nvp.getName()); //$NON-NLS-1$
+				builder.append("=").append(URLEncoder.encode(nvp.getValue(), encoding)); //$NON-NLS-1$
 			}
 		} catch (UnsupportedEncodingException e) {
-			throw new RedmineApiErrorException("Invalid encoding {}", e, encoding);
+			throw new RedmineApiErrorException(Messages.ERRMSG_INVALID_ENCODING_X, e, encoding);
 		}
 		
 		if(builder.length()>0) {
 			builder.deleteCharAt(0);
-			builder.insert(0, "?");
+			builder.insert(0, "?"); //$NON-NLS-1$
 		}
 		
 		return builder.toString();
@@ -91,9 +92,9 @@ public class Query {
 	
 	public static Query fromUrl(String url, String encoding, Configuration configuration) throws RedmineApiErrorException {
 		if(encoding==null) {
-			encoding="UTF-8";
+			encoding="UTF-8"; //$NON-NLS-1$
 		}
-		if(url==null || url.indexOf("query_id=")<0 && url.indexOf('&')<0) {
+		if(url==null || url.indexOf("query_id=")<0 && url.indexOf('&')<0) { //$NON-NLS-1$
 			return null;
 		}
 
@@ -104,8 +105,8 @@ public class Query {
 		}
 
 		/* URL to NamedValuePairs */
-		for(String part : url.split("&")) {
-			String[] namedValue = part.split("=");
+		for(String part : url.split("&")) { //$NON-NLS-1$
+			String[] namedValue = part.split("="); //$NON-NLS-1$
 			if(namedValue.length!=2) {
 				continue;
 			}
@@ -113,7 +114,7 @@ public class Query {
 			try {
 				namedValue[1] = URLDecoder.decode(namedValue[1], encoding);
 			} catch (UnsupportedEncodingException e) {
-				throw new RedmineApiErrorException("Invalid encoding {}", e, encoding);
+				throw new RedmineApiErrorException(Messages.ERRMSG_INVALID_ENCODING_X, e, encoding);
 			}
 			
 			nvp.add(new NameValuePair(namedValue[0], namedValue[1]));

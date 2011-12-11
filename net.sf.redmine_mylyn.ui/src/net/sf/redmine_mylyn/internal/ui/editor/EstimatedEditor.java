@@ -2,6 +2,7 @@ package net.sf.redmine_mylyn.internal.ui.editor;
 
 import net.sf.redmine_mylyn.core.RedmineCorePlugin;
 import net.sf.redmine_mylyn.internal.ui.Images;
+import net.sf.redmine_mylyn.internal.ui.Messages;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.mylyn.commons.core.StatusHandler;
@@ -75,7 +76,7 @@ public class EstimatedEditor extends AbstractAttributeEditor {
 			spinner.setSelection(getValue());
 			
 //			!PlatformUtil.spinnerHasNativeBorder()
-			if (!("carbon".equals(SWT.getPlatform()) || "cocoa".equals(SWT.getPlatform()))) {
+			if (!("carbon".equals(SWT.getPlatform()) || "cocoa".equals(SWT.getPlatform()))) { //$NON-NLS-1$ //$NON-NLS-2$
 				spinner.setData(FormToolkit.KEY_DRAW_BORDER, FormToolkit.TEXT_BORDER);
 			}
 			
@@ -87,7 +88,7 @@ public class EstimatedEditor extends AbstractAttributeEditor {
 			
 			ImageHyperlink clearEstimated = toolkit.createImageHyperlink(composite, SWT.NONE);
 			clearEstimated.setImage(Images.getImage(Images.CLEAR));
-			clearEstimated.setToolTipText("Clear");
+			clearEstimated.setToolTipText(Messages.Clear);
 			clearEstimated.addHyperlinkListener(new HyperlinkAdapter() {
 				@Override
 				public void linkActivated(HyperlinkEvent e) {
@@ -118,7 +119,7 @@ public class EstimatedEditor extends AbstractAttributeEditor {
 	}
 
 	private void setValue(int val) {
-		String newValue = "" + (((float)(val))*1e-2);
+		String newValue = "" + (((float)(val))*1e-2); //$NON-NLS-1$
 		if(!newValue.equals(getTaskAttribute().getValue())) {
 			getTaskAttribute().setValue(newValue);
 			attributeChanged();
@@ -138,7 +139,7 @@ public class EstimatedEditor extends AbstractAttributeEditor {
 				}
 				
 			} catch (NumberFormatException e) {
-				IStatus status = RedmineCorePlugin.toStatus(e, "INVALID_REDMINE_HOURS {0}", getTaskAttribute().getValue());
+				IStatus status = RedmineCorePlugin.toStatus(e, Messages.ERRMSG_INVALID_REDMINE_HOURS, getTaskAttribute().getValue());
 				StatusHandler.log(status);
 			}
 		}

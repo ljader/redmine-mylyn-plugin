@@ -9,7 +9,7 @@ import org.osgi.framework.BundleContext;
 
 public class RedmineApiPlugin extends Plugin {
 
-	public final static String PLUGIN_ID = "net.sf.redmine_mylyn.api.client.RedmineApiPlugin";
+	public final static String PLUGIN_ID = "net.sf.redmine_mylyn.api.client.RedmineApiPlugin"; //$NON-NLS-1$
 
 	private static RedmineApiPlugin plugin;
 	
@@ -32,7 +32,7 @@ public class RedmineApiPlugin extends Plugin {
 	}
 
 	public static ILogService getLogService(Class<?> clazz) {
-		return plugin==null ? LogServiceImpl.getInstance() : LogServiceImpl.getInstance(plugin.getBundle(), clazz);
+		return LogServiceImpl.getInstance((plugin==null ? null : plugin.getBundle()), clazz);
 	}
 
 }

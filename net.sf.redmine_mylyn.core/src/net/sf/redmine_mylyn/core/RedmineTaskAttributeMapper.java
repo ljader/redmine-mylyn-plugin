@@ -19,37 +19,72 @@ public class RedmineTaskAttributeMapper extends TaskAttributeMapper {
 	
 	@Override
 	public void setRepositoryPerson(TaskAttribute taskAttribute, IRepositoryPerson person) {
-		if(person.getName()==null || person.getName().isEmpty()) {
-			User user = configuration.getUsers().getById(RedmineUtil.parseIntegerId(person.getPersonId()));
-			if(user!=null) {
-				person.setName(user.getName());
+		User user = null;
+		
+		if (person.getPersonId()!=null && !person.getPersonId().isEmpty()) {
+			user = configuration.getUsers().getByLogin(person.getPersonId());
+			if (user==null && person.getPersonId().matches(IRedmineConstants.REGEX_INTEGER)) {
+				user = configuration.getUsers().getById(RedmineUtil.parseIntegerId(person.getPersonId()));
 			}
 		}
 		
-		super.setRepositoryPerson(taskAttribute, person);
+		if(user!=null) {
+			setValue(taskAttribute, ""+ user.getId()); //$NON-NLS-1$
+		} else {
+			setValue(taskAttribute, ""); //$NON-NLS-1$
+		}
 	}
 
 	@Override
 	public IRepositoryPerson getRepositoryPerson(TaskAttribute taskAttribute) {
-		IRepositoryPerson person =  super.getRepositoryPerson(taskAttribute);
+		User user = null;
 		
-		if (configuration!=null || person.getPersonId()!=null) {
-			User user = configuration.getUsers().getById(RedmineUtil.parseIntegerId(person.getPersonId()));
-			if(user!=null) {
+		if (!taskAttribute.getValue().isEmpty()) {
+			if(RedmineUtil.isInteger(taskAttribute.getValue())) {
+				user = configuration.getUsers().getById(RedmineUtil.parseIntegerId(taskAttribute.getValue()));
+			}
+			
+			if (user==null) {
+				user = configuration.getUsers().getByLogin(taskAttribute.getValue());
+			}
+			
+			if (user!=null) {
+				IRepositoryPerson person = getTaskRepository().createPerson(user.getLogin());
 				person.setName(user.getName());
+				return person;
 			}
 		}
 		
+		IRepositoryPerson person = super.getRepositoryPerson(taskAttribute);
+		if (person.getName()==null) {
+			person.setName(""); //$NON-NLS-1$
+		}
 		return person;
 	}
 
 	@Override
 	public boolean getBooleanValue(TaskAttribute attribute) {
 		String value = attribute.getValue();
-		if (value.equals("1")) {
+		if (value.equals(IRedmineConstants.BOOLEAN_TRUE_SUBMIT_VALUE)) {
 			return true;
 		}
 		return super.getBooleanValue(attribute);
 	}
+	
+@Override
+public void setValue(TaskAttribute attribute, String value) {
+	
+	if (attribute.getMetaData().getKind()!=null && attribute.getMetaData().getKind().equals(TaskAttribute.KIND_PEOPLE)) {
+		if (!value.isEmpty() && !value.matches(IRedmineConstants.REGEX_INTEGER)) {
+			User user = configuration.getUsers().getByLogin(value);
+			if(user!=null) {
+				super.setValue(attribute, ""+user.getId()); //$NON-NLS-N$
+				return;
+			}
+		}
+	}
+	
+	super.setValue(attribute, value);
+}
 	
 }

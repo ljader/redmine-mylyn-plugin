@@ -1,9 +1,11 @@
 package net.sf.redmine_mylyn.core;
 
+import net.sf.redmine_mylyn.internal.core.Messages;
+
 public enum RedmineOperation {
 
-	none(RedmineAttribute.STATUS, "Leave as %s", false, true),
-	markas(RedmineAttribute.STATUS_CHG, "Mark as", true, false);
+	none(RedmineAttribute.STATUS, Messages.STATUS_LEAVE_AS_X, false, true),
+	markas(RedmineAttribute.STATUS_CHG, Messages.STATUS_MARK_AS_X, true, false);
 	
 	private RedmineAttribute attribute;
 	

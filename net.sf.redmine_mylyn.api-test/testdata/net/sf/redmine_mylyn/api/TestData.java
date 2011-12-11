@@ -35,9 +35,14 @@ public class TestData {
 
 	static SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 	
-	public final static Configuration cfg = buildConfiguration();
+	public static Configuration cfg = buildConfiguration();
 	
-	public final static Issue issue2 = buildIssue2();
+	public static Issue issue2 = buildIssue2();
+	
+	public static void reset() {
+		cfg = buildConfiguration();
+		issue2 = buildIssue2();
+	} 
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	static Issue buildIssue2() {
@@ -56,8 +61,12 @@ public class TestData {
 			issue.setProjectId(1);
 			issue.setStatusId(2);
 			issue.setPriorityId(5);
+			issue.setSubtasks(new int[]{3,4});
 			issue.setWatched(true);
 			issue.setWatcherIds(new int[]{1,3});
+			issue.setWatchersViewAllowed(true);
+			issue.setWatchersAddAllowed(true);
+			issue.setWatchersDeleteAllowed(true);
 			issue.setStartDate(df.parse("2010-05-08"));
 			//dueDate
 			issue.setDoneRatio(10);

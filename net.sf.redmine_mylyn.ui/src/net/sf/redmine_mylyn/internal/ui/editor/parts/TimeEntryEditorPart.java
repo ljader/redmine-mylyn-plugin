@@ -10,6 +10,7 @@ import net.sf.redmine_mylyn.core.IRedmineConstants;
 import net.sf.redmine_mylyn.core.RedmineAttribute;
 import net.sf.redmine_mylyn.core.RedmineTaskTimeEntryMapper;
 import net.sf.redmine_mylyn.internal.ui.Images;
+import net.sf.redmine_mylyn.internal.ui.Messages;
 import net.sf.redmine_mylyn.internal.ui.editor.helper.AttributePartLayoutHelper;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -39,7 +40,7 @@ import org.eclipse.ui.forms.widgets.Section;
 
 public class TimeEntryEditorPart extends AbstractTaskEditorPart {
 
-	public final static String PART_ID = "net.sf.redmine_mylyn.ui.editor.part.timeEntry";
+	public final static String PART_ID = "net.sf.redmine_mylyn.ui.editor.part.timeEntry"; //$NON-NLS-1$
 
 	/** Expandable composites are indented by 6 pixels by default. */
 	private static final int INDENT = -6;
@@ -52,7 +53,7 @@ public class TimeEntryEditorPart extends AbstractTaskEditorPart {
 	
 	public TimeEntryEditorPart() {
 		super();
-		setPartName("Time Entries");
+		setPartName(Messages.TIMEENTRIES_PART);
 	}
 	@Override
 	public void createControl(Composite parent, final FormToolkit toolkit) {
@@ -61,25 +62,22 @@ public class TimeEntryEditorPart extends AbstractTaskEditorPart {
 		section = createSection(parent, toolkit, hasIncoming);
 
 		StringBuilder nameDetail = new StringBuilder(section.getText());
-		nameDetail.append(" (").append(timeEntryAttributes.size());
 		
+		int iHours = 0, iMinutes = 0;
 		TaskAttribute totalAttribute = getTaskData().getRoot().getAttribute(RedmineAttribute.TIME_ENTRY_TOTAL.getTaskKey());
-		if(totalAttribute!=null && totalAttribute.getValue()!="") {
-			nameDetail.append(" - ").append("Total");
+		if(totalAttribute!=null && !totalAttribute.getValue().isEmpty()) {
 
-			//Move into RedmineUtil
-			String val = "0:00";
 			if (!totalAttribute.getValue().isEmpty()) {
-				float hours = Float.parseFloat(totalAttribute.getValue());
-				float minutes = (int)(60.f * (hours - (int)hours));
-				val = String.format("%02d:%02d", (int)hours, (int)minutes);
+				float fHours = Float.parseFloat(totalAttribute.getValue());
+				
+				iMinutes = (int)(60.f * (fHours - (int)fHours));
+				iHours = (int)fHours;
 			}
 
-			nameDetail.append(": ").append(val);
-			nameDetail.append(" hours");
 		}
-		
-		nameDetail.append(")");
+		String titleDetails = String.format(Messages.TIMEENTRY_PART_DETAIL_X_X_X, timeEntryAttributes.size(), iHours, iMinutes);
+		nameDetail.append(titleDetails);
+
 		section.setText(nameDetail.toString());
 		
 		if (timeEntryAttributes.isEmpty()) {

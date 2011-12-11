@@ -31,6 +31,7 @@ import net.sf.redmine_mylyn.api.model.container.Trackers;
 import net.sf.redmine_mylyn.api.model.container.Users;
 import net.sf.redmine_mylyn.api.model.container.Versions;
 import net.sf.redmine_mylyn.api.query.Query;
+import net.sf.redmine_mylyn.internal.api.Messages;
 import net.sf.redmine_mylyn.internal.api.parser.AttachmentParser;
 import net.sf.redmine_mylyn.internal.api.parser.AttributeParser;
 import net.sf.redmine_mylyn.internal.api.parser.IModelParser;
@@ -60,24 +61,28 @@ import org.eclipse.mylyn.commons.net.Policy;
 
 public class Api_2_7_ClientImpl extends AbstractClient {
 
-	private final static String URL_SERVER_VERSION = "/mylyn/version";
-	private final static String URL_ISSUE_STATUS = "/mylyn/issuestatus";
-	private final static String URL_ISSUE_CATEGORIES = "/mylyn/issuecategories";
-	private final static String URL_ISSUE_PRIORITIES = "/mylyn/issuepriorities";
-	private final static String URL_TRACKERS = "/mylyn/trackers";
-	private final static String URL_CUSTOMFIELDS = "/mylyn/customfields";
-	private final static String URL_USERS = "/mylyn/users";
-	private final static String URL_QUERIES = "/mylyn/queries";
-	private final static String URL_PROJECTS = "/mylyn/projects";
-	private final static String URL_VERSIONS = "/mylyn/versions";
-	private final static String URL_SETTINGS = "/mylyn/settings";
+	private final static String URL_SERVER_VERSION = "/mylyn/version"; //$NON-NLS-1$
+	private final static String URL_ISSUE_STATUS = "/mylyn/issuestatus"; //$NON-NLS-1$
+	private final static String URL_ISSUE_CATEGORIES = "/mylyn/issuecategories"; //$NON-NLS-1$
+	private final static String URL_ISSUE_PRIORITIES = "/mylyn/issuepriorities"; //$NON-NLS-1$
+	private final static String URL_TRACKERS = "/mylyn/trackers"; //$NON-NLS-1$
+	private final static String URL_CUSTOMFIELDS = "/mylyn/customfields"; //$NON-NLS-1$
+	private final static String URL_USERS = "/mylyn/users"; //$NON-NLS-1$
+	private final static String URL_QUERIES = "/mylyn/queries"; //$NON-NLS-1$
+	private final static String URL_PROJECTS = "/mylyn/projects"; //$NON-NLS-1$
+	private final static String URL_VERSIONS = "/mylyn/versions"; //$NON-NLS-1$
+	private final static String URL_SETTINGS = "/mylyn/settings"; //$NON-NLS-1$
 
-	private final static String URL_ISSUES_UPDATED = "/mylyn/issues/updatedsince?issues=%s&unixtime=%d";
-	private final static String URL_ISSUES_LIST = "/mylyn/issues/list?issues=%s";
-	private final static String URL_ISSUE = "/mylyn/issue/%d";
-	private final static String URL_QUERY = "/mylyn/issues";
+	private final static String URL_ISSUES_UPDATED = "/mylyn/issues/updatedsince?issues=%s&unixtime=%d"; //$NON-NLS-1$
+	private final static String URL_ISSUES_LIST = "/mylyn/issues/list?issues=%s"; //$NON-NLS-1$
+	private final static String URL_ISSUE = "/mylyn/issue/%d"; //$NON-NLS-1$
+	private final static String URL_QUERY = "/mylyn/issues"; //$NON-NLS-1$
 
-	private final static String URL_UPDATE_ISSUE = "/issues/%d.xml";
+	private final static String URL_UPDATE_ISSUE = "/issues/%d.xml"; //$NON-NLS-1$
+	
+	private final static String URL_GET_ATTACHMENT = "/mylyn/attachment/%d/%s"; //$NON-NLS-1$
+
+	private final static String URL_GET_AUTHENTICITY_TOKEN = "/mylyn/token"; //$NON-NLS-1$
 	
 	private final static String URL_GET_ATTACHMENT = "/mylyn/attachment/%d/%s";
 
@@ -116,7 +121,7 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	@Override
 	public RedmineServerVersion detectServerVersion(IProgressMonitor monitor) throws RedmineApiErrorException {
 		monitor = Policy.monitorFor(monitor);
-		monitor.beginTask("Detect version of Redmine", 1);
+		monitor.beginTask(Messages.PROGRESS_DETECT_REDMINE_VERSION, 1);
 
 		GetMethod method = new GetMethod(URL_SERVER_VERSION);
 		RedmineServerVersion version = executeMethod(method, versionParser, monitor);
@@ -136,7 +141,7 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 
 		Configuration conf = new Configuration();
 		
-		monitor.beginTask("Updating Attributes", parserByClass.size()+1);
+		monitor.beginTask(Messages.PROGRESS_UPDATING_ATTRIBUTES, parserByClass.size()+1);
 		GetMethod method = null;
 		
 		for (Entry<String, IModelParser<? extends AbstractPropertyContainer<?>>> entry : parserByClass.entrySet()) {
@@ -168,10 +173,14 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 			return null;
 		}
 		
+		long unixtime = updatedSince.getTime()/1000l;
+		//workaround: bug in redmine plugin
+		unixtime += 1l;
+		
 		monitor = Policy.monitorFor(monitor);
-		monitor.beginTask("Search updated issues", 1);
+		monitor.beginTask(Messages.PROGRESS_SEARCH_UPDATED_ISSUES, 1);
 
-		String uri = String.format(URL_ISSUES_UPDATED, Arrays.toString(issues).replaceAll("[\\[\\] ]", ""), updatedSince.getTime()/1000l);
+		String uri = String.format(URL_ISSUES_UPDATED, Arrays.toString(issues).replaceAll("[\\[\\] ]", ""), unixtime); //$NON-NLS-1$ //$NON-NLS-2$
 		GetMethod method = new GetMethod(uri);
 		
 		UpdatedIssuesType result = executeMethod(method, updatedIssuesParser, monitor);
@@ -192,7 +201,7 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 		}
 		
 		monitor = Policy.monitorFor(monitor);
-		monitor.beginTask("Fetch issue", 1);
+		monitor.beginTask(Messages.PROGRESS_FETCH_ISSUE, 1);
 
 		String uri = String.format(URL_ISSUE, id);
 		GetMethod method = new GetMethod(uri);
@@ -215,9 +224,9 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 		}
 		
 		monitor = Policy.monitorFor(monitor);
-		monitor.beginTask("Fetch issues", 1);
+		monitor.beginTask(Messages.PROGRESS_FETCH_ISSUES, 1);
 
-		String uri = String.format(URL_ISSUES_LIST, Arrays.toString(issueIds).replaceAll("[\\[\\] ]", ""));
+		String uri = String.format(URL_ISSUES_LIST, Arrays.toString(issueIds).replaceAll("[\\[\\] ]", "")); //$NON-NLS-1$ //$NON-NLS-2$
 		GetMethod method = new GetMethod(uri);
 		
 		Issues issues = executeMethod(method, issuesParser, monitor);
@@ -234,7 +243,7 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	@Override
 	public Issue[] query(Query query, IProgressMonitor monitor) throws RedmineApiErrorException {
 		monitor = Policy.monitorFor(monitor);
-		monitor.beginTask("Execute query", 1);
+		monitor.beginTask(Messages.PROGRESS_EXECUTE_QUERY, 1);
 
 		GetMethod method = new GetMethod(URL_QUERY);
 		List<NameValuePair> params = query.getParams();
@@ -256,16 +265,16 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	@Override
 	public Issue createIssue(Issue issue, IRedmineApiErrorCollector errorCollector, IProgressMonitor monitor) throws RedmineApiInvalidDataException, RedmineApiErrorException {
 		monitor = Policy.monitorFor(monitor);
-		monitor.beginTask("Upload Task", 1);
+		monitor.beginTask(Messages.PROGRESS_UPLOAD_TASK, 1);
 		
-		PostMethod method = new PostMethod("/issues.xml");
+		PostMethod method = new PostMethod("/issues.xml"); //$NON-NLS-1$
 		try {
 			//Workaround: remote method CREATE dosn't support API-Keys, we need a session
 			getAuthenticityToken(monitor);
 			
 			method.setRequestEntity(new IssueRequestEntity(issue));
 		} catch (UnsupportedEncodingException e) {
-			throw new RedmineApiErrorException("Execution of method failed - Invalid encoding {}", e, "UTF-8");
+			throw new RedmineApiErrorException(Messages.ERRMSG_METHOD_EXECUTION_FAILED_INVALID_ENCODING, e, "UTF-8"); //$NON-NLS-2$ //$NON-NLS-1$
 		}
 		
 		Object response = executeMethod(method, submitIssueParser, monitor, HttpStatus.SC_CREATED, HttpStatus.SC_UNPROCESSABLE_ENTITY);
@@ -291,12 +300,12 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	@Override
 	public void updateIssue(int issueId, Map<RedmineApiIssueProperty, String> issueValues, String comment, TimeEntry timeEntry, IRedmineApiErrorCollector errorCollector, IProgressMonitor monitor) throws RedmineApiInvalidDataException, RedmineApiErrorException {
 		monitor = Policy.monitorFor(monitor);
-		monitor.beginTask("Upload Task", 1);
+		monitor.beginTask(Messages.PROGRESS_UPLOAD_TASK, 1);
 
 		try {
 			updateIssue(issueId, new IssueRequestEntity(issueValues, comment, timeEntry), errorCollector, monitor);
 		} catch (UnsupportedEncodingException e) {
-			throw new RedmineApiErrorException("Execution of method failed - Invalid encoding {}", e, "UTF-8");
+			throw new RedmineApiErrorException(Messages.ERRMSG_METHOD_EXECUTION_FAILED_INVALID_ENCODING, e, "UTF-8"); //$NON-NLS-2$ //$NON-NLS-1$
 		} finally {
 			if(monitor.isCanceled()) {
 				throw new OperationCanceledException();
@@ -309,12 +318,12 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	@Override
 	public void updateIssue(Issue issue, String comment, TimeEntry timeEntry, IRedmineApiErrorCollector errorCollector, IProgressMonitor monitor) throws RedmineApiInvalidDataException, RedmineApiErrorException {
 		monitor = Policy.monitorFor(monitor);
-		monitor.beginTask("Upload Task", 1);
+		monitor.beginTask(Messages.PROGRESS_UPLOAD_TASK, 1);
 
 		try {
 			updateIssue(issue.getId(), new IssueRequestEntity(issue, comment, timeEntry), errorCollector, monitor);
 		} catch (UnsupportedEncodingException e) {
-			throw new RedmineApiErrorException("Execution of method failed - Invalid encoding {}", e, "UTF-8");
+			throw new RedmineApiErrorException(Messages.ERRMSG_METHOD_EXECUTION_FAILED_INVALID_ENCODING, e, "UTF-8"); //$NON-NLS-2$ //$NON-NLS-1$
 		} finally {
 			if(monitor.isCanceled()) {
 				throw new OperationCanceledException();
@@ -345,7 +354,13 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	@Override
 	public InputStream getAttachmentContent(int attachmentId, String fileName, IProgressMonitor monitor) throws RedmineApiErrorException {
 		monitor = Policy.monitorFor(monitor);
-		monitor.beginTask("Download attachment", 1);
+		monitor.beginTask(Messages.PROGRESS_DOWNLOAD_ATTACHMENT, 1);
+		
+		//WOrkaround: Attachments::download dosn't support API-AUTH - this starts a session
+		String token = getAuthenticityToken(monitor);
+		if(token==null) {
+			throw new RedmineApiRemoteException(Messages.ERRMSG_AUTH_TOKEN_REQUEST_FAILED);
+		}
 		
 		GetMethod method = new GetMethod(String.format(URL_GET_ATTACHMENT, attachmentId, fileName));
 		InputStream attachment = executeMethod(method, attachmentParser, monitor, HttpStatus.SC_OK, HttpStatus.SC_NOT_FOUND);
@@ -361,29 +376,29 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	
 	public void uploadAttachment(int issueId, final Attachment attachment, final InputStream content, String comment, IRedmineApiErrorCollector errorCollector, IProgressMonitor monitor) throws RedmineApiInvalidDataException, RedmineApiErrorException {
 		monitor = Policy.monitorFor(monitor);
-		monitor.beginTask("Upload attachment", 1);
+		monitor.beginTask(Messages.PROGRESS_UPLOAD_ATTACHMENT, 1);
 		
 		Object response = null;
 		
 		String token = getAuthenticityToken(monitor);
 		if(token==null) {
-			throw new RedmineApiRemoteException("Request of a Authenticity-Token failed");
+			throw new RedmineApiRemoteException(Messages.ERRMSG_AUTH_TOKEN_REQUEST_FAILED);
 		}
 		
 		try {
 			PutMethod method = new PutMethod(String.format(URL_UPDATE_ISSUE, issueId));
 			
 			Part[] parts = new Part[4];
-			parts[0] = new StringPart("authenticity_token", token, characterEncoding);
-			parts[1] = new StringPart("attachments[1][description]", attachment.getDescription(), characterEncoding);
-			parts[2] = new StringPart("notes", comment, characterEncoding);
+			parts[0] = new StringPart("authenticity_token", token, characterEncoding); //$NON-NLS-1$
+			parts[1] = new StringPart("attachments[1][description]", attachment.getDescription(), characterEncoding); //$NON-NLS-1$
+			parts[2] = new StringPart("notes", comment, characterEncoding); //$NON-NLS-1$
 			
 			//Workaround: http://rack.lighthouseapp.com/projects/22435/tickets/79-multipart-handling-incorrectly-assuming-file-upload
 			for(int i=2;i>=0;i--) {
 				((StringPart)parts[i]).setContentType(null);
 			}
 			
-			parts[3] = new FilePart("attachments[1][file]", new AttachmentPartSource(attachment, content), attachment.getContentType(), null) {
+			parts[3] = new FilePart("attachments[1][file]", new AttachmentPartSource(attachment, content), attachment.getContentType(), null) { //$NON-NLS-1$
 				//Workaround: avoid 'Content-Type image/png; charset=iso8859-1'
 				public String getCharSet() {
 					return null;
@@ -411,7 +426,7 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	}
 	
 	private String getAuthenticityToken(IProgressMonitor monitor) throws RedmineApiErrorException {
-		monitor.beginTask("Get Authenticity-Token", 1);
+		monitor.beginTask(Messages.PROGRESS_REQUEST_AUTHTOKEN, 1);
 		
 		GetMethod method = new GetMethod(URL_GET_AUTHENTICITY_TOKEN);
 		String token = executeMethod(method, stringParser, monitor);

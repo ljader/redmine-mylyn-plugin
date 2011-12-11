@@ -42,12 +42,14 @@ public class CustomFieldParserTest {
 		
 		int idx=0;
 		assertNotNull(ct.getIssueCustomFields());
-		assertEquals(5, ct.getIssueCustomFields().size());
+		assertEquals(7, ct.getIssueCustomFields().size());
 		assertEquals(1, ct.getIssueCustomFields().get(idx++).getId());
 		assertEquals(2, ct.getIssueCustomFields().get(idx++).getId());
 		assertEquals(6, ct.getIssueCustomFields().get(idx++).getId());
 		assertEquals(8, ct.getIssueCustomFields().get(idx++).getId());
 		assertEquals(9, ct.getIssueCustomFields().get(idx++).getId());
+		assertEquals(11, ct.getIssueCustomFields().get(idx++).getId());
+		assertEquals(12, ct.getIssueCustomFields().get(idx++).getId());
 
 		assertNotNull(ct.getTimeEntryCustomFields());
 		assertEquals(1, ct.getTimeEntryCustomFields().size());

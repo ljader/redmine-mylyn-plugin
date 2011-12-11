@@ -3,6 +3,7 @@ package net.sf.redmine_mylyn.internal.api;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.text.SimpleDateFormat;
@@ -54,6 +55,8 @@ public class IssueValidator {
 		//AssignedTo
 		//FixedVersion
 		//parent
+		assertNotNull(obj.getSubtasks());
+		assertEquals("[2]", Arrays.toString(obj.getSubtasks()));
 		assertEquals("[1]", Arrays.toString(obj.getAvailableStatusId()));
 		
 		CustomValues cfs = obj.getCustomValues();
@@ -95,11 +98,17 @@ public class IssueValidator {
 
 		assertEquals(10, obj.getDoneRatio());
 		assertEquals(3.5, obj.getEstimatedHours(), 0.0);
+		
+		//Watchers
 		assertTrue(obj.isWatched());
 		assertEquals("[1, 3]", Arrays.toString(obj.getWatcherIds()));
 		assertEquals(3, obj.getAssignedToId());
 		assertEquals(2, obj.getFixedVersionId());
 		assertEquals(1, obj.getParentId());
+		assertNull(obj.getSubtasks());
+		assertTrue(obj.isWatchersViewAllowed());
+		assertTrue(obj.isWatchersAddAllowed());
+		assertTrue(obj.isWatchersDeleteAllowed());
 		
 		TimeEntries tEntrys = obj.getTimeEntries();
 		assertEquals(4.25f, tEntrys.getSum(), 0.0);

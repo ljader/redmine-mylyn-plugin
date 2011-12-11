@@ -8,6 +8,7 @@ import net.sf.redmine_mylyn.api.client.IRedmineApiWebHelper;
 import net.sf.redmine_mylyn.api.exception.RedmineApiAuthenticationException;
 import net.sf.redmine_mylyn.core.IRedmineConstants;
 import net.sf.redmine_mylyn.core.RedmineCorePlugin;
+import net.sf.redmine_mylyn.internal.core.Messages;
 
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HostConfiguration;
@@ -43,7 +44,7 @@ public class ApiWebHelper implements IRedmineApiWebHelper {
 			//TODO ExceptionHandling
 			e.printStackTrace();
 		}
-		return "/";
+		return "/"; //$NON-NLS-1$
 	}
 	@Override
 	public boolean useApiKey() {
@@ -69,14 +70,14 @@ public class ApiWebHelper implements IRedmineApiWebHelper {
 				String password = credentials.getPassword();
 				
 				Credentials httpCredentials = new UsernamePasswordCredentials(username, password);
-				int i = username.indexOf("\\");
+				int i = username.indexOf("\\"); //$NON-NLS-1$
 				if (i > 0 && i < username.length() - 1 && host != null) {
 					httpCredentials = new NTCredentials(username.substring(i + 1), password, host, username.substring(0, i));
 				}
 				
 				return httpCredentials;
 			} catch (MalformedURLException e) {
-				IStatus status = RedmineCorePlugin.toStatus(e, "Can't detect Redmine host");
+				IStatus status = RedmineCorePlugin.toStatus(e, Messages.ERRMSG_MALFORMED_URL);
 				StatusHandler.fail(status);
 			}
 			
@@ -100,7 +101,7 @@ public class ApiWebHelper implements IRedmineApiWebHelper {
 		try {
 			location.requestCredentials(AuthenticationType.REPOSITORY, message, monitor);
 		} catch (UnsupportedRequestException e) {
-			throw new RedmineApiAuthenticationException("Request credentials failed - not supported", e);
+			throw new RedmineApiAuthenticationException(Messages.ERRMSG_CANT_REQUEST_CREDENTIALS, e);
 		}
 	}
 	@Override
@@ -108,7 +109,7 @@ public class ApiWebHelper implements IRedmineApiWebHelper {
 		try {
 			location.requestCredentials(AuthenticationType.HTTP, message, monitor);
 		} catch (UnsupportedRequestException e) {
-			throw new RedmineApiAuthenticationException("Request credentials failed - not supported", e);
+			throw new RedmineApiAuthenticationException(Messages.ERRMSG_CANT_REQUEST_CREDENTIALS, e);
 		}
 	}
 	
@@ -117,7 +118,7 @@ public class ApiWebHelper implements IRedmineApiWebHelper {
 		try {
 			location.requestCredentials(AuthenticationType.PROXY, message, monitor);
 		} catch (UnsupportedRequestException e) {
-			throw new RedmineApiAuthenticationException("Request credentials failed - not supported", e);
+			throw new RedmineApiAuthenticationException(Messages.ERRMSG_CANT_REQUEST_CREDENTIALS, e);
 		}
 	}
 }

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues xmlns="http://redmin-mylyncon.sf.net/api" authenticatedAs="albert.chan" api="2.7.3.stable" authenticated="true">
+<issue editAllowed="true" id="771">
+  <subject>test 1</subject>
+  <description>test 1</description>
+  <createdOn unixtime="1312045425">2011-07-31T01:03:45+08:00</createdOn>
+  <updatedOn unixtime="1312077090">2011-07-31T09:51:30+08:00</updatedOn>
+  <trackerId>4</trackerId>
+  <projectId>18</projectId>
+  <statusId>1</statusId>
+  <priorityId>4</priorityId>
+  <watched>false</watched>
+  <watchers addAllowed="true" deleteAllowed="true" viewAllowed="true"></watchers>
+  <startDate>2011-07-31</startDate>
+  <doneRatio>0</doneRatio>
+  <estimatedHours>0.0</estimatedHours>
+  <authorId>21</authorId>
+  <availableStatus>1 2 3 4 5 6</availableStatus>
+  <customValues>
+  </customValues>
+  <journals>
+    <journal editAllowed="true" id="1777">
+      <userId>21</userId>
+      <createdOn unixtime="1312045448">2011-07-31T01:04:08+08:00</createdOn>
+      <notes>new comment</notes>
+    </journal>
+    <journal editAllowed="true" id="1778">
+      <userId>21</userId>
+      <createdOn unixtime="1312045470">2011-07-31T01:04:30+08:00</createdOn>
+      <notes>comment 2</notes>
+    </journal>
+  </journals>
+  <attachments>
+    <attachment id="220">
+      <authorId>21</authorId>
+      <createdOn unixtime="1312077090">2011-07-31T09:51:30+08:00</createdOn>
+      <filename>c.html</filename>
+      <filesize>1500</filesize>
+      <digest>06f8aeb6b10725b447ac26ce4aff27f9</digest>
+      <contentType>text/html</contentType>
+      <description></description>
+    </attachment>
+  </attachments>
+  <issueRelations>
+  </issueRelations>
+  <timeEntries newAllowed="false" viewAllowed="false">
+  </timeEntries>
+</issue>
+</issues>

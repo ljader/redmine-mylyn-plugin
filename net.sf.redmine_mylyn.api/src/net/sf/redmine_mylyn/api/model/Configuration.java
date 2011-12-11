@@ -27,6 +27,7 @@ import net.sf.redmine_mylyn.api.model.container.Trackers;
 import net.sf.redmine_mylyn.api.model.container.Users;
 import net.sf.redmine_mylyn.api.model.container.Versions;
 import net.sf.redmine_mylyn.common.logging.ILogService;
+import net.sf.redmine_mylyn.internal.api.Messages;
 import net.sf.redmine_mylyn.internal.api.parser.JaxbParser;
 import net.sf.redmine_mylyn.internal.api.parser.TypedParser;
 
@@ -74,7 +75,7 @@ public class Configuration implements Serializable {
 				}
 			}
 		} catch (Exception e) {
-			throw new RedmineApiErrorException("Updating Attributes failed", e);
+			throw new RedmineApiErrorException(Messages.ERRMSG_UPDATING_ATTRIBUTES_FAILED, e);
 		}
 	}
 	
@@ -86,7 +87,7 @@ public class Configuration implements Serializable {
 				}
 			}
 		} catch (Exception e) {
-			throw new RedmineApiErrorException("Updating Attributes failed", e);
+			throw new RedmineApiErrorException(Messages.ERRMSG_UPDATING_ATTRIBUTES_FAILED, e);
 		}
 	}
 
@@ -162,7 +163,7 @@ public class Configuration implements Serializable {
 				m.marshal(this, out);
 			} catch(JAXBException e) {
 				ILogService log = RedmineApiPlugin.getLogService(JaxbParser.class);
-				RedmineApiErrorException exc = new RedmineApiErrorException("Serialization of configuration failed", e); 
+				RedmineApiErrorException exc = new RedmineApiErrorException(Messages.ERRMSG_CONFIGURATION_SERIALIZATION_FAILED, e); 
 				log.error(e, exc.getMessage());
 				throw exc;
 			}

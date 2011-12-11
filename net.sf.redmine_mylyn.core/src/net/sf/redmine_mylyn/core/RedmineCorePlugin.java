@@ -4,6 +4,7 @@ import java.text.MessageFormat;
 
 import net.sf.redmine_mylyn.common.logging.ILogService;
 import net.sf.redmine_mylyn.common.logging.LogServiceImpl;
+import net.sf.redmine_mylyn.internal.core.RedmineExtensionManager;
 import net.sf.redmine_mylyn.internal.core.RedmineSpentTimeManager;
 import net.sf.redmine_mylyn.internal.core.client.ClientManager;
 
@@ -19,15 +20,17 @@ public class RedmineCorePlugin extends Plugin /*implements BundleActivator*/ {
 
 	private static BundleContext context;
 
-	public static final String PLUGIN_ID = "net.sf.redmine_mylyn.core";
+	public static final String PLUGIN_ID = "net.sf.redmine_mylyn.core"; //$NON-NLS-1$
 
-	public final static String REPOSITORY_KIND = "redmineV2";
+	public final static String REPOSITORY_KIND = "redmineV2"; //$NON-NLS-1$
 	
 	private static RedmineCorePlugin plugin;
 	
 	private RedmineRepositoryConnector connector;
 	
 	private RedmineSpentTimeManager spentTimeManager;
+	
+	private RedmineExtensionManager extensionManager;
 	
 	static BundleContext getContext() {
 		return context;
@@ -77,12 +80,12 @@ public class RedmineCorePlugin extends Plugin /*implements BundleActivator*/ {
 	
 	public IPath getRepostioryAttributeCachePath() {
 		IPath stateLocation = Platform.getStateLocation(getBundle());
-		return stateLocation.append("repositoryClientDataCache");
+		return stateLocation.append("repositoryClientDataCache"); //$NON-NLS-1$
 	}
 
 	public IPath getRepostioryAttributeCachePath2() {
 		IPath stateLocation = Platform.getStateLocation(getBundle());
-		return stateLocation.append("repositoryClientDataCache.zip");
+		return stateLocation.append("repositoryClientDataCache.zip"); //$NON-NLS-1$
 	}
 	
 	public IRedmineSpentTimeManager getSpentTimeManager(ITaskActivityManager taskActivityManager) {
@@ -97,8 +100,15 @@ public class RedmineCorePlugin extends Plugin /*implements BundleActivator*/ {
 		return spentTimeManager;
 	}
 	
-	public ILogService getLogService(Class<?> clazz) {
-		return LogServiceImpl.getInstance(getBundle(), clazz);
+	public IRedmineExtensionManager getExtensionManager() {
+		if(extensionManager==null) {
+			extensionManager = RedmineExtensionManager.getInstance();
+		}
+		return extensionManager;
+	}
+	
+	public static ILogService getLogService(Class<?> clazz) {
+		return LogServiceImpl.getInstance((plugin==null ? null : plugin.getBundle()), clazz);
 	}
 	
 	public static IStatus toStatus(Throwable e, String message) {

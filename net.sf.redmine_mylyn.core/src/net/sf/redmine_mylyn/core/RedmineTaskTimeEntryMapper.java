@@ -50,7 +50,7 @@ public class RedmineTaskTimeEntryMapper {
 			TaskAttribute child = taskAttribute.createMappedAttribute(IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY_HOURS);
 			child.getMetaData().defaults().setType(RedmineAttribute.TIME_ENTRY_HOURS.getType());
 			child.getMetaData().setLabel(RedmineAttribute.TIME_ENTRY_HOURS.getLabel());
-			mapper.setValue(child, ""+getHours());
+			mapper.setValue(child, ""+getHours()); //$NON-NLS-1$
 		}
 		if (getActivityId()>0) {
 			TaskAttribute child = taskAttribute.createMappedAttribute(IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY_ACTIVITY);
@@ -62,7 +62,7 @@ public class RedmineTaskTimeEntryMapper {
 			if(project!=null) {
 				TimeEntryActivity activity = project.getTimeEntryActivities().getById(getActivityId());
 				if (activity!=null) {
-					child.putOption(""+activity.getId(), activity.getName());
+					child.putOption(""+activity.getId(), activity.getName()); //$NON-NLS-1$
 				}
 			}
 		}

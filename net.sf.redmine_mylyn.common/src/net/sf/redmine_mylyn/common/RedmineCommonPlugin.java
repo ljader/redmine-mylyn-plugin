@@ -8,7 +8,7 @@ import org.osgi.framework.BundleContext;
 
 public class RedmineCommonPlugin extends Plugin {
 
-	public final static String PLUGIN_ID = "net.sf.redmine_mylyn.common.RedmineCommonPlugin";
+	public final static String PLUGIN_ID = "net.sf.redmine_mylyn.common.RedmineCommonPlugin"; //$NON-NLS-1$
 	
 	private static RedmineCommonPlugin plugin;
 	@Override
@@ -17,7 +17,7 @@ public class RedmineCommonPlugin extends Plugin {
 		
 		plugin = this;
 
-		Bundle logBundle = Platform.getBundle("org.eclipse.equinox.log");
+		Bundle logBundle = Platform.getBundle("org.eclipse.equinox.log"); //$NON-NLS-1$
 		if (logBundle.getState()==Bundle.RESOLVED) {
 			logBundle.start();
 		}
@@ -36,7 +36,7 @@ public class RedmineCommonPlugin extends Plugin {
 	}
 
 	public IPath getLogFilePath() {
-		return getStateLocation().append("redmine_connector.log");
+		return getStateLocation().append("redmine_connector.log"); //$NON-NLS-1$
 	}
 }
 

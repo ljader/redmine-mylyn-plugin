@@ -26,6 +26,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.Version;
 import org.osgi.service.log.LogEntry;
 import org.osgi.service.log.LogListener;
 import org.osgi.service.log.LogReaderService;
@@ -33,7 +34,7 @@ import org.osgi.service.log.LogService;
 
 public class RedmineUiPlugin extends AbstractUIPlugin implements LogListener {
 
-	public static final String PLUGIN_ID = "net.sf.redmine_mylyn.ui";
+	public static final String PLUGIN_ID = "net.sf.redmine_mylyn.ui"; //$NON-NLS-1$
 
 	private static RedmineUiPlugin plugin;
 
@@ -46,9 +47,13 @@ public class RedmineUiPlugin extends AbstractUIPlugin implements LogListener {
 	private ServiceReference logReaderServiceReference;
 	
 	private LogReaderService logReaderService;
+	
+	private boolean isEclipseVersionLesserThan37 = false;
 
 	public RedmineUiPlugin() {
 		super();
+		
+		isEclipseVersionLesserThan37 = Platform.getBundle("org.eclipse.core.runtime").getVersion().compareTo(new Version(3, 7, 0)) < 0;
 		
 		taskListSelectionListener = new ISelectionListener() {
 			@Override
@@ -73,6 +78,7 @@ public class RedmineUiPlugin extends AbstractUIPlugin implements LogListener {
 			
 			redmineConnector.setTaskRepositoryLocationFactory(new TaskRepositoryLocationUiFactory());
 			TasksUi.getRepositoryManager().addListener(redmineConnector.getClientManager());
+			TasksUi.getRepositoryManager().addListener(RedmineCorePlugin.getDefault().getExtensionManager());
 			
 			RedmineCorePlugin.getDefault().setConnector(redmineConnector);
 		}
@@ -93,14 +99,14 @@ public class RedmineUiPlugin extends AbstractUIPlugin implements LogListener {
 		
 		
 		//Workaround for a bundle with experimental addons
-		Bundle extrasBundle = Platform.getBundle("net.sf.redmine_mylyn.ui.extras");
+		Bundle extrasBundle = Platform.getBundle("org.tigase.redmine_mylyn.ui.extras"); //$NON-NLS-1$
 		if(extrasBundle!=null) {
 			try {
 				extrasBundle.start(Bundle.START_TRANSIENT);
 			} catch (BundleException e ) {
-				getLogService(this.getClass()).error(e, "Can't start bundle net.sf.redmine_mylyn.ui.extras");
+				getLogService(this.getClass()).error(e, "Can't start bundle org.tigase.redmine_mylyn.ui.extras"); //$NON-NLS-1$
 			} catch (IllegalStateException e ) {
-				getLogService(this.getClass()).error(e, "Can't start bundle net.sf.redmine_mylyn.ui.extras");
+				getLogService(this.getClass()).error(e, "Can't start bundle org.tigase.redmine_mylyn.ui.extras"); //$NON-NLS-1$
 			}
 		}
 	}
@@ -129,10 +135,13 @@ public class RedmineUiPlugin extends AbstractUIPlugin implements LogListener {
 	
 	@Override
 	public void logged(LogEntry entry) {
-		if (entry.getBundle().getSymbolicName().startsWith("net.sf.redmine_mylyn.")) {
+		if (entry.getBundle().getSymbolicName().startsWith("net.sf.redmine_mylyn.")) { //$NON-NLS-1$
 			IStatus status = buildStatus(entry);
 
-			getLog().log(buildStatus(entry));
+			if (isEclipseVersionLesserThan37) {
+				getLog().log(buildStatus(entry));
+			}
+			
 
 			if(status.getSeverity()==IStatus.ERROR) {
 				StatusManager.getManager().handle(status, StatusManager.SHOW);
@@ -156,7 +165,7 @@ public class RedmineUiPlugin extends AbstractUIPlugin implements LogListener {
 	}
 	
 	public static ILogService getLogService(Class<?> clazz) {
-		return plugin==null ? LogServiceImpl.getInstance() : LogServiceImpl.getInstance(plugin.getBundle(), clazz);
+		return LogServiceImpl.getInstance((plugin==null ? null : plugin.getBundle()), clazz);
 	}
 
 	public static IStatus toStatus(Throwable e, String message) {

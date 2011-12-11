@@ -6,55 +6,56 @@ import java.util.List;
 
 public enum QueryField implements IQueryField {
 	
-	LIST_TYPE("LIST_BASED", CompareOperator.IS, CompareOperator.IS_NOT, CompareOperator.NONE, CompareOperator.ALL),
-	TEXT_TYPE("TEXT_BASED", CompareOperator.IS, CompareOperator.IS_NOT, CompareOperator.CONTAINS, CompareOperator.CONTAINS_NOT),
-	INT_TYPE("TEXT_BASED", new IntegerValidator(), CompareOperator.IS, CompareOperator.IS_NOT, CompareOperator.CONTAINS, CompareOperator.CONTAINS_NOT),
-	FLOAT_TYPE("TEXT_BASED", new FloatValidator(), CompareOperator.IS, CompareOperator.IS_NOT, CompareOperator.CONTAINS, CompareOperator.CONTAINS_NOT),
-	DATE_TYPE("DATE_BASED", new DateValidator(), 
+	LIST_TYPE("LIST_BASED", CompareOperator.IS, CompareOperator.IS_NOT, CompareOperator.NONE, CompareOperator.ALL), //$NON-NLS-1$
+	TEXT_TYPE("TEXT_BASED", CompareOperator.IS, CompareOperator.IS_NOT, CompareOperator.CONTAINS, CompareOperator.CONTAINS_NOT), //$NON-NLS-1$
+	INT_TYPE("TEXT_BASED", new IntegerValidator(), CompareOperator.IS, CompareOperator.IS_NOT, CompareOperator.CONTAINS, CompareOperator.CONTAINS_NOT), //$NON-NLS-1$
+	FLOAT_TYPE("TEXT_BASED", new FloatValidator(), CompareOperator.IS, CompareOperator.IS_NOT, CompareOperator.CONTAINS, CompareOperator.CONTAINS_NOT), //$NON-NLS-1$
+	DATE_TYPE("DATE_BASED", new DateValidator(),  //$NON-NLS-1$
 			CompareOperator.DAY_AGO_MORE_THEN,
 			CompareOperator.DAY_AGO_LESS_THEN, CompareOperator.DAY_AGO,
 			CompareOperator.TODAY, CompareOperator.CURRENT_WEEK,
 			CompareOperator.DAY_LATER, CompareOperator.DAY_LATER_LESS_THEN,
 			CompareOperator.DAY_LATER_MORE_THEN),
-	BOOLEAN_TYPE("BOOLEAN_BASED", CompareOperator.IS, CompareOperator.IS_NOT),
+	BOOLEAN_TYPE("BOOLEAN_BASED", CompareOperator.IS, CompareOperator.IS_NOT), //$NON-NLS-1$
 	
 	//TODO not tested
-	PROJECT("project_id", CompareOperator.IS, CompareOperator.IS_NOT),
-	STOREDQUERY("query_id", CompareOperator.IS),
+	PROJECT("project_id", CompareOperator.IS, CompareOperator.IS_NOT), //$NON-NLS-1$
+	STOREDQUERY("query_id", CompareOperator.IS), //$NON-NLS-1$
 
-	STATUS("status_id", CompareOperator.OPEN, CompareOperator.IS, CompareOperator.IS_NOT, CompareOperator.CLOSED, CompareOperator.ALL),
-	PRIORITY("priority_id", CompareOperator.IS, CompareOperator.IS_NOT),
-	TRACKER("tracker_id", CompareOperator.IS, CompareOperator.IS_NOT),
-	FIXED_VERSION("fixed_version_id", CompareOperator.IS, CompareOperator.IS_NOT, CompareOperator.NONE, CompareOperator.ALL),
-	ASSIGNED_TO("assigned_to_id", CompareOperator.IS, CompareOperator.IS_NOT, CompareOperator.NONE, CompareOperator.ALL),
-	AUTHOR("author_id", CompareOperator.IS, CompareOperator.IS_NOT),
-	CATEGORY("category_id", 
+	//TODO use RedmineApiIssueProperty instead of status_id, ...
+	STATUS("status_id", CompareOperator.OPEN, CompareOperator.IS, CompareOperator.IS_NOT, CompareOperator.CLOSED, CompareOperator.ALL), //$NON-NLS-1$
+	PRIORITY("priority_id", CompareOperator.IS, CompareOperator.IS_NOT), //$NON-NLS-1$
+	TRACKER("tracker_id", CompareOperator.IS, CompareOperator.IS_NOT), //$NON-NLS-1$
+	FIXED_VERSION("fixed_version_id", CompareOperator.IS, CompareOperator.IS_NOT, CompareOperator.NONE, CompareOperator.ALL), //$NON-NLS-1$
+	ASSIGNED_TO("assigned_to_id", CompareOperator.IS, CompareOperator.IS_NOT, CompareOperator.NONE, CompareOperator.ALL), //$NON-NLS-1$
+	AUTHOR("author_id", CompareOperator.IS, CompareOperator.IS_NOT), //$NON-NLS-1$
+	CATEGORY("category_id",  //$NON-NLS-1$
 			CompareOperator.IS,	
 			CompareOperator.IS_NOT, 
 			CompareOperator.ALL, 
 			CompareOperator.NONE),
-	SUBJECT("subject",CompareOperator.CONTAINS, CompareOperator.CONTAINS_NOT),
-	DATE_CREATED("created_on", new DateValidator(),
+	SUBJECT("subject",CompareOperator.CONTAINS, CompareOperator.CONTAINS_NOT), //$NON-NLS-1$
+	DATE_CREATED("created_on", new DateValidator(), //$NON-NLS-1$
 			CompareOperator.DAY_AGO_MORE_THEN, 
 			CompareOperator.DAY_AGO_LESS_THEN, CompareOperator.DAY_AGO,
 			CompareOperator.TODAY, CompareOperator.CURRENT_WEEK),
-	DATE_UPDATED("updated_on", new DateValidator(),
+	DATE_UPDATED("updated_on", new DateValidator(), //$NON-NLS-1$
 			CompareOperator.DAY_AGO_MORE_THEN,
 			CompareOperator.DAY_AGO_LESS_THEN, CompareOperator.DAY_AGO,
 			CompareOperator.TODAY, CompareOperator.CURRENT_WEEK),
-	DATE_START("start_date", new DateValidator(),
+	DATE_START("start_date", new DateValidator(), //$NON-NLS-1$
 			CompareOperator.DAY_AGO_MORE_THEN,
 			CompareOperator.DAY_AGO_LESS_THEN, CompareOperator.DAY_AGO,
 			CompareOperator.TODAY, CompareOperator.CURRENT_WEEK,
 			CompareOperator.DAY_LATER, CompareOperator.DAY_LATER_LESS_THEN,
 			CompareOperator.DAY_LATER_MORE_THEN),
-	DATE_DUE("due_date",new DateValidator(),
+	DATE_DUE("due_date",new DateValidator(), //$NON-NLS-1$
 			CompareOperator.DAY_AGO_MORE_THEN,
 			CompareOperator.DAY_AGO_LESS_THEN, CompareOperator.DAY_AGO,
 			CompareOperator.TODAY, CompareOperator.CURRENT_WEEK,
 			CompareOperator.DAY_LATER, CompareOperator.DAY_LATER_LESS_THEN,
 			CompareOperator.DAY_LATER_MORE_THEN),
-	DONE_RATIO("done_ratio", new DoneRatioValidator(), CompareOperator.GTE, CompareOperator.LTE);
+	DONE_RATIO("done_ratio", new DoneRatioValidator(), CompareOperator.GTE, CompareOperator.LTE); //$NON-NLS-1$
 
 	final static EnumSet<QueryField> ABSTRACT = EnumSet.of(BOOLEAN_TYPE, LIST_TYPE, TEXT_TYPE, DATE_TYPE);
 	final static EnumSet<QueryField> REQUIRED = EnumSet.of(STATUS);
@@ -65,7 +66,7 @@ public enum QueryField implements IQueryField {
 
 	public final static EnumSet<QueryField> ORDERED = EnumSet.of(SUBJECT, DATE_CREATED, DATE_UPDATED, DATE_START, DATE_DUE, DONE_RATIO, PROJECT, TRACKER, STATUS, PRIORITY, FIXED_VERSION, ASSIGNED_TO, AUTHOR, CATEGORY);
 
-	public final static String VALUE_PERSON_ME = "me";
+	public final static String VALUE_PERSON_ME = "me"; //$NON-NLS-1$
 
 	private final String fieldName;
 	

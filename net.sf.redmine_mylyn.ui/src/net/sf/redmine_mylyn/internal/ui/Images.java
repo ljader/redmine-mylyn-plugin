@@ -10,21 +10,25 @@ public class Images {
 
 	private static ImageRegistry registry;
 	
-	public final static String CLEAR = "/icons/etool16/clear.gif";
+	public final static String CLEAR = "/icons/etool16/clear.gif"; //$NON-NLS-1$
 
-	public final static String FIND_CLEAR = "/icons/etool16/find-clear.gif";
+	public final static String FIND_CLEAR = "/icons/etool16/find-clear.gif"; //$NON-NLS-1$
 	
-	public final static String FIND_CLEAR_DISABLED = "/icons/etool16/find-clear-disabled.gif";
+	public final static String FIND_CLEAR_DISABLED = "/icons/etool16/find-clear-disabled.gif"; //$NON-NLS-1$
 
-	public final static String REPLY = "/icons/etool16/reply.gif";
+	public final static String REPLY = "/icons/etool16/reply.gif"; //$NON-NLS-1$
 
-	public final static String PERSON_NARROW = "/icons/etool16/person-narrow.gif";
+	public final static String PERSON_NARROW = "/icons/etool16/person-narrow.gif"; //$NON-NLS-1$
+
+	public static final String PERSON = "/icons/etool16/person.gif"; //$NON-NLS-1$
+
+	public static final String PERSON_ME = "/icons/etool16/person-me.gif"; //$NON-NLS-1$
 
 	public static ImageDescriptor getImageDescriptor(String key) {
-		ImageDescriptor imageDescriptor = RedmineUiPlugin.imageDescriptorFromPlugin("org.eclipse.mylyn.commons.ui", key);
+		ImageDescriptor imageDescriptor = RedmineUiPlugin.imageDescriptorFromPlugin("org.eclipse.mylyn.commons.ui", key); //$NON-NLS-1$
 		
 		if(imageDescriptor==null) {
-			imageDescriptor = RedmineUiPlugin.imageDescriptorFromPlugin("org.eclipse.mylyn.tasks.ui", key);
+			imageDescriptor = RedmineUiPlugin.imageDescriptorFromPlugin("org.eclipse.mylyn.tasks.ui", key); //$NON-NLS-1$
 		}
 		return imageDescriptor;
 	}
@@ -39,10 +43,10 @@ public class Images {
 			return null;
 		}
 		
-		Image image = getRegistry().get("" + descriptor.hashCode());
+		Image image = getRegistry().get("" + descriptor.hashCode()); //$NON-NLS-1$
 		if(image==null) {
 			image = descriptor.createImage();
-			getRegistry().put("" + descriptor.hashCode(), image);
+			getRegistry().put("" + descriptor.hashCode(), image); //$NON-NLS-1$
 		}
 		
 		return image;
