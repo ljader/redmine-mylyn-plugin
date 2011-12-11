@@ -29,6 +29,7 @@ import net.sf.redmine_mylyn.api.client.RedmineServerVersion;
 import net.sf.redmine_mylyn.api.exception.RedmineApiAuthenticationException;
 import net.sf.redmine_mylyn.api.exception.RedmineApiInvalidDataException;
 import net.sf.redmine_mylyn.api.model.Configuration;
+import net.sf.redmine_mylyn.api.model.CustomField;
 import net.sf.redmine_mylyn.api.model.Issue;
 import net.sf.redmine_mylyn.api.model.ProjectValidator;
 import net.sf.redmine_mylyn.api.query.Query;
@@ -207,6 +208,13 @@ public class Api_2_7_ClientImplTest {
 
 		assertNotNull(configuration.getCustomFields());
 		assertEquals(CustomFieldValidator.COUNT, configuration.getCustomFields().getAll().size());
+		for (CustomField cf : configuration.getCustomFields().getAll()) {
+			assertNotNull(cf.getFieldFormat());
+			
+			if (cf.isFilter()) {
+				assertNotNull(cf.getQueryField());
+			}
+		}
 
 		assertNotNull(configuration.getUsers());
 		assertEquals(UserValidator.COUNT, configuration.getUsers().getAll().size());

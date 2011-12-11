@@ -3,6 +3,7 @@ package net.sf.redmine_mylyn.internal.ui.action;
 import net.sf.redmine_mylyn.common.logging.ILogService;
 import net.sf.redmine_mylyn.core.RedmineAttribute;
 import net.sf.redmine_mylyn.core.RedmineCorePlugin;
+import net.sf.redmine_mylyn.internal.ui.Messages;
 import net.sf.redmine_mylyn.ui.RedmineTasksUiUtil;
 import net.sf.redmine_mylyn.ui.RedmineUiPlugin;
 
@@ -91,7 +92,7 @@ public abstract class AbstractRedmineAttributeChangeAction extends Action {
 										
 				} catch (CoreException e) {
 					ILogService log = RedmineUiPlugin.getLogService(getClass());
-					log.error(e, "Can't set value of attribute {0}", attributeName);
+					log.error(e, Messages.ERRMSG_CANT_SET_ATTRIBUTE_VALUE_X, attributeName);
 				}
 			}
 		}

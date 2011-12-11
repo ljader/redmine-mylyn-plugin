@@ -9,6 +9,7 @@ import java.util.Set;
 
 import net.sf.redmine_mylyn.common.logging.ILogService;
 import net.sf.redmine_mylyn.core.RedmineAttribute;
+import net.sf.redmine_mylyn.internal.ui.Messages;
 import net.sf.redmine_mylyn.ui.RedmineUiPlugin;
 
 import org.eclipse.core.runtime.CoreException;
@@ -86,10 +87,10 @@ public class RedmineStatusTaskListContributionItem extends AbstractRedmineTaskLi
 			
 		} catch (NullPointerException e) {
 			ILogService log = RedmineUiPlugin.getLogService(getClass());
-			log.error(e, "Can't fill menu `Markas`");
+			log.error(e, Messages.ERRMSG_CANT_FILL_MARKAS_MENU);
 		} catch (CoreException e) {
 			ILogService log = RedmineUiPlugin.getLogService(getClass());
-			log.error(e, "Can't fill menu `Markas`");
+			log.error(e, Messages.ERRMSG_CANT_FILL_MARKAS_MENU);
 		}
 		
 		return statusMap;

@@ -155,4 +155,16 @@ public class Project extends Property {
 		return ids;
 	}
 	
+	public int[] getMemberIds() {
+		if(members==null) {
+			return new int[0];
+		}
+		
+		int[] ids = new int[members.size()];
+		for (int i = 0; i < members.size(); i++) {
+			ids[i] = members.get(i).getUserId();
+		}
+		return ids;
+	}
+	
 }

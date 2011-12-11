@@ -2,6 +2,7 @@ package net.sf.redmine_mylyn.internal.core;
 
 import java.lang.reflect.Field;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -14,6 +15,7 @@ import net.sf.redmine_mylyn.api.model.Journal;
 import net.sf.redmine_mylyn.api.model.TimeEntry;
 import net.sf.redmine_mylyn.api.model.container.CustomValues;
 import net.sf.redmine_mylyn.common.logging.ILogService;
+import net.sf.redmine_mylyn.core.IRedmineExtensionField;
 import net.sf.redmine_mylyn.core.IRedmineConstants;
 import net.sf.redmine_mylyn.core.RedmineAttribute;
 import net.sf.redmine_mylyn.core.RedmineCorePlugin;
@@ -40,22 +42,39 @@ public class IssueMapper {
 		
 		/* Default Attributes */
 		for (RedmineAttribute redmineAttribute : RedmineAttribute.values()) {
-			Field field = redmineAttribute.getAttributeField();
-			if(field!=null) {
-				taskAttribute = root.getAttribute(redmineAttribute.getTaskKey());
-				if(taskAttribute !=null ) {
+			String taskKey = redmineAttribute.getTaskKey();
+			if(taskKey==null) {
+				continue;
+			}
+			
+			taskAttribute = root.getAttribute(taskKey);
+			if (taskAttribute!=null) {
+				Field field = redmineAttribute.getAttributeField();
+				
+				if(field!=null) {
 					try {
 						setValue(taskAttribute, field.get(issue));
 					} catch (Exception e) {
-						IStatus status = RedmineCorePlugin.toStatus(e, "Reading of property {0} failed - Should never happen", redmineAttribute.name());
-						ILogService log = RedmineCorePlugin.getDefault().getLogService(IssueMapper.class);
+						IStatus status = RedmineCorePlugin.toStatus(e, Messages.ERRMSG_CANT_READ_PROPERTY_X, redmineAttribute.name());
+						ILogService log = RedmineCorePlugin.getLogService(IssueMapper.class);
 						log.error(e, status.getMessage());
 						throw new CoreException(status);
 					}
+				} else {
+					switch (redmineAttribute) {
+					case WATCHERS:
+						for(int watcherId : issue.getWatcherIds()) {
+							taskAttribute.addValue(Integer.toString(watcherId));
+						}
+						break;
+					default:
+						break;
+					}
+					
 				}
 			}
 		}
-
+		
 		/* Custom Attributes */
 		if(issue.getCustomValues()!=null) {
 			for (CustomValue customValue : issue.getCustomValues().getAll()) {
@@ -71,7 +90,7 @@ public class IssueMapper {
 			int jrnlCount=1;
 			for (Journal journal : issue.getJournals().getAll()) {
 				TaskCommentMapper mapper = new TaskCommentMapper();
-				mapper.setAuthor(repository.createPerson(""+journal.getUserId()));
+				mapper.setAuthor(repository.createPerson(""+journal.getUserId())); //$NON-NLS-1$
 				mapper.setCreationDate(journal.getCreatedOn());
 				mapper.setText(journal.getNotes());
 				String issueUrl = RedmineRepositoryConnector.getTaskUrl(repository.getUrl(), issue.getId());
@@ -89,7 +108,7 @@ public class IssueMapper {
 			for (Attachment	attachment : issue.getAttachments().getAll()) {
 				TaskAttachmentMapper mapper = new TaskAttachmentMapper();
 				mapper.setAttachmentId("" + attachment.getId()); //$NON-NLS-1$
-				mapper.setAuthor(repository.createPerson(""+attachment.getAuthorId()));
+				mapper.setAuthor(repository.createPerson(""+attachment.getAuthorId())); //$NON-NLS-1$
 				mapper.setDescription(attachment.getDescription());
 				mapper.setCreationDate(attachment.getCreatedOn());
 				mapper.setContentType(attachment.getContentType());
@@ -107,13 +126,13 @@ public class IssueMapper {
 			taskAttribute = taskData.getRoot().createAttribute(IRedmineConstants.TASK_ATTRIBUTE_TIMEENTRY_TOTAL);
 			
 			if(issue.getTimeEntries()!=null) {
-				taskAttribute.setValue(""+issue.getTimeEntries().getSum());
+				taskAttribute.setValue(""+issue.getTimeEntries().getSum()); //$NON-NLS-1$
 				
 				
 				for (TimeEntry timeEntry : issue.getTimeEntries().getAll()) {
 					RedmineTaskTimeEntryMapper mapper = new RedmineTaskTimeEntryMapper();
 					mapper.setTimeEntryId(timeEntry.getId());
-					mapper.setUser(repository.createPerson(""+timeEntry.getUserId()));
+					mapper.setUser(repository.createPerson(""+timeEntry.getUserId())); //$NON-NLS-1$
 					mapper.setActivityId(timeEntry.getActivityId());
 					mapper.setHours(timeEntry.getHours());
 					mapper.setSpentOn(timeEntry.getSpentOn());
@@ -141,6 +160,39 @@ public class IssueMapper {
 			}
 		}
 
+		
+		/* Watcher */
+		TaskAttribute watchersAttribute = root.getAttribute(RedmineAttribute.WATCHERS.getTaskKey());
+		if (watchersAttribute!=null) {
+			LinkedHashSet<String> watchers = new LinkedHashSet<String>(watchersAttribute.getValues());
+			
+			TaskAttribute newWatcherAttribute = watchersAttribute.getAttribute(RedmineAttribute.WATCHERS_ADD.getTaskKey());
+			if (newWatcherAttribute !=null && !newWatcherAttribute.getMetaData().isReadOnly()) {
+				issue.setWatchersAddAllowed(true);
+				for (String newWatcher : newWatcherAttribute.getValues()) {
+					watchers.add(newWatcher);
+				}
+			}
+			
+			TaskAttribute oldWatcherAttribute = watchersAttribute.getAttribute(RedmineAttribute.WATCHERS_REMOVE.getTaskKey());
+			if (oldWatcherAttribute !=null && !oldWatcherAttribute.getMetaData().isReadOnly()) {
+				issue.setWatchersDeleteAllowed(true);
+				for (String oldWatcher : oldWatcherAttribute.getValues()) {
+					watchers.remove(oldWatcher);
+				}
+			}
+			
+			if (watchers.size()>0) {
+				int[] watcherIds = new int[watchers.size()];
+				int lv = 0;
+				for (String idVal : watchers) {
+					watcherIds[lv++] = Integer.parseInt(idVal);
+				}
+				issue.setWatcherIds(watcherIds);
+			}
+			
+		}
+
 		/* Custom Attributes */
 		int[] customFieldIds = cfg.getProjects().getById(issue.getProjectId()).getCustomFieldIdsByTrackerId(issue.getTrackerId());
 		if(customFieldIds!=null && customFieldIds.length>0) {
@@ -153,6 +205,7 @@ public class IssueMapper {
 				}
 			}
 		}
+		
 		
 		/* Operations */
 		taskAttribute = root.getMappedAttribute(TaskAttribute.OPERATION);
@@ -178,6 +231,7 @@ public class IssueMapper {
 				}
 			}
 		}
+		
 		
 		return issue;
 	}
@@ -210,10 +264,18 @@ public class IssueMapper {
 						customValues.setCustomValue(customField.getId(), formatCustomValue(value, customField.getId(), cfg));
 					}
 				}
+				
+				/* Extension/Additional Attributes */
+				IRedmineExtensionField additionalFields[] = RedmineCorePlugin.getDefault().getExtensionManager().getAdditionalTimeEntryFields(repository);
+				for (IRedmineExtensionField additionalField : additionalFields) {
+					String value = getValue(taskData, IRedmineConstants.TASK_KEY_PREFIX_TIMEENTRY_EX+additionalField.getTaskKey());
+					timeEntry.addExtensionValue(additionalField.getSubmitKey(), value);
+				}
+				
 			}
 		} catch (NumberFormatException e) {
 			timeEntry = null;
-			IStatus status = RedmineCorePlugin.toStatus(e, "Illegal Attribute Value");
+			IStatus status = RedmineCorePlugin.toStatus(e, Messages.ERRMSG_ILLEGAL_ATTRIBUTE_VALUE);
 			StatusHandler.log(status);
 		}
 		
@@ -224,8 +286,8 @@ public class IssueMapper {
 		CustomField field = cfg.getCustomFields().getById(customFieldId);
 		if(field!=null) {
 			switch(field.getFieldFormat()) {
-			case DATE: value = value.isEmpty() ? "" : RedmineUtil.formatDate(RedmineUtil.parseDate(value)); break;
-			case BOOL: value = Boolean.parseBoolean(value) ? "1" : "0";
+			case DATE: value = value.isEmpty() ? "" : RedmineUtil.formatDate(RedmineUtil.parseDate(value)); break; //$NON-NLS-1$
+			case BOOL: value = Boolean.parseBoolean(value) ? IRedmineConstants.BOOLEAN_TRUE_SUBMIT_VALUE : IRedmineConstants.BOOLEAN_FALSE_SUBMIT_VALUE;
 			}
 		}
 		return value;
@@ -237,18 +299,22 @@ public class IssueMapper {
 	
 	private static String getValue(TaskData taskData, String taskKey) {
 		TaskAttribute attribute = taskData.getRoot().getAttribute(taskKey);
-		return attribute==null ? "" : attribute.getValue();
+		return attribute==null ? "" : attribute.getValue(); //$NON-NLS-1$
 	}
 	
 	private static void setValue(TaskAttribute attribute, Object value) {
 		if(value==null) {
-			setValue(attribute, "");
+			attribute.clearValues();
 		} else if(value instanceof String) {
 			setValue(attribute, (String)value);
 		} else if(value instanceof Date) {
 			setValue(attribute, (Date)value);
 		} else if(value instanceof Integer) {
 			setValue(attribute, ((Integer)value).intValue());
+		} else if(value instanceof int[]) {
+			for (int intVal : (int[])value) {
+				attribute.addValue(Integer.toString(intVal));
+			}
 		} else {
 			setValue(attribute, value.toString());
 		}
@@ -256,7 +322,7 @@ public class IssueMapper {
 
 	private static void setValue(TaskAttribute attribute, String value) {
 		if(value==null) {
-			attribute.setValue("");
+			attribute.setValue(""); //$NON-NLS-1$
 		} else if(attribute.getMetaData().getType()==null) {
 			attribute.setValue(value);
 		} else if(attribute.getMetaData().getType().equals(TaskAttribute.TYPE_BOOLEAN)) {
@@ -271,19 +337,58 @@ public class IssueMapper {
 
 	private static void setValue(TaskAttribute attribute, Date value) {
 		if(value==null) {
-			attribute.setValue("");
+			attribute.setValue(""); //$NON-NLS-1$
 		} else {
-			attribute.setValue(""+value.getTime());
+			attribute.setValue(""+value.getTime()); //$NON-NLS-1$
 		}
 	}
 	
 	private static void setValue(TaskAttribute attribute, int value) {
 		if (attribute.getId().equals(RedmineAttribute.PROGRESS.getTaskKey()) && attribute.getMetaData().getType()==null) {
-			attribute.setValue("");
-		} else if((attribute.getMetaData().getType()!=null && attribute.getMetaData().getType().equals(TaskAttribute.TYPE_SINGLE_SELECT) || attribute.getId().equals(RedmineAttribute.PARENT.getTaskKey())) && value<1) {
-			attribute.setValue("");
+			attribute.setValue(""); //$NON-NLS-1$
+		} else if((attribute.getMetaData().getType()!=null && attribute.getMetaData().getType().equals(TaskAttribute.TYPE_SINGLE_SELECT) || attribute.getMetaData().getType().equals(TaskAttribute.TYPE_PERSON) || attribute.getMetaData().getType().equals(IRedmineConstants.EDITOR_TYPE_PERSON) || attribute.getId().equals(RedmineAttribute.PARENT.getTaskKey())) && value<1) {
+			attribute.setValue(""); //$NON-NLS-1$
 		} else {
-			attribute.setValue(""+value);
+			attribute.setValue(""+value); //$NON-NLS-1$
+		}
+	}
+	
+	private static void setProperty(RedmineAttribute redmineAttribute, TaskAttribute root, Issue issue) throws CoreException {
+		Field field = redmineAttribute.getAttributeField();
+		if(!redmineAttribute.isReadOnly() && field!=null) {
+			TaskAttribute taskAttribute = root.getAttribute(redmineAttribute.getTaskKey());
+			if(taskAttribute !=null ) {
+				try {
+					switch(redmineAttribute) {
+					case SUMMARY:
+					case DESCRIPTION:
+					case COMMENT: field.set(issue, taskAttribute.getValue()); break;
+					case PROGRESS:field.setInt(issue, taskAttribute.getValue().isEmpty() ? 0 : Integer.parseInt(taskAttribute.getValue())); break;
+					case ESTIMATED:
+						if (!taskAttribute.getValue().isEmpty())
+							field.setFloat(issue, Float.parseFloat(taskAttribute.getValue()));
+						break;
+					default:
+						if(redmineAttribute.getType().equals(TaskAttribute.TYPE_SINGLE_SELECT) || redmineAttribute.getType().equals(TaskAttribute.TYPE_PERSON) || redmineAttribute.getType().equals(IRedmineConstants.EDITOR_TYPE_PERSON) || redmineAttribute==RedmineAttribute.PARENT) {
+							int idVal = RedmineUtil.parseIntegerId(taskAttribute.getValue());
+							if(idVal>0) {
+								field.setInt(issue, idVal);
+							}
+						} else
+						
+						if(redmineAttribute.getType().equals(TaskAttribute.TYPE_DATE)) {
+							if (!taskAttribute.getValue().isEmpty()) {
+								field.set(issue, RedmineUtil.parseDate(taskAttribute.getValue()));
+							}
+						}
+					}
+				} catch (Exception e) {
+					IStatus status = RedmineCorePlugin.toStatus(e, Messages.ERRMSG_CANT_READ_PROPERTY_X, redmineAttribute.name());
+					ILogService log = RedmineCorePlugin.getLogService(IssueMapper.class);
+					log.error(e, status.getMessage());
+					throw new CoreException(status);
+				}
+			}
 		}
 	}
 	

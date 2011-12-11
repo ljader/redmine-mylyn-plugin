@@ -17,6 +17,7 @@ import net.sf.redmine_mylyn.api.model.container.CustomValues;
 import net.sf.redmine_mylyn.api.model.container.Journals;
 import net.sf.redmine_mylyn.api.model.container.TimeEntries;
 import net.sf.redmine_mylyn.internal.api.client.IssuePropertyMapping;
+import net.sf.redmine_mylyn.internal.api.parser.adapter.type.WatchersType;
 
 @XmlRootElement
 @XmlType
@@ -30,6 +31,12 @@ public class Issue implements IModel {
 	
 	@XmlAttribute(required=true)
 	private boolean editAllowed;
+	
+	private boolean watchersViewAllowed;
+	
+	private boolean watchersAddAllowed;
+	
+	private boolean watchersDeleteAllowed;
 	
 	@IssuePropertyMapping(RedmineApiIssueProperty.SUBJECT)
 	private String subject;
@@ -56,8 +63,6 @@ public class Issue implements IModel {
 	
 	private boolean watched;
 	
-	@XmlElement(name="watchers")
-	@XmlList
 	private int[] watcherIds;
 	
 	@IssuePropertyMapping(RedmineApiIssueProperty.START_DATE)
@@ -86,6 +91,9 @@ public class Issue implements IModel {
 	@IssuePropertyMapping(RedmineApiIssueProperty.PARENT)
 	private int parentId;
 
+	@XmlList
+	private int [] subtasks;
+
 	private boolean closed;
 	
 	public Issue(){
@@ -110,6 +118,14 @@ public class Issue implements IModel {
 	//IssueRelations
 
 	private TimeEntries timeEntries;
+
+	@XmlElement(name="watchers")
+	void setWatchers(WatchersType watchers) {
+		watcherIds = watchers.watchers;
+		watchersViewAllowed = watchers.viewAllowed;
+		watchersAddAllowed = watchers.addAllowed;
+		watchersDeleteAllowed = watchers.deleteAllowed;
+	}
 
 	public boolean isEditAllowed() {
 		return editAllowed;
@@ -192,11 +208,38 @@ public class Issue implements IModel {
 	}
 
 	public int[] getWatcherIds() {
+		if(watcherIds==null) {
+			watcherIds = new int[0];
+		}
 		return watcherIds;
 	}
 
 	public void setWatcherIds(int[] watcherIds) {
 		this.watcherIds = watcherIds;
+	}
+
+	public boolean isWatchersViewAllowed() {
+		return watchersViewAllowed;
+	}
+
+	public void setWatchersViewAllowed(boolean watchersViewAllowed) {
+		this.watchersViewAllowed = watchersViewAllowed;
+	}
+
+	public boolean isWatchersAddAllowed() {
+		return watchersAddAllowed;
+	}
+
+	public void setWatchersAddAllowed(boolean watchersAddAllowed) {
+		this.watchersAddAllowed = watchersAddAllowed;
+	}
+
+	public boolean isWatchersDeleteAllowed() {
+		return watchersDeleteAllowed;
+	}
+
+	public void setWatchersDeleteAllowed(boolean watchersDeleteAllowed) {
+		this.watchersDeleteAllowed = watchersDeleteAllowed;
 	}
 
 	public Date getStartDate() {
@@ -269,6 +312,14 @@ public class Issue implements IModel {
 
 	public void setParentId(int parentId) {
 		this.parentId = parentId;
+	}
+
+	public int[] getSubtasks() {
+		return subtasks;
+	}
+
+	public void setSubtasks(int[] subtasks) {
+		this.subtasks = subtasks;
 	}
 
 	public int[] getAvailableStatusId() {

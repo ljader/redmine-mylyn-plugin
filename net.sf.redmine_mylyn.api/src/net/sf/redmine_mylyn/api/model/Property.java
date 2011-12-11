@@ -25,7 +25,7 @@ public class Property implements Serializable {
 	}
 
 	public String getName() {
-		return name==null ? "" : name;
+		return name==null ? "" : name; //$NON-NLS-1$
 	}
 
 	public void setName(String name) {

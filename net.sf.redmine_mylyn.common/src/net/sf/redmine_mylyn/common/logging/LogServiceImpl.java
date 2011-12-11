@@ -14,17 +14,11 @@ public class LogServiceImpl implements ILogService {
 	private LogService logService;
 	
 	private static LogServiceImpl instance;
-	
+
 	public LogServiceImpl() {
 		instance = this;
 	}
 	
-	public static ILogService getInstance() {
-		if(instance==null) {
-			instance = new LogServiceImpl();
-		}
-		return instance;
-	}
 	
 	public static ILogService getInstance(Bundle bundle, Class<?> loggerName) {
 		if(instance==null) {

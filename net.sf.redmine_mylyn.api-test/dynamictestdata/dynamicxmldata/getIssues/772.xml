@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues xmlns="http://redmin-mylyncon.sf.net/api" authenticatedAs="albert.chan" api="2.7.3.stable" authenticated="true">
+<issue editAllowed="true" id="772">
+  <subject>test 2</subject>
+  <description>test 2</description>
+  <createdOn unixtime="1312045496">2011-07-31T01:04:56+08:00</createdOn>
+  <updatedOn unixtime="1312045567">2011-07-31T01:06:07+08:00</updatedOn>
+  <trackerId>2</trackerId>
+  <projectId>18</projectId>
+  <statusId>1</statusId>
+  <priorityId>4</priorityId>
+  <watched>false</watched>
+  <watchers addAllowed="true" deleteAllowed="true" viewAllowed="true"></watchers>
+  <startDate>2011-07-31</startDate>
+  <doneRatio>0</doneRatio>
+  <authorId>21</authorId>
+  <availableStatus>1 2 3 4 5 6</availableStatus>
+  <customValues>
+    <customValue customFieldId="13" id="879"></customValue>
+    <customValue customFieldId="14" id="880"></customValue>
+  </customValues>
+  <journals>
+    <journal editAllowed="true" id="1779">
+      <userId>21</userId>
+      <createdOn unixtime="1312045522">2011-07-31T01:05:22+08:00</createdOn>
+      <notes>comment 2</notes>
+    </journal>
+    <journal editAllowed="true" id="1780">
+      <userId>21</userId>
+      <createdOn unixtime="1312045567">2011-07-31T01:06:07+08:00</createdOn>
+      <notes>comment 3</notes>
+    </journal>
+  </journals>
+  <attachments>
+  </attachments>
+  <issueRelations>
+  </issueRelations>
+  <timeEntries newAllowed="false" viewAllowed="false">
+  </timeEntries>
+</issue>
+</issues>

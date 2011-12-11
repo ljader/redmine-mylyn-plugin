@@ -9,6 +9,7 @@ import net.sf.redmine_mylyn.api.RedmineApiPlugin;
 import net.sf.redmine_mylyn.api.exception.RedmineApiErrorException;
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.CustomField;
+import net.sf.redmine_mylyn.internal.api.Messages;
 
 import org.apache.commons.httpclient.NameValuePair;
 
@@ -22,10 +23,10 @@ public class QueryFilter {
 	
 	private List<String> values = new ArrayList<String>();
 
-	public final static String CUSTOM_FIELD_PREFIX = "cf_";
+	public final static String CUSTOM_FIELD_PREFIX = "cf_"; //$NON-NLS-1$
 	
-	private final static Pattern FIND_QUERY_NAME_OPARATOR_PATTERN = Pattern.compile("^operators\\[(\\w+)\\]$");
-	private final static Pattern FIND_QUERY_NAME_VALUES_PATTERN = Pattern.compile("^values\\[(\\w+)\\]\\[\\]$");
+	private final static Pattern FIND_QUERY_NAME_OPARATOR_PATTERN = Pattern.compile("^operators\\[(\\w+)\\]$"); //$NON-NLS-1$
+	private final static Pattern FIND_QUERY_NAME_VALUES_PATTERN = Pattern.compile("^values\\[(\\w+)\\]\\[\\]$"); //$NON-NLS-1$
 	
 	QueryFilter(QueryField queryField) {
 		this(queryField, queryField);
@@ -98,7 +99,7 @@ public class QueryFilter {
 				}
 			}
 		} catch (NumberFormatException e) {
-			throw new RedmineApiErrorException("Invalid Integer-Value `{0}` for Query-Field `{1}`", e, ""+values.get(0), queryField.getQueryValue());
+			throw new RedmineApiErrorException(Messages.ERRMSG_QUERY_FIELD_INVALID_INTEGER_X_X, e, ""+values.get(0), queryField.getQueryValue()); //$NON-NLS-1$
 		}
 		
 		if((queryField==QueryField.PROJECT || queryField==QueryField.STOREDQUERY) && values.size()==1 && operator==CompareOperator.IS) {
@@ -110,24 +111,24 @@ public class QueryFilter {
 	}
 	
 	private void appendFieldAndOperator(List<NameValuePair> parts) {
-		parts.add(new NameValuePair("fields[]", queryField.getQueryValue()));
-		parts.add(new NameValuePair(String.format("operators[%s]", queryField.getQueryValue()), operator.getQueryValue()));
+		parts.add(new NameValuePair("fields[]", queryField.getQueryValue())); //$NON-NLS-1$
+		parts.add(new NameValuePair(String.format("operators[%s]", queryField.getQueryValue()), operator.getQueryValue())); //$NON-NLS-1$
 	}
 
 	private void appendValues(List<NameValuePair> parts) {
 		if (values.size() > 0) {
 			for (String value : values) {
-				parts.add(new NameValuePair(String.format("values[%s][]", queryField.getQueryValue()), value));
+				parts.add(new NameValuePair(String.format("values[%s][]", queryField.getQueryValue()), value)); //$NON-NLS-1$
 			}
 		} else {
-			parts.add(new NameValuePair(String.format("values[%s][]", queryField.getQueryValue()), ""));
+			parts.add(new NameValuePair(String.format("values[%s][]", queryField.getQueryValue()), "")); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
 	static QueryFilter fromNameValuePair(NameValuePair nvp, Configuration configuration) {
 		QueryFilter filter = null;
 		
-		if(nvp.getName().equals("fields[]")) {
+		if(nvp.getName().equals("fields[]")) { //$NON-NLS-1$
 			if(nvp.getValue().startsWith(CUSTOM_FIELD_PREFIX)) {
 				try {
 					int cfId = Integer.parseInt(nvp.getValue().substring(3));
@@ -136,7 +137,7 @@ public class QueryFilter {
 						filter = new QueryFilter(customField, customField.getQueryField());
 					}
 				} catch (NumberFormatException e){
-					RedmineApiPlugin.getLogService(QueryFilter.class).error(e, "Can't restore QueryFilter, {0} isn't a CustomField-Id", nvp.getValue().substring(3));
+					RedmineApiPlugin.getLogService(QueryFilter.class).error(e, Messages.ERRMSG_CANT_RESTORE_QUERYFILTER_INVALID_FIELDID_X, nvp.getValue().substring(3));
 				}
 				
 			} else {

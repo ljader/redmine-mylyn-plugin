@@ -14,6 +14,7 @@ import net.sf.redmine_mylyn.api.query.IQueryField;
 import net.sf.redmine_mylyn.api.query.Query;
 import net.sf.redmine_mylyn.api.query.QueryField;
 import net.sf.redmine_mylyn.api.query.QueryFilter;
+import net.sf.redmine_mylyn.core.IRedmineConstants;
 import net.sf.redmine_mylyn.core.RedmineUtil;
 
 import org.eclipse.jface.viewers.ComboViewer;
@@ -48,14 +49,14 @@ public class QueryBuilder {
 				
 				selection = (IStructuredSelection)viewer.getSelection();
 				if (selection.isEmpty()) {
-					query.addFilter(queryField, definition, operator, "");
+					query.addFilter(queryField, definition, operator, ""); //$NON-NLS-1$
 				} else {
 					Iterator<?> valIterator = selection.iterator();
 					while(valIterator.hasNext()) {
 						Object obj = valIterator.next();
 						if  (obj instanceof Property) {
 							Property property = (Property)obj; 
-							query.addFilter(queryField, definition, operator, ""+property.getId());
+							query.addFilter(queryField, definition, operator, ""+property.getId()); //$NON-NLS-1$
 						} else {
 							query.addFilter(queryField, definition, operator, obj.toString());
 						}
@@ -77,7 +78,7 @@ public class QueryBuilder {
 				if (queryField instanceof CustomField) {
 					CustomField customField = (CustomField)queryField;
 					if(customField.getFieldFormat()==CustomField.Format.BOOL) {
-						query.addFilter(customField, QueryField.BOOLEAN_TYPE, operator, "1");
+						query.addFilter(customField, QueryField.BOOLEAN_TYPE, operator, IRedmineConstants.BOOLEAN_TRUE_SUBMIT_VALUE);
 					} else {
 						QueryField definition = customField.getQueryField();
 						query.addFilter(customField, definition, operator, text.getText().trim());

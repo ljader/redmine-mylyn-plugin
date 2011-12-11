@@ -17,10 +17,12 @@ import net.sf.redmine_mylyn.core.RedmineAttribute;
 import net.sf.redmine_mylyn.core.RedmineCorePlugin;
 import net.sf.redmine_mylyn.core.RedmineOperation;
 import net.sf.redmine_mylyn.core.RedmineRepositoryConnector;
+import net.sf.redmine_mylyn.internal.ui.Messages;
 import net.sf.redmine_mylyn.internal.ui.editor.TaskDataValidator.ErrorMessageCollector;
 import net.sf.redmine_mylyn.internal.ui.editor.helper.AttributePartLayoutHelper;
 import net.sf.redmine_mylyn.internal.ui.editor.parts.NewTimeEntryEditorPart;
 import net.sf.redmine_mylyn.internal.ui.editor.parts.PlanningEditorPart;
+import net.sf.redmine_mylyn.internal.ui.editor.parts.RedminePeoplePart;
 import net.sf.redmine_mylyn.internal.ui.editor.parts.TimeEntryEditorPart;
 import net.sf.redmine_mylyn.ui.RedmineUiPlugin;
 
@@ -54,7 +56,7 @@ import org.eclipse.ui.IEditorSite;
 
 public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 
-	public final static String ID = "net.sf.redmine_mylyn.ui.editor.page";
+	public final static String ID = "net.sf.redmine_mylyn.ui.editor.page"; //$NON-NLS-1$
 
 	private final TaskDataModelListener projectAttributeListener;
 	private final TaskDataModelListener trackerAttributeListener;
@@ -70,7 +72,7 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 	private Configuration cfg;
 	
 	Map<TaskAttribute, AbstractAttributeEditor> attributeEditors = new HashMap<TaskAttribute, AbstractAttributeEditor>();
-//	
+
 	Map<String, CustomField> customFields = new HashMap<String, CustomField>();
 	
 	public RedmineTaskEditorPage(TaskEditor editor) {
@@ -116,6 +118,14 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 	protected Set<TaskEditorPartDescriptor> createPartDescriptors() {
 		Set<TaskEditorPartDescriptor> descriptors = super.createPartDescriptors();
 
+		// remove unnecessary default editor parts
+		for (TaskEditorPartDescriptor taskEditorPartDescriptor : descriptors) {
+			if (taskEditorPartDescriptor.getId().equals(ID_PART_PEOPLE)) {
+				descriptors.remove(taskEditorPartDescriptor);
+				break;
+			}
+		}
+
 		TaskAttribute rootAttribute = getModel().getTaskData().getRoot();
 		
 		descriptors.add(new TaskEditorPartDescriptor(PlanningEditorPart.PART_ID) {
@@ -143,6 +153,13 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 			}.setPath(PATH_COMMENTS));
 		}
 		
+		descriptors.add(new TaskEditorPartDescriptor(RedminePeoplePart.PART_ID) {
+			@Override
+			public AbstractTaskEditorPart createPart() {
+				return new RedminePeoplePart();
+			}
+		}.setPath(PATH_ACTIONS));
+		
 		return descriptors;
 	}
 	
@@ -154,7 +171,7 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 		if(project!=null && trackerId>0) {
 			refreshCustomFields(project, trackerId);
 		} else {
-			getTaskEditor().setMessage("Problem occured when creating attributes", IMessageProvider.ERROR);
+			getTaskEditor().setMessage(Messages.ERRMSG_UNABLE_TO_CREATE_ATTRIBUTES, IMessageProvider.ERROR);
 		}
 			
 		attributeEditors.clear();
@@ -179,10 +196,14 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 				if(IRedmineConstants.EDITOR_TYPE_ESTIMATED.equals(type)) {
 					editor = new EstimatedEditor(getModel(), taskAttribute);
 				} else if(IRedmineConstants.EDITOR_TYPE_DURATION.equals(type)) {
-						editor = new DurationEditor(getModel(), taskAttribute);
+					editor = new DurationEditor(getModel(), taskAttribute);
 				} else if(IRedmineConstants.EDITOR_TYPE_PARENTTASK.equals(type)) {
 					editor = super.createEditor(TaskAttribute.TYPE_TASK_DEPENDENCY, taskAttribute);
 					editor.setLayoutHint(new LayoutHint(RowSpan.SINGLE, ColumnSpan.SINGLE));
+				} else if(IRedmineConstants.EDITOR_TYPE_WATCHERS.equals(type)) {
+					editor = new RedmineWatchersEditor(cfg, getModel(), taskAttribute);
+				} else if(IRedmineConstants.EDITOR_TYPE_PERSON.equals(type)) {
+					editor = new RedminePersonEditor(getModel(), taskAttribute);
 				} else {
 					editor = super.createEditor(type, taskAttribute);
 //						if(taskAttribute.getId().equals(RedmineAttribute.STATUS_CHG.getTaskKey())) {
@@ -215,7 +236,7 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 			return;
 		}
 
-		getTaskEditor().setMessage("", IMessageProvider.NONE);
+		getTaskEditor().setMessage("", IMessageProvider.NONE); //$NON-NLS-1$
 		super.doSubmit();
 	}
 	
@@ -300,7 +321,7 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 		int id =-1;
 		TaskAttribute taskAttribute = getModel().getTaskData().getRoot().getAttribute(attribute.getTaskKey());
 		if(taskAttribute==null) {
-			IStatus status = new Status(IStatus.ERROR, RedmineUiPlugin.PLUGIN_ID, "Invalid Attribute "+attribute.name()); 
+			IStatus status = new Status(IStatus.ERROR, RedmineUiPlugin.PLUGIN_ID, Messages.ERRMSG_INVALID_ATTRIBUTE+attribute.name()); 
 			StatusHandler.fail(status);
 		} else {
 			try {
@@ -308,9 +329,9 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 					id = Integer.parseInt(taskAttribute.getValue());
 				}
 			} catch (NumberFormatException e) {
-				IStatus status = RedmineUiPlugin.toStatus(e, "Invalid {0}-ID {1}", attribute.name(), taskAttribute.getValue());
+				IStatus status = RedmineUiPlugin.toStatus(e, Messages.ERRMSG_INVALID_ATTRIBUTE_ID_X_X, attribute.name(), taskAttribute.getValue());
 				StatusHandler.fail(status);
-				getTaskEditor().setMessage("Problem occured when updating attributes", IMessageProvider.ERROR);
+				getTaskEditor().setMessage(Messages.ERRMSG_UPDATING_ATTRIBUTES_FAILED, IMessageProvider.ERROR);
 			}
 		}
 		return id;
@@ -368,7 +389,7 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 				Project project = cfg.getProjects().getById(getAttributeId(RedmineAttribute.PROJECT));
 				
 				if(project==null) {
-					getTaskEditor().setMessage("Problem occured when updating attributes", IMessageProvider.ERROR);
+					getTaskEditor().setMessage(Messages.ERRMSG_UPDATING_ATTRIBUTES_FAILED, IMessageProvider.ERROR);
 				} else {
 					
 					TaskAttribute taskAttribute = null;
@@ -384,13 +405,13 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 						if(taskAttribute!=null) {
 							taskAttribute.clearOptions();
 							if(!entry.getKey().isRequired()) {
-								taskAttribute.putOption("", "");
+								taskAttribute.putOption("", ""); //$NON-NLS-1$ //$NON-NLS-2$
 							}
 							for(Property property : entry.getValue()) {
-								taskAttribute.putOption(""+property.getId(), property.getName());
+								taskAttribute.putOption(""+property.getId(), property.getName()); //$NON-NLS-1$
 							}
 							if(entry.getKey().isRequired() && entry.getValue().size()==1) {
-								taskAttribute.setValue(""+entry.getValue().get(0).getId());
+								taskAttribute.setValue(""+entry.getValue().get(0).getId()); //$NON-NLS-1$
 							}
 							
 							refreshEditor(taskAttribute);
@@ -419,7 +440,7 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 					refreshCustomFields(project, trackerId);
 					refreshCustomFieldsComposite();
 				} else {
-					getTaskEditor().setMessage("Problem occured when updating attributes", IMessageProvider.ERROR);
+					getTaskEditor().setMessage(Messages.ERRMSG_UPDATING_ATTRIBUTES_FAILED, IMessageProvider.ERROR);
 				}
 				
 			}

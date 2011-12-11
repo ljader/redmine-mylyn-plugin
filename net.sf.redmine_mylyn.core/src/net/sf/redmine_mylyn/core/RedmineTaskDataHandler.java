@@ -1,19 +1,23 @@
 package net.sf.redmine_mylyn.core;
 
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.CustomField;
-import net.sf.redmine_mylyn.api.model.CustomField.Format;
 import net.sf.redmine_mylyn.api.model.Issue;
 import net.sf.redmine_mylyn.api.model.IssuePriority;
 import net.sf.redmine_mylyn.api.model.IssueStatus;
+import net.sf.redmine_mylyn.api.model.Member;
 import net.sf.redmine_mylyn.api.model.Project;
 import net.sf.redmine_mylyn.api.model.Property;
 import net.sf.redmine_mylyn.api.model.TimeEntry;
+import net.sf.redmine_mylyn.api.model.User;
+import net.sf.redmine_mylyn.api.model.Version;
 import net.sf.redmine_mylyn.core.client.IClient;
 import net.sf.redmine_mylyn.internal.core.IssueMapper;
+import net.sf.redmine_mylyn.internal.core.Messages;
 import net.sf.redmine_mylyn.internal.core.ProgressValues;
 
 import org.eclipse.core.runtime.CoreException;
@@ -51,7 +55,9 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 	public void getMultiTaskData(TaskRepository repository, Set<String> taskIds, TaskDataCollector collector, IProgressMonitor monitor) throws CoreException {
 		TaskData[] taskData = connector.getTaskData(repository, taskIds, monitor);
 		for (TaskData data : taskData) {
-			collector.accept(data);
+			if (data!=null) {
+				collector.accept(data);
+			}
 		}
 	}
 	
@@ -67,9 +73,6 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 	
 	@Override
 	public boolean initializeSubTaskData(TaskRepository repository, TaskData taskData, TaskData parentTaskData, IProgressMonitor monitor) throws CoreException {
-		System.out.println("Parent-Project: " + parentTaskData.getRoot().getAttribute(RedmineAttribute.PROJECT.getTaskKey()).getValue());
-		System.out.println("Parent-Tracker: " + parentTaskData.getRoot().getAttribute(RedmineAttribute.TRACKER.getTaskKey()).getValue());
-		
 		Issue issue = new Issue();
 		
 		TaskAttribute parentRoot = parentTaskData.getRoot();
@@ -101,7 +104,7 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 			
 			return initializeNewTaskData(issue, repository, taskData, monitor);
 		} catch (RuntimeException e) {
-			IStatus status = new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, "Initialization of task failed. The provided data are insufficient.", e);
+			IStatus status = new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, Messages.ERRMSG_TASK_INITIALIZATION_FALED_INSUFFICENT_DATA, e);
 			StatusHandler.log(status);
 			throw new CoreException(status);
 		}
@@ -111,28 +114,28 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 		Configuration conf = connector.getRepositoryConfiguration(repository);
 		
 		try {
-			createAttributes(taskData, issue, conf);
+			createAttributes(repository, taskData, issue, conf);
 			createOperations(taskData, issue, conf);
 			
 			/* Default-Values */
 			TaskAttribute root = taskData.getRoot();
-			root.getAttribute(RedmineAttribute.PROJECT.getTaskKey()).setValue(""+issue.getProjectId());
-			root.getAttribute(RedmineAttribute.TRACKER.getTaskKey()).setValue(""+issue.getTrackerId());
+			root.getAttribute(RedmineAttribute.PROJECT.getTaskKey()).setValue(""+issue.getProjectId()); //$NON-NLS-1$
+			root.getAttribute(RedmineAttribute.TRACKER.getTaskKey()).setValue(""+issue.getTrackerId()); //$NON-NLS-1$
 			
 			IssuePriority priority = conf.getIssuePriorities().getDefault();
 			if(priority!=null) {
-				root.getAttribute(RedmineAttribute.PRIORITY.getTaskKey()).setValue(""+priority.getId());
+				root.getAttribute(RedmineAttribute.PRIORITY.getTaskKey()).setValue(""+priority.getId()); //$NON-NLS-1$
 			} else if(conf.getIssuePriorities().getAll().size()>0){
-				root.getAttribute(RedmineAttribute.PRIORITY.getTaskKey()).setValue(""+conf.getIssuePriorities().getAll().get(0));
+				root.getAttribute(RedmineAttribute.PRIORITY.getTaskKey()).setValue(""+conf.getIssuePriorities().getAll().get(0)); //$NON-NLS-1$
 			}
 			
 			IssueStatus status = conf.getIssueStatuses().getDefault();
 			if(status!=null) {
-				root.getAttribute(RedmineAttribute.STATUS.getTaskKey()).setValue(""+status.getId());
-				root.getAttribute(RedmineAttribute.STATUS_CHG.getTaskKey()).setValue(""+status.getId());
+				root.getAttribute(RedmineAttribute.STATUS.getTaskKey()).setValue(""+status.getId()); //$NON-NLS-1$
+				root.getAttribute(RedmineAttribute.STATUS_CHG.getTaskKey()).setValue(""+status.getId()); //$NON-NLS-1$
 			} else if(conf.getIssueStatuses().getAll().size()>0){
-				root.getAttribute(RedmineAttribute.STATUS.getTaskKey()).setValue(""+conf.getIssueStatuses().getAll().get(0));
-				root.getAttribute(RedmineAttribute.STATUS_CHG.getTaskKey()).setValue(""+conf.getIssueStatuses().getAll().get(0));
+				root.getAttribute(RedmineAttribute.STATUS.getTaskKey()).setValue(""+conf.getIssueStatuses().getAll().get(0)); //$NON-NLS-1$
+				root.getAttribute(RedmineAttribute.STATUS_CHG.getTaskKey()).setValue(""+conf.getIssueStatuses().getAll().get(0)); //$NON-NLS-1$
 			}
 			
 		} catch (RedmineStatusException e) {
@@ -163,7 +166,7 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 			throw new CoreException(e.getStatus());
 		}
 		
-		return new RepositoryResponse(ResponseKind.TASK_CREATED, "" + taskId);
+		return new RepositoryResponse(ResponseKind.TASK_CREATED, "" + taskId); //$NON-NLS-1$
 	}
 	
 	public TaskData createTaskDataFromIssue(TaskRepository repository, Issue issue, IProgressMonitor monitor) throws CoreException {
@@ -171,7 +174,7 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 		Configuration configuration = connector.getRepositoryConfiguration(repository);
 		try {
 			TaskData taskData = new TaskData(getAttributeMapper(repository), RedmineCorePlugin.REPOSITORY_KIND, repository.getRepositoryUrl(), issue.getId() + ""); //$NON-NLS-1$
-			createAttributes(taskData, issue, configuration);
+			createAttributes(repository, taskData, issue, configuration);
 			createOperations(taskData, issue, configuration);
 
 			IssueMapper.updateTaskData(repository, taskData, configuration, issue);
@@ -182,17 +185,17 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 		}
 	}
 
-	private void createAttributes(TaskData data, Issue issue,  Configuration configuration) throws RedmineStatusException {
-		createDefaultAttributes(data, issue, configuration);
-		createCustomAttributes(data, issue, configuration.getCustomFields().getIssueCustomFields(), IRedmineConstants.TASK_KEY_PREFIX_ISSUE_CF, false);
+	private void createAttributes(TaskRepository repository, TaskData data, Issue issue,  Configuration configuration) throws RedmineStatusException {
+		createDefaultAttributes(repository, data, issue, configuration);
+		createCustomAttributes(data, configuration, issue, configuration.getCustomFields().getIssueCustomFields(), IRedmineConstants.TASK_KEY_PREFIX_ISSUE_CF, false);
 	}
 	
-	private static void createDefaultAttributes(TaskData data, Issue issue , Configuration cfg) throws RedmineStatusException {
+	private static void createDefaultAttributes(TaskRepository repository, TaskData data, Issue issue , Configuration cfg) throws RedmineStatusException {
 		boolean existingTask = issue.getId()>0;
 		Project project = cfg.getProjects().getById(issue.getProjectId());
 
 		if (project==null || cfg.getSettings()==null) {
-			IStatus status = new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, "Initialization of task failed. The provided data are insufficient.");
+			IStatus status = new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, Messages.ERRMSG_TASK_INITIALIZATION_FALED_INSUFFICENT_DATA);
 			StatusHandler.log(status);
 			throw new RedmineStatusException(status);
 		}
@@ -211,6 +214,7 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 		}
 		
 		createAttribute(data, RedmineAttribute.PARENT);
+		createAttribute(data, RedmineAttribute.SUBTASKS);
 		createAttribute(data, RedmineAttribute.TRACKER, cfg.getTrackers().getById(project.getTrackerIds()));
 
 		if (existingTask) {
@@ -253,10 +257,31 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 				createAttribute(data, RedmineAttribute.TIME_ENTRY_HOURS);
 				createAttribute(data, RedmineAttribute.TIME_ENTRY_ACTIVITY, project.getTimeEntryActivities().getAll());
 				createAttribute(data, RedmineAttribute.TIME_ENTRY_COMMENTS);
-				createCustomAttributes(data, issue, cfg.getCustomFields().getTimeEntryCustomFields(), IRedmineConstants.TASK_KEY_PREFIX_TIMEENTRY_CF, true);
+				
+				for (IRedmineExtensionField additionalField : RedmineCorePlugin.getDefault().getExtensionManager().getAdditionalTimeEntryFields(repository)) {
+					createAttribute(data, additionalField, IRedmineConstants.TASK_KEY_PREFIX_TIMEENTRY_EX);
+				}
+				
+				createCustomAttributes(data, cfg, issue, cfg.getCustomFields().getTimeEntryCustomFields(), IRedmineConstants.TASK_KEY_PREFIX_TIMEENTRY_CF, true);
 			}
 		}
 
+		//Watchers
+		if(existingTask) {
+			if(issue.isWatchersViewAllowed()) {
+				attribute = createAttribute(data, RedmineAttribute.WATCHERS, cfg.getUsers().getAll());
+				
+				if(issue.isWatchersAddAllowed()) {
+					TaskAttribute addWatcherAttribute = attribute.createAttribute(RedmineAttribute.WATCHERS_ADD.getTaskKey());
+					addWatcherAttribute.getMetaData().setLabel(RedmineAttribute.WATCHERS_ADD.getLabel());
+					addOptions(addWatcherAttribute, cfg.getUsers().getById(project.getMemberIds()));
+				}
+
+				if(issue.isWatchersDeleteAllowed()) {
+					attribute.createAttribute(RedmineAttribute.WATCHERS_REMOVE.getTaskKey());
+				}
+			}
+		}
 	}
 	
 	private static TaskAttribute createAttribute(TaskData data, RedmineAttribute redmineAttribute) {
@@ -279,26 +304,50 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 			if (allowEmtpy) {
 				attr.putOption("", ""); //$NON-NLS-1$ //$NON-NLS-2$
 			}
-			for (Property property : properties) {
-				attr.putOption(String.valueOf(property.getId()), property.getName());
-			}
+			addOptions(attr, properties);
 		}
 		return attr;
 	}
+	
+	private static TaskAttribute addOptions(TaskAttribute attribute, List<? extends Property> properties) {
+		for (Property property : properties) {
+			attribute.putOption(String.valueOf(property.getId()), property.getName());
+		}
+		return attribute;
+	}
 
-	private static void createCustomAttributes(TaskData taskData, Issue issue , List<CustomField> customFields, String prefix, boolean hidden) throws RedmineStatusException {
+	private static void createCustomAttributes(TaskData taskData, Configuration configuration, Issue issue , List<CustomField> customFields, String prefix, boolean hidden) throws RedmineStatusException {
+		Project project = configuration.getProjects().getById(issue.getProjectId());
+		
 		for (CustomField customField : customFields) {
 			TaskAttribute taskAttribute = createAttribute(taskData, customField, prefix);
 			if(hidden) {
 				taskAttribute.getMetaData().setKind(null);
 			}
-			if (customField.getFieldFormat()==Format.LIST) {
+			if (customField.getFieldFormat().isListType()) {
 				if (!customField.isRequired()) {
-					taskAttribute.putOption("", "");
+					taskAttribute.putOption("", ""); //$NON-NLS-1$ //$NON-NLS-2$
 				}
-				for (String option : customField.getPossibleValues()) {
-					taskAttribute.putOption(option, option);
-				}
+				
+				switch (customField.getFieldFormat()) {
+				case VERSION:
+					for( Version version : configuration.getVersions().getById(project.getVersionIds()) ) {
+						taskAttribute.putOption(""+version.getId(), version.getName()); //$NON-NLS-1$
+					}
+					break;
+				case USER: 
+					for( Member member : project.getMembers() ) {
+						User user = configuration.getUsers().getById(member.getUserId());
+						if (user != null) {
+							taskAttribute.putOption(""+user.getId(), user.getName()); //$NON-NLS-1$
+						}
+					}
+					break;
+				default:
+					for (String option : customField.getPossibleValues()) {
+						taskAttribute.putOption(option, option);
+					}
+				} 
 			}
 			
 		}
@@ -313,6 +362,24 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 		return attr;
 	}
 	
+	private static TaskAttribute createAttribute(TaskData taskData, IRedmineExtensionField  additionalField, String prefix) {
+		TaskAttribute attr = taskData.getRoot().createAttribute(prefix + additionalField.getTaskKey());
+		attr.getMetaData().setType(additionalField.getEditorType());
+		attr.getMetaData().setLabel(additionalField.getLabel());
+		attr.getMetaData().setReadOnly(false);
+		
+		if (additionalField.getOptions()!=null) {
+			if (!additionalField.isRequired()) {
+				attr.putOption("", ""); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			for (Entry<String, String> entry : additionalField.getOptions().entrySet()) {
+				attr.putOption(entry.getKey(), entry.getValue());
+			}
+			
+		}
+		return attr;
+	}
+	
 	private void createOperations(TaskData taskData, Issue issue, Configuration configuration) {
 		IssueStatus currentStatus = null;
 		if(issue!=null) {
@@ -320,7 +387,7 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 		}
 		
 		if(currentStatus!=null) {
-			createOperation(taskData, RedmineOperation.none, ""+currentStatus.getId(), currentStatus.getName());
+			createOperation(taskData, RedmineOperation.none, ""+currentStatus.getId(), currentStatus.getName()); //$NON-NLS-1$
 		}
 		
 		createOperation(taskData, RedmineOperation.markas, null);
@@ -338,7 +405,7 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 		
 		if(operation.isAssociated()) {
 			attribute.getMetaData().putValue(TaskAttribute.META_ASSOCIATED_ATTRIBUTE_ID, operation.getInputId());
-		} else if(operation.needsRestoreValue() && defaultValue!=null && defaultValue!=""){
+		} else if(operation.needsRestoreValue() && defaultValue!=null && defaultValue!=""){ //$NON-NLS-1$
 			attribute.getMetaData().putValue(IRedmineConstants.TASK_ATTRIBUTE_OPERATION_RESTORE, defaultValue);
 		}
 

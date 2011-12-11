@@ -87,9 +87,13 @@ public class AttributePartLayoutHelper {
 		
 		Label label = editor.getLabelControl();
 		GridData labelGridData = GridDataFactory.fillDefaults()
-				.align(SWT.RIGHT, isMultiRowEditor ? SWT.TOP : SWT.CENTER)
+				.align(SWT.LEFT, isMultiRowEditor ? SWT.TOP : SWT.CENTER)
 				.hint((dynamic ? SWT.DEFAULT : LABEL_WIDTH), SWT.DEFAULT)
 				.create();
+		
+		if (!label.getText().endsWith(":")) {
+			label.setText(label.getText() + ":"); //$NON-NLS-1$
+		}
 		
 		if (currentColumn > 1) {
 			labelGridData.horizontalIndent = COLUMN_GAP;

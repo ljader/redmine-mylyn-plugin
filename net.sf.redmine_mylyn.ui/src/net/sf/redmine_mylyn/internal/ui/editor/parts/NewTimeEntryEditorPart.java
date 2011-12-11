@@ -7,6 +7,7 @@ import net.sf.redmine_mylyn.core.IRedmineConstants;
 import net.sf.redmine_mylyn.core.IRedmineSpentTimeManager;
 import net.sf.redmine_mylyn.core.IRedmineSpentTimeManagerListener;
 import net.sf.redmine_mylyn.core.RedmineAttribute;
+import net.sf.redmine_mylyn.internal.ui.Messages;
 import net.sf.redmine_mylyn.internal.ui.action.RedmineCaptureActivityTimeAction;
 import net.sf.redmine_mylyn.internal.ui.action.RedmineResetUncapturedActivityTimeAction;
 import net.sf.redmine_mylyn.internal.ui.editor.helper.AttributePartLayoutHelper;
@@ -36,7 +37,7 @@ import org.eclipse.ui.forms.widgets.Section;
 
 public class NewTimeEntryEditorPart extends AbstractTaskEditorPart {
 
-	public final static String PART_ID = "net.sf.redmine_mylyn.ui.editor.part.newtimeentry";
+	public final static String PART_ID = "net.sf.redmine_mylyn.ui.editor.part.newtimeentry"; //$NON-NLS-1$
 
 	private Section section;
 
@@ -54,7 +55,7 @@ public class NewTimeEntryEditorPart extends AbstractTaskEditorPart {
 	
 	public NewTimeEntryEditorPart() {
 		super();
-		setPartName("New Time Entry");
+		setPartName(Messages.NEW_TIMEENTRY_PART);
 		setExpandVertically(true);
 		
 		spentTimeManager = RedmineUiPlugin.getDefault().getSpentTimeManager();
@@ -136,6 +137,18 @@ public class NewTimeEntryEditorPart extends AbstractTaskEditorPart {
 		}
 
 		for (TaskAttribute childAttribute : root.getAttributes().values()) {
+			if(childAttribute.getId().startsWith(IRedmineConstants.TASK_KEY_PREFIX_TIMEENTRY_EX)) {
+				attributeList.add(childAttribute.getId());
+				attributeEditor = createAttributeEditor(childAttribute);
+				attributeEditor.createLabelControl(composite, toolkit);
+				attributeEditor.createControl(composite, toolkit);
+				attributeEditor.setDecorationEnabled(false);
+				layoutHelper.setLayoutData(attributeEditor);
+				editorToolkit.adapt(attributeEditor);
+			}
+		}
+		
+		for (TaskAttribute childAttribute : root.getAttributes().values()) {
 			if(childAttribute.getId().startsWith(IRedmineConstants.TASK_KEY_PREFIX_TIMEENTRY_CF)) {
 				attributeList.add(childAttribute.getId());
 				attributeEditor = createAttributeEditor(childAttribute);
@@ -166,11 +179,11 @@ public class NewTimeEntryEditorPart extends AbstractTaskEditorPart {
 			rowLayout.marginBottom = 1;
 			textClient.setLayout(rowLayout);
 			
-			Label label = toolkit.createLabel(textClient, "Uncaptured time:");
+			Label label = toolkit.createLabel(textClient, Messages.UNCAPTURED_TIME);
 			label.setForeground(toolkit.getColors().getColor(IFormColors.TITLE));
 			label.setBackground(null);
 			
-			uncapturedTimeValueLabel = toolkit.createLabel(textClient, "00:00");
+			uncapturedTimeValueLabel = toolkit.createLabel(textClient, IRedmineConstants.EMPTY_DURATION_VALUE);
 			uncapturedTimeValueLabel.setForeground(toolkit.getColors().getColor(IFormColors.TITLE));
 			uncapturedTimeValueLabel.setBackground(null);
 
@@ -215,7 +228,7 @@ public class NewTimeEntryEditorPart extends AbstractTaskEditorPart {
 		if(uncapturedTimeValueLabel!=null && !uncapturedTimeValueLabel.isDisposed()) {
 			String uncapturedTimeString = DateUtil.getFormattedDurationShort(uncapturedTimeValue);
 			if (uncapturedTimeString.isEmpty()) {
-				uncapturedTimeString = "00:00";
+				uncapturedTimeString = IRedmineConstants.EMPTY_DURATION_VALUE;
 			}
 			uncapturedTimeValueLabel.setText(uncapturedTimeString);
 			

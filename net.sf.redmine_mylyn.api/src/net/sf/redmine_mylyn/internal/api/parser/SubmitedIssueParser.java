@@ -9,6 +9,7 @@ import javax.xml.transform.sax.SAXSource;
 import net.sf.redmine_mylyn.api.RedmineApiPlugin;
 import net.sf.redmine_mylyn.api.exception.RedmineApiErrorException;
 import net.sf.redmine_mylyn.common.logging.ILogService;
+import net.sf.redmine_mylyn.internal.api.Messages;
 import net.sf.redmine_mylyn.internal.api.parser.adapter.type.PartialIssueType;
 import net.sf.redmine_mylyn.internal.api.parser.adapter.type.SubmitError;
 
@@ -20,7 +21,7 @@ import org.xml.sax.helpers.XMLFilterImpl;
 
 public class SubmitedIssueParser implements IModelParser<Object> {
 
-	public final static String FAKE_NS = "http://redmin-mylyncon.sf.net/api"; 
+	public final static String FAKE_NS = "http://redmin-mylyncon.sf.net/api";  //$NON-NLS-1$
 	
 	protected JaxbParser<PartialIssueType> successParser;
 	protected JaxbParser<SubmitError> errorParser;
@@ -56,7 +57,7 @@ public class SubmitedIssueParser implements IModelParser<Object> {
 			
 			return parser.parseInputStream(source);
 		} catch (Exception e) {
-			throw new RedmineApiErrorException("Parsing of InputStream failed", e);
+			throw new RedmineApiErrorException(Messages.ERRMSG_INPUTSTREAM_PARSING_FAILED, e);
 		}
 	}
 
@@ -68,14 +69,14 @@ public class SubmitedIssueParser implements IModelParser<Object> {
 		
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
-			int idx = atts.getIndex("authenticated");
+			int idx = atts.getIndex("authenticated"); //$NON-NLS-1$
 			if(idx>0) {
 				boolean authenticated = Boolean.parseBoolean(atts.getValue(idx));
 				if(authenticated) {
-					String authenticatedAs = atts.getValue(atts.getIndex("authenticatedAs"));
-					log.debug("AUTHENTICATED AS {0}", authenticatedAs);
+					String authenticatedAs = atts.getValue(atts.getIndex("authenticatedAs")); //$NON-NLS-1$
+					log.debug("AUTHENTICATED AS {0}", authenticatedAs); //$NON-NLS-1$
 				} else {
-					log.debug("NOT AUTHENTICATED");
+					log.debug("NOT AUTHENTICATED"); //$NON-NLS-1$
 				}
 			}
 
