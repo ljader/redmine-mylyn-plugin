@@ -5,12 +5,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import net.sf.redmine_mylyn.api.exception.RedmineApiErrorException;
 import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.Issue;
 import net.sf.redmine_mylyn.api.model.IssueStatus;
+import net.sf.redmine_mylyn.api.model.Project;
+import net.sf.redmine_mylyn.api.model.Tracker;
 import net.sf.redmine_mylyn.api.query.Query;
 import net.sf.redmine_mylyn.core.client.IClient;
 import net.sf.redmine_mylyn.internal.core.Messages;
@@ -81,10 +84,22 @@ public class RedmineRepositoryConnector extends AbstractRepositoryConnector {
 	@Override
 	public boolean canCreateNewTask(TaskRepository repository) {
 		try {
-			return getClientManager().getClient(repository) != null;
+			IClient client = getClientManager().getClient(repository);
+			if (client!=null) {
+				Configuration conf = client.getConfiguration();
+				if (!conf.getProjects().isEmpty() && !conf.getTrackers().isEmpty()) {
+					Project project = conf.getProjects().getAll().get(0);
+					List<Tracker> trackers = conf.getTrackers().getById(project.getTrackerIds());
+					if (trackers.size()>0) {
+						return true;
+					}
+				}
+				
+			}
 		} catch (RedmineStatusException e) {
 			return false;
 		}
+		return false;
 	}
 
 	@Override

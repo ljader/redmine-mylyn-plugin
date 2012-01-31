@@ -17,6 +17,10 @@ public abstract class AbstractPropertyContainer<T extends Property> implements S
 
 	abstract protected List<T> getModifiableList();
 	
+	public boolean isEmpty() {
+		return getModifiableList().isEmpty();
+	}
+	
 	public List<T> getAll() {
 		return Collections.unmodifiableList(getModifiableList());
 	}
