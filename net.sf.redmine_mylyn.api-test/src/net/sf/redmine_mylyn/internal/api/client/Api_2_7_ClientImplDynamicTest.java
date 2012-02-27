@@ -86,7 +86,7 @@ public class Api_2_7_ClientImplDynamicTest {
 			@Override
 			public HostConfiguration createHostConfiguration(HttpClient httpClient, IProgressMonitor monitor) {
 				HostConfiguration hostConfiguration = new HostConfiguration();
-				hostConfiguration.setHost("localhost", 1234);
+				hostConfiguration.setHost("localhost", 1235);
 				return hostConfiguration;
 			}
 			@Override
@@ -171,7 +171,7 @@ public class Api_2_7_ClientImplDynamicTest {
 		public void run() {
 			try {
 				
-				ServerSocket server = new ServerSocket(1234);
+				ServerSocket server = new ServerSocket(1235);
 				
 				while(!Thread.interrupted()) {
 					OutputStream respStream = null;

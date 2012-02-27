@@ -212,7 +212,7 @@ public class Api_2_7_ClientImplTest {
 			assertNotNull(cf.getFieldFormat());
 			
 			if (cf.isFilter()) {
-				assertNotNull(cf.getQueryField());
+				assertNotNull("Missing Query-Field for " + cf.getFieldFormat(), cf.getQueryField());
 			}
 		}
 
@@ -281,6 +281,7 @@ public class Api_2_7_ClientImplTest {
 		Issue issue = testee.createIssue(TestData.issue2, errorCollector, monitor);
 		assertNotNull(issue);
 		assertEquals(14, issue.getId());
+		assertEquals(1, issue.getProjectId());
 		assertEquals(0, errorCollector.lst.size());
 	}
 
@@ -391,7 +392,9 @@ public class Api_2_7_ClientImplTest {
 		public TestServer() {
 			requestMap = new HashMap<String, String>();
 			requestMap.put("version", ServerVersionValidator.RESOURCE_FILE);
-			requestMap.put("issues/updatedsince?issues=1,6,7,8&unixtime=123456789", IssueValidator.RESOURCE_FILE_UPDATED);
+			//workaround: bug in redmine plugin
+//			requestMap.put("issues/updatedsince?issues=1,6,7,8&unixtime=123456789", IssueValidator.RESOURCE_FILE_UPDATED);
+			requestMap.put("issues/updatedsince?issues=1,6,7,8&unixtime=123456790", IssueValidator.RESOURCE_FILE_UPDATED);
 			requestMap.put("issue/1", IssueValidator.RESOURCE_FILE_ISSUE_1);
 			requestMap.put("issues/list?issues=1,7,8", IssueValidator.RESOURCE_FILE_LIST);
 			requestMap.put("issues", PartialIssueValidator.RESOURCE_FILE);
