@@ -56,6 +56,7 @@ public class Messages extends NLS {
 	public static String SETTINGS_PAGE_TITLE;
 	public static String SUCCESSFUL_CONNECTION_TEST_X_X;
 	public static String REDMINE;
+	public static String OPEN_REVISION_INTEGER_STRING;
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
