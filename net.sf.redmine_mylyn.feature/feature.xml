@@ -2,7 +2,7 @@
 <feature
       id="net.sf.redmine_mylyn.feature"
       label="%Feature-Name"
-      version="0.3.6.qualifier"
+      version="0.3.7.qualifier"
       provider-name="%Feature-Vendor"
       plugin="net.sf.redmine_mylyn">
 
@@ -29,21 +29,22 @@
       <import plugin="org.eclipse.mylyn.commons.net" version="3.5.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.mylyn.tasks.core" version="3.5.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.mylyn.commons.core" version="3.5.0" match="greaterOrEqual"/>
-      <import plugin="net.sf.redmine_mylyn.api" version="0.3.3" match="greaterOrEqual"/>
+      <import plugin="net.sf.redmine_mylyn.api" version="0.3.5" match="greaterOrEqual"/>
       <import plugin="org.aspectj.runtime" version="1.6.0" match="greaterOrEqual"/>
-      <import plugin="net.sf.redmine_mylyn.api" version="0.3.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.mylyn.tasks.ui" version="3.5.0" match="greaterOrEqual"/>
-      <import plugin="net.sf.redmine_mylyn.core" version="0.3.0" match="greaterOrEqual"/>
+      <import plugin="net.sf.redmine_mylyn.core" version="0.3.3" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.forms" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui" version="3.5.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.osgi.services" version="3.2.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.editors" version="3.5.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.mylyn.commons.ui" version="3.5.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.jface.text"/>
       <import plugin="org.slf4j.api" version="1.5.11" match="greaterOrEqual"/>
       <import plugin="ch.qos.logback.classic" version="0.9.19" match="greaterOrEqual"/>
       <import plugin="ch.qos.logback.core" version="0.9.19" match="greaterOrEqual"/>
       <import plugin="org.eclipse.equinox.log" version="1.2.0" match="greaterOrEqual"/>
       <import plugin="org.slf4j.api" version="1.5.11" match="equivalent"/>
+      <import plugin="net.sf.redmine_mylyn.api" version="0.3.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
