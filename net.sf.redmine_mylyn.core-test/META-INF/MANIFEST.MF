@@ -2,12 +2,12 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Redmine-Mylyn-Connector Core Test
 Bundle-SymbolicName: net.sf.redmine_mylyn.core-test
-Bundle-Version: 0.3.2.qualifier
+Bundle-Version: 0.3.3.qualifier
 Bundle-Vendor: Sven Krzyzak
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Require-Bundle: net.sf.redmine_mylyn.api;bundle-version="0.3.3",
- net.sf.redmine_mylyn.core;bundle-version="0.3.2",
+Require-Bundle: net.sf.redmine_mylyn.api;bundle-version="0.3.5",
+ net.sf.redmine_mylyn.core;bundle-version="0.3.3",
  org.eclipse.mylyn.tasks.core;bundle-version="3.5.0",
- net.sf.redmine_mylyn.api-test;bundle-version="0.3.3",
+ net.sf.redmine_mylyn.api-test;bundle-version="0.3.5",
  org.eclipse.core.runtime;bundle-version="3.5.0",
  org.junit4

@@ -147,7 +147,7 @@ public class CustomField extends Property implements IQueryField {
 	}
 
 	public boolean isFilter() {
-		return isFilter;
+		return isFilter && getFieldFormat()!=Format.USER && getFieldFormat()!=Format.VERSION;
 	}
 
 	public void setFilter(boolean isFilter) {
@@ -178,7 +178,7 @@ public class CustomField extends Property implements IQueryField {
 	}
 	
 	public QueryField getQueryField() {
-		if(isFilter) {
+		if(isFilter()) {
 			switch (getFieldFormat()) {
 			case LIST: return QueryField.LIST_TYPE;
 			case BOOL: return QueryField.BOOLEAN_TYPE;

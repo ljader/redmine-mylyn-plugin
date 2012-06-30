@@ -44,5 +44,7 @@ public interface IRedmineConstants {
 	public final static  String REGEX_INTEGER = "^\\d+$"; //$NON-NLS-1$
 
 	public final static  String DATE_FORMAT = "yyyy-MM-dd"; //$NON-NLS-1$
+	
+	public final static String REDMINE_URL_REVISION = "/repositories/revision/"; //$NON-NLS-N$
 
 }

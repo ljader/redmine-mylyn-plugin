@@ -28,6 +28,7 @@ public class Messages extends NLS {
 	public static String ERRMSG_SHOULD_NEVER_HAPPENS;
 	public static String ERRMSG_SYNCRONIZATION_FAILED;
 	public static String ERRMSG_TASK_INITIALIZATION_FALED_INSUFFICENT_DATA;
+	public static String ERRMSG_TASK_INITIALIZATION_FALED_INSUFFICENT_DATA_X_X;
 	public static String ERRMSG_X_VALID_INTEGER;
 	public static String ERRMSG_X_VALID_UNIXTIME_DATE;
 	public static String ESTIMATED_HOURS;

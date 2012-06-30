@@ -120,4 +120,13 @@ public class RedmineCorePlugin extends Plugin /*implements BundleActivator*/ {
 		return toStatus(e, message);
 	}
 
+	public static IStatus toStatus(int severity, String message) {
+		return new Status(severity, PLUGIN_ID, message);
+	}
+
+	public static IStatus toStatus(int severity, String message, Object... params) {
+		message = MessageFormat.format(message, params);
+		return toStatus(severity, message);
+	}
+
 }

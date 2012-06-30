@@ -194,8 +194,16 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 		boolean existingTask = issue.getId()>0;
 		Project project = cfg.getProjects().getById(issue.getProjectId());
 
-		if (project==null || cfg.getSettings()==null) {
-			IStatus status = new Status(IStatus.ERROR, RedmineCorePlugin.PLUGIN_ID, Messages.ERRMSG_TASK_INITIALIZATION_FALED_INSUFFICENT_DATA);
+		if (project==null) {
+			//https://sourceforge.net/tracker/index.php?func=detail&aid=3441198&group_id=228995&atid=1075435#
+			IStatus status = RedmineCorePlugin.toStatus(IStatus.ERROR, Messages.ERRMSG_TASK_INITIALIZATION_FALED_INSUFFICENT_DATA_X_X, issue.getId(), "Project" + " " + issue.getProjectId() );
+			StatusHandler.log(status);
+			throw new RedmineStatusException(status);
+		}
+
+		if (cfg.getSettings()==null) {
+			//https://sourceforge.net/tracker/index.php?func=detail&aid=3441198&group_id=228995&atid=1075435#
+			IStatus status = RedmineCorePlugin.toStatus(IStatus.ERROR, Messages.ERRMSG_TASK_INITIALIZATION_FALED_INSUFFICENT_DATA_X_X, issue.getId(), "Settings" );
 			StatusHandler.log(status);
 			throw new RedmineStatusException(status);
 		}

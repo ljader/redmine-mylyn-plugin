@@ -15,7 +15,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class PartialIssueParserTest {
+public class IssuesParserTest {
 
 	InputStream input;
 	IssuesParser testee;

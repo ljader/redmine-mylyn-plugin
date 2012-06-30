@@ -35,7 +35,7 @@ public class SubmitedIssueParser implements IModelParser<Object> {
 		successParser = new JaxbParser<PartialIssueType>(PartialIssueType.class);
 
 		parserFactory = SAXParserFactory.newInstance();
-		parserFactory.setNamespaceAware(false);
+		parserFactory.setNamespaceAware(true);
 
 		log = RedmineApiPlugin.getLogService(SubmitedIssueParser.class);
 	}
