@@ -15,6 +15,7 @@
 	
 	<modules>
 		<module>net.sf.redmine_mylyn</module>
+		<module>net.sf.redmine_mylyn.common</module>
 	</modules>
 
 	<properties>
