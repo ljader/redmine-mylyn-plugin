@@ -22,6 +22,9 @@
 		<tycho-version>0.16.0</tycho-version>
 		<platform-version-name>indigo</platform-version-name> <!-- for informative purposes only -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		
+		<mylyn-site>http://download.eclipse.org/tools/mylyn/update/weekly</mylyn-site>
+		<orbit-site>http://download.eclipse.org/tools/orbit/downloads/drops/R20110523182458/repository/</orbit-site>
 	</properties>
 	
 	<repositories>
@@ -29,6 +32,16 @@
 			<id>eclipse-platform</id>
 			<layout>p2</layout>
 			<url>${eclipse-site}</url>
+		</repository>
+		<repository>
+			<id>mylyn</id>
+			<layout>p2</layout>
+			<url>${mylyn-site}</url>
+		</repository>
+		<repository>
+			<id>orbit</id>
+			<layout>p2</layout>
+			<url>${orbit-site}</url>
 		</repository>
 	</repositories>	
 	
