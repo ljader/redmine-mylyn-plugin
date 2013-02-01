@@ -26,6 +26,7 @@
 		
 		<mylyn-site>http://download.eclipse.org/tools/mylyn/update/weekly</mylyn-site>
 		<orbit-site>http://download.eclipse.org/tools/orbit/downloads/drops/R20110523182458/repository/</orbit-site>
+		<aspectj-site>http://download.eclipse.org/tools/ajdt/37/dev/update</aspectj-site>
 	</properties>
 	
 	<repositories>
@@ -43,6 +44,11 @@
 			<id>orbit</id>
 			<layout>p2</layout>
 			<url>${orbit-site}</url>
+		</repository>
+		<repository>
+			<id>aspectj</id>
+			<layout>p2</layout>
+			<url>${aspectj-site}</url>
 		</repository>
 	</repositories>	
 	
