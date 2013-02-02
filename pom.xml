@@ -23,9 +23,9 @@
 
 	<properties>
 		<tycho-version>0.16.0</tycho-version>
-		<platform-version-name>indigo</platform-version-name> <!-- for informative purposes only -->
+		<platform-version-name>indigo</platform-version-name>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		
+		<eclipse-site>http://download.eclipse.org/releases/${platform-version-name}</eclipse-site>
 		<mylyn-site>http://download.eclipse.org/tools/mylyn/update/weekly</mylyn-site>
 		<orbit-site>http://download.eclipse.org/tools/orbit/downloads/drops/R20110523182458/repository/</orbit-site>
 		<aspectj-site>http://download.eclipse.org/tools/ajdt/37/dev/update</aspectj-site>
