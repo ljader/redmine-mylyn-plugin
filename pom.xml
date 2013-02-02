@@ -18,6 +18,7 @@
 		<module>net.sf.redmine_mylyn.common</module>
 		<module>net.sf.redmine_mylyn.api</module>
 		<module>net.sf.redmine_mylyn.core</module>
+		<module>net.sf.redmine_mylyn.ui</module>
 	</modules>
 
 	<properties>
