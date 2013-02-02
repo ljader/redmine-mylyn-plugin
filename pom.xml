@@ -21,6 +21,8 @@
 		<module>net.sf.redmine_mylyn.ui</module>
 		
 		<module>net.sf.redmine_mylyn.feature</module>
+		
+		<module>net.sf.redmine_mylyn.p2repository</module>
 	</modules>
 
 	<properties>
@@ -65,6 +67,14 @@
 				<artifactId>tycho-maven-plugin</artifactId>
 				<version>${tycho-version}</version>
 				<extensions>true</extensions>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>target-platform-configuration</artifactId>
+				<version>${tycho-version}</version>
+				<configuration>
+					<resolver>p2</resolver>
+				</configuration>
 			</plugin>
 		</plugins>		
 		
