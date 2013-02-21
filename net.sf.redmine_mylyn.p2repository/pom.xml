@@ -14,4 +14,19 @@
 	<packaging>eclipse-repository</packaging>
 	<version>0.4.0-SNAPSHOT</version>
 	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-p2-repository-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<configuration>
+				  <includeAllDependencies>false</includeAllDependencies>
+				  <createArtifactRepository>true</createArtifactRepository>
+				  <compress>true</compress>
+				</configuration>
+			  </plugin>
+		</plugins>		
+	</build>
+	
 </project>
