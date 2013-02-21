@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<prerequisites>
+		<maven>3.0</maven>
+	</prerequisites>
+
+	<groupId>net.sf.redmine_mylyn</groupId>
+	<artifactId>net.sf.redmine_mylyn.parent</artifactId>
+	<version>0.4.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	
+	<modules>
+		<module>net.sf.redmine_mylyn</module>
+		<module>net.sf.redmine_mylyn.common</module>
+		<module>net.sf.redmine_mylyn.api</module>
+		<module>net.sf.redmine_mylyn.core</module>
+		<module>net.sf.redmine_mylyn.ui</module>
+		
+		<module>net.sf.redmine_mylyn.feature</module>
+		
+		<module>net.sf.redmine_mylyn.p2repository</module>
+	</modules>
+
+	<properties>
+		<tycho-version>0.16.0</tycho-version>
+		<platform-version-name>indigo</platform-version-name>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<eclipse-site>http://download.eclipse.org/releases/${platform-version-name}</eclipse-site>
+		<mylyn-site>http://download.eclipse.org/tools/mylyn/update/weekly</mylyn-site>
+		<orbit-site>http://download.eclipse.org/tools/orbit/downloads/drops/R20110523182458/repository/</orbit-site>
+		<aspectj-site>http://download.eclipse.org/tools/ajdt/37/dev/update</aspectj-site>
+	</properties>
+	
+	<repositories>
+		<repository>
+			<id>eclipse-platform</id>
+			<layout>p2</layout>
+			<url>${eclipse-site}</url>
+		</repository>
+		<repository>
+			<id>mylyn</id>
+			<layout>p2</layout>
+			<url>${mylyn-site}</url>
+		</repository>
+		<repository>
+			<id>orbit</id>
+			<layout>p2</layout>
+			<url>${orbit-site}</url>
+		</repository>
+		<repository>
+			<id>aspectj</id>
+			<layout>p2</layout>
+			<url>${aspectj-site}</url>
+		</repository>
+	</repositories>	
+	
+	<build>
+		<sourceDirectory>src</sourceDirectory>
+
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-maven-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<extensions>true</extensions>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>target-platform-configuration</artifactId>
+				<version>${tycho-version}</version>
+				<configuration>
+					<resolver>p2</resolver>
+				</configuration>
+			</plugin>
+		</plugins>		
+		
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.eclipse.tycho</groupId>
+					<artifactId>tycho-compiler-plugin</artifactId>
+					<version>${tycho-version}</version>
+					<configuration>
+						<encoding>UTF-8</encoding>
+					</configuration>
+				</plugin>
+				
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>2.4.1</version>
+					<configuration>
+						<encoding>ISO-8859-1</encoding>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+		
+
+	<profiles>
+		<profile>
+			<id>platform-helios</id>
+			<activation>
+				<property>
+					<name>platform-version-name</name>
+					<value>helios</value>
+				</property>
+			</activation>
+			<properties>
+				<eclipse-site>http://download.eclipse.org/releases/helios</eclipse-site>
+				<platform-version>[3.6,3.7)</platform-version>
+			</properties>
+		</profile>
+		<profile>
+			<id>platform-indigo</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+				<property>
+					<name>platform-version-name</name>
+					<value>indigo</value>
+				</property>
+			</activation>
+			<properties>
+				<eclipse-site>http://download.eclipse.org/releases/indigo</eclipse-site>
+				<platform-version>[3.7,3.8)</platform-version>
+			</properties>
+		</profile>
+	</profiles>
+
+</project>
