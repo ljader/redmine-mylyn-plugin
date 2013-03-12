@@ -84,6 +84,8 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 
 	private final static String URL_GET_AUTHENTICITY_TOKEN = "/mylyn/token"; //$NON-NLS-1$
 	
+	private final static String HEADER_CSRF_TOKEN = "X-CSRF-Token";
+	
 	private Map<String, IModelParser<? extends AbstractPropertyContainer<?>>> parserByClass;
 	
 	private SettingsParser settingsParser;
@@ -266,9 +268,11 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 		PostMethod method = new PostMethod("/issues.xml"); //$NON-NLS-1$
 		try {
 			//Workaround: remote method CREATE dosn't support API-Keys, we need a session
-			getAuthenticityToken(monitor);
+			String token = getAuthenticityToken(monitor);
 			
 			method.setRequestEntity(new IssueRequestEntity(issue));
+			method.addRequestHeader(HEADER_CSRF_TOKEN, token);
+			
 		} catch (UnsupportedEncodingException e) {
 			throw new RedmineApiErrorException(Messages.ERRMSG_METHOD_EXECUTION_FAILED_INVALID_ENCODING, e, "UTF-8"); //$NON-NLS-2$ //$NON-NLS-1$
 		}
@@ -331,10 +335,12 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 	
 	private void updateIssue(int issueId, IssueRequestEntity requestEntity, IRedmineApiErrorCollector errorCollector, IProgressMonitor monitor) throws RedmineApiInvalidDataException, RedmineApiErrorException {
 		//Workaround: remote method UPDATE dosn't support API-Keys, we need a session
-		getAuthenticityToken(monitor);
+		String token = getAuthenticityToken(monitor);
 		
 		PutMethod method = new PutMethod(String.format(URL_UPDATE_ISSUE, issueId));
 		method.setRequestEntity(requestEntity);
+		method.addRequestHeader(HEADER_CSRF_TOKEN, token);
+		
 		Object response = executeMethod(method, submitIssueParser, monitor, HttpStatus.SC_OK, HttpStatus.SC_UNPROCESSABLE_ENTITY);
 		
 		if(response instanceof SubmitError) {
