@@ -91,6 +91,9 @@ public class Issue implements IModel {
 	@IssuePropertyMapping(RedmineApiIssueProperty.PARENT)
 	private int parentId;
 
+	@IssuePropertyMapping(RedmineApiIssueProperty.NOTES)
+	private String notes;
+	
 	@XmlList
 	private int [] subtasks;
 
@@ -372,5 +375,13 @@ public class Issue implements IModel {
 	
 	public void setClosed(boolean closed) {
 		this.closed = closed;
+	}
+	
+	public String getNotes() {
+		return notes;
+	}
+	
+	public void setNotes(String notes) {
+		this.notes = notes;
 	}
 }

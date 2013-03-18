@@ -10,7 +10,7 @@ import net.sf.redmine_mylyn.api.model.Issue;
 import net.sf.redmine_mylyn.internal.api.Messages;
 
 public enum RedmineApiIssueProperty {
-	SUBJECT, DESCRIPTION, ASSIGNED_TO, CATEGORY, DONE_RATIO, DUE_DATE, ESTIMATED_HOURS, FIXED_VERSION, PARENT("parent_issue_id"), PRIORITY, PROJECT, START_DATE, STATUS, TRACKER; //$NON-NLS-1$
+	SUBJECT, DESCRIPTION, ASSIGNED_TO, CATEGORY, DONE_RATIO, DUE_DATE, ESTIMATED_HOURS, FIXED_VERSION, PARENT("parent_issue_id"), PRIORITY, PROJECT, START_DATE, STATUS, TRACKER, NOTES; //$NON-NLS-1$
 	
 	private static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 	
