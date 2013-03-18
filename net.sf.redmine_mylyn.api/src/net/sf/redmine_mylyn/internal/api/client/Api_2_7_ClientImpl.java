@@ -299,6 +299,7 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 		monitor.beginTask(Messages.PROGRESS_UPLOAD_TASK, 1);
 
 		try {
+			issueValues.put(RedmineApiIssueProperty.NOTES, comment);
 			updateIssue(issueId, new IssueRequestEntity(issueValues, comment, timeEntry), errorCollector, monitor);
 		} catch (UnsupportedEncodingException e) {
 			throw new RedmineApiErrorException(Messages.ERRMSG_METHOD_EXECUTION_FAILED_INVALID_ENCODING, e, "UTF-8"); //$NON-NLS-2$ //$NON-NLS-1$
@@ -317,6 +318,7 @@ public class Api_2_7_ClientImpl extends AbstractClient {
 		monitor.beginTask(Messages.PROGRESS_UPLOAD_TASK, 1);
 
 		try {
+			issue.setNotes(comment);
 			updateIssue(issue.getId(), new IssueRequestEntity(issue, comment, timeEntry), errorCollector, monitor);
 		} catch (UnsupportedEncodingException e) {
 			throw new RedmineApiErrorException(Messages.ERRMSG_METHOD_EXECUTION_FAILED_INVALID_ENCODING, e, "UTF-8"); //$NON-NLS-2$ //$NON-NLS-1$
