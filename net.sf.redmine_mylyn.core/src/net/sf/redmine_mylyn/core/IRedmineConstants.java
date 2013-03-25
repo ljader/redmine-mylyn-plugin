@@ -2,7 +2,7 @@ package net.sf.redmine_mylyn.core;
 
 public interface IRedmineConstants {
 
-	public final static String REDMINE_URL_TICKET = "/issues/show/"; //$NON-NLS-1$
+	public final static String REDMINE_URL_TICKET = "/issues/"; //$NON-NLS-1$
 	public final static String REDMINE_URL_PART_COMMENT = "#note-%d"; //$NON-NLS-1$
 	public final static String REDMINE_URL_ATTACHMENT_DOWNLOAD = "%s/attachments/download/%d"; //$NON-NLS-1$
 
