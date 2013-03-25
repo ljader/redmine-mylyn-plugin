@@ -123,7 +123,7 @@ public class IssueMapperTest {
 		assertEquals(""+journal.getUserId(), attribute.getAttribute(TaskAttribute.COMMENT_AUTHOR).getValue());
 		assertEquals(""+journal.getCreatedOn().getTime(), attribute.getAttribute(TaskAttribute.COMMENT_DATE).getValue());
 		assertEquals(""+journal.getNotes(), attribute.getAttribute(TaskAttribute.COMMENT_TEXT).getValue());
-		assertEquals(URL + "/issues/show/" + issue.getId() + "#note-3", attribute.getAttribute(TaskAttribute.COMMENT_URL).getValue());
+		assertEquals(URL + "/issues/" + issue.getId() + "#note-3", attribute.getAttribute(TaskAttribute.COMMENT_URL).getValue());
 		
 		/* Attachments */
 		/* affected by TaskAttributeMapper, RedmineTaskAttributeMapper */
