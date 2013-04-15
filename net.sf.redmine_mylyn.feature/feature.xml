@@ -43,7 +43,6 @@
       <import plugin="ch.qos.logback.classic" version="0.9.19" match="greaterOrEqual"/>
       <import plugin="ch.qos.logback.core" version="0.9.19" match="greaterOrEqual"/>
       <import plugin="org.eclipse.equinox.log" version="1.2.0" match="greaterOrEqual"/>
-      <import plugin="org.slf4j.api" version="1.5.11" match="equivalent"/>
       <import plugin="net.sf.redmine_mylyn.api" version="0.4.0" match="greaterOrEqual"/>
    </requires>
 
