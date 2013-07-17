@@ -119,7 +119,6 @@
 		<profile>
 			<id>platform-indigo</id>
 			<activation>
-				<activeByDefault>true</activeByDefault>
 				<property>
 					<name>platform-version-name</name>
 					<value>indigo</value>
@@ -128,6 +127,32 @@
 			<properties>
 				<eclipse-site>http://download.eclipse.org/releases/indigo</eclipse-site>
 				<platform-version>[3.7,3.8)</platform-version>
+			</properties>
+		</profile>
+		<profile>
+			<id>platform-juno</id>
+			<activation>
+				<property>
+					<name>platform-version-name</name>
+					<value>juno</value>
+				</property>
+			</activation>
+			<properties>
+				<eclipse-site>http://download.eclipse.org/releases/juno</eclipse-site>
+				<platform-version>[3.8,4.3)</platform-version>
+			</properties>
+		</profile>
+		<profile>
+			<id>platform-kepler</id>
+			<activation>
+				<property>
+					<name>platform-version-name</name>
+					<value>kepler</value>
+				</property>
+			</activation>
+			<properties>
+				<eclipse-site>http://download.eclipse.org/releases/kepler</eclipse-site>
+				<platform-version>[4.3,4.4)</platform-version>
 			</properties>
 		</profile>
 	</profiles>
