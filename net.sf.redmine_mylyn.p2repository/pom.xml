@@ -12,7 +12,6 @@
 	
 	<artifactId>net.sf.redmine_mylyn.p2repository</artifactId>
 	<packaging>eclipse-repository</packaging>
-	<version>0.4.0-SNAPSHOT</version>
 	
 	<build>
 		<plugins>
