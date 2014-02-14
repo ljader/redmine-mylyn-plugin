@@ -32,7 +32,7 @@ public class EstimatedEditor extends AbstractAttributeEditor {
 
 	private final static int STEPS = 25;
 	
-	Spinner spinner;
+	private Spinner spinner;
 	
 	private final TaskDataModelListener modelListener;
 	
