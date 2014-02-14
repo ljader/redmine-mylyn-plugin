@@ -12,6 +12,5 @@
 
 	<artifactId>net.sf.redmine_mylyn.ui</artifactId>
 	<packaging>eclipse-plugin</packaging>
-	<version>0.4.0-SNAPSHOT</version>
 
 </project>
