@@ -187,6 +187,8 @@ public class CustomField extends Property implements IQueryField {
 			case TEXT: return QueryField.TEXT_TYPE;
 			case INT: return QueryField.INT_TYPE;
 			case FLOAT: return QueryField.FLOAT_TYPE;
+			
+			default: return null;
 			}
 		}
 		return null;
