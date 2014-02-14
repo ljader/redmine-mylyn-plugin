@@ -85,9 +85,9 @@ public class RedmineCaptureActivityTimeAction extends AbstractRedmineAttributeCh
 			
 			return value;
 			
+		default:
+			return ""; //$NON-NLS-1$
 		}
-		
-		return ""; //$NON-NLS-1$
 	}
 	
 	@Override

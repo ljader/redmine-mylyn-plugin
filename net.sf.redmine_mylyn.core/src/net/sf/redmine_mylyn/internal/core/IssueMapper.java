@@ -288,6 +288,7 @@ public class IssueMapper {
 			switch(field.getFieldFormat()) {
 			case DATE: value = value.isEmpty() ? "" : RedmineUtil.formatDate(RedmineUtil.parseDate(value)); break; //$NON-NLS-1$
 			case BOOL: value = Boolean.parseBoolean(value) ? IRedmineConstants.BOOLEAN_TRUE_SUBMIT_VALUE : IRedmineConstants.BOOLEAN_FALSE_SUBMIT_VALUE;
+			default: return value;
 			}
 		}
 		return value;

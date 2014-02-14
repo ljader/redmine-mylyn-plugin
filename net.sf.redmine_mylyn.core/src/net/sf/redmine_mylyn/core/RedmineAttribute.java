@@ -170,8 +170,10 @@ public enum RedmineAttribute {
 		case REPORTER :
 		case ASSIGNED_TO :
 			return TaskAttribute.KIND_PEOPLE;
+		
+		default:
+			return TaskAttribute.KIND_DEFAULT;
 		}
-		return TaskAttribute.KIND_DEFAULT;
 	}
 	
 	public String getType() {

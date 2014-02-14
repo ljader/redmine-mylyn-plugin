@@ -171,6 +171,7 @@ public class TaskDataValidator {
 			switch (customField.getFieldFormat()) {
 			case FLOAT: Double.valueOf(value); break;
 			case INT: Integer.valueOf(value); break;
+			default: return true;
 			}
 		} catch (NumberFormatException e) {
 			return false;

@@ -167,9 +167,9 @@ public class QueryBuilder {
 		case AUTHOR:
 		case ASSIGNED_TO:
 			return configuration.getUsers().getById(propertyId);
-		}
 		
-		return null;
+		default:
+			return null;
+		}
 	}
-
 }
