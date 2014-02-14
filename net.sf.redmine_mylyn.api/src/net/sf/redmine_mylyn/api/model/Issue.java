@@ -75,7 +75,7 @@ public class Issue implements IModel {
 	private int doneRatio;
 	
 	@IssuePropertyMapping(RedmineApiIssueProperty.ESTIMATED_HOURS)
-	private float estimatedHours;
+	private Float estimatedHours;
 
 	private int authorId;
 	
@@ -275,6 +275,9 @@ public class Issue implements IModel {
 
 	public void setEstimatedHours(float estimatedHours) {
 		this.estimatedHours = estimatedHours;
+		if (this.estimatedHours == 0) {
+			this.estimatedHours = null;
+		}
 	}
 
 	public int getAuthorId() {
