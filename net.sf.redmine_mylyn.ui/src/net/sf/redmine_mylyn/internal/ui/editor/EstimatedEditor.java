@@ -32,7 +32,7 @@ public class EstimatedEditor extends AbstractAttributeEditor {
 
 	private final static int STEPS = 25;
 	
-	Spinner spinner;
+	private Spinner spinner;
 	
 	private final TaskDataModelListener modelListener;
 	
@@ -82,7 +82,7 @@ public class EstimatedEditor extends AbstractAttributeEditor {
 			
 			spinner.addModifyListener(new ModifyListener() {
 				public void modifyText(ModifyEvent e) {
-					EstimatedEditor.this.setValue(spinner.getSelection());
+					EstimatedEditor.this.setValue(spinner.getText());
 				}
 			});
 			
@@ -118,32 +118,30 @@ public class EstimatedEditor extends AbstractAttributeEditor {
 		return toSelectionValue(getTaskAttribute().getValue());
 	}
 
-	private void setValue(int val) {
-		String newValue = "" + (((float)(val))*1e-2); //$NON-NLS-1$
-		if(!newValue.equals(getTaskAttribute().getValue())) {
-			getTaskAttribute().setValue(newValue);
+	private void setValue(String val) {
+		if(!val.equals(getTaskAttribute().getValue())) {
+			if(Float.valueOf(val) == 0) {
+				val = "";
+			}
+			getTaskAttribute().setValue(val);
 			attributeChanged();
 		}
 	}
 	
 	private int toSelectionValue(String val) {
-		float selectionVal = 0;
+		float value = 0;
 		if(!val.isEmpty()) {
 			try {
-				selectionVal = Float.valueOf(val);
-				selectionVal *= 1e2;
 				
-				float rest = selectionVal%STEPS;
-				if(rest>0) {
-					selectionVal += STEPS-rest;
-				}
+				value = Float.parseFloat(val);
+				value *= 100;
 				
 			} catch (NumberFormatException e) {
 				IStatus status = RedmineCorePlugin.toStatus(e, Messages.ERRMSG_INVALID_REDMINE_HOURS, getTaskAttribute().getValue());
 				StatusHandler.log(status);
 			}
 		}
-		return (int)selectionVal;
+		return (int)value;
 	}
 	
 
