@@ -392,7 +392,7 @@ public class IssueMapper {
 					case PROGRESS:field.setInt(issue, taskAttribute.getValue().isEmpty() ? 0 : Integer.parseInt(taskAttribute.getValue())); break;
 					case ESTIMATED:
 						if (!taskAttribute.getValue().isEmpty())
-							field.setFloat(issue, Float.parseFloat(taskAttribute.getValue()));
+							field.set(issue, new Float(taskAttribute.getValue()));
 						break;
 					default:
 						if(redmineAttribute.getType().equals(TaskAttribute.TYPE_SINGLE_SELECT) || redmineAttribute.getType().equals(TaskAttribute.TYPE_PERSON) || redmineAttribute.getType().equals(IRedmineConstants.EDITOR_TYPE_PERSON) || redmineAttribute==RedmineAttribute.PARENT) {
