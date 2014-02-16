@@ -144,7 +144,13 @@ public class IssueMapper {
 				}
 			}
 			
-		}
+		}  
+		   
+		setTaskKind(issue, cfg, root);
+		
+
+		
+		
 	}
 
 	public static Issue createIssue(TaskRepository repository, TaskData taskData, Set<TaskAttribute> oldAttributes, Configuration cfg) throws CoreException {
@@ -232,8 +238,27 @@ public class IssueMapper {
 			}
 		}
 		
+		setTaskKind(issue, cfg, root);
+		
 		
 		return issue;
+	}
+
+	/**
+	 * Sets the ${task.kind} mylyn property to the redmine tracker name.
+	 * 
+	 * @param issue the redmine issue 
+	 * @param cfg the redmine configuration
+	 * @param task the mylyn task
+	 */
+	private static void setTaskKind(Issue issue, Configuration cfg, TaskAttribute task) {
+		if (issue.getTrackerId()!=0) {
+			TaskAttribute kind = task.getAttribute(TaskAttribute.TASK_KIND);
+			if (kind==null) {
+				kind = task.createAttribute(TaskAttribute.TASK_KIND); 
+			}
+			kind.setValue(cfg.getTrackers().getById(issue.getTrackerId()).getName());
+		}
 	}
 
 	public static TimeEntry createTimeEntry(TaskRepository repository, TaskData taskData, Set<TaskAttribute> oldAttributes, Configuration cfg) throws CoreException {
