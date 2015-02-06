@@ -1,5 +1,8 @@
 package net.sf.redmine_mylyn.internal.ui.editor;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.regex.Pattern;
 
 import net.sf.redmine_mylyn.core.IRedmineConstants;
@@ -71,9 +74,14 @@ public class DurationEditor extends AbstractAttributeEditor {
 			//Move into RedmineUtil
 			String val = IRedmineConstants.EMPTY_DURATION_VALUE;
 			if (!getTaskAttribute().getValue().isEmpty()) {
-				float hours = Float.parseFloat(getTaskAttribute().getValue());
-				float minutes = (int)(60.f * (hours - (int)hours));
-				val = String.format(Messages.TIME_VALUE_X_X, (int)hours, (int)minutes);
+				NumberFormat nf = NumberFormat.getInstance();
+				try {
+					float hours = nf.parse(getTaskAttribute().getValue()).floatValue();
+					float minutes = (int)(60.f * (hours - (int)hours));
+					val = String.format(Messages.TIME_VALUE_X_X, (int)hours, (int)minutes);
+				} catch (ParseException e) {
+					// Do nothing
+				}
 			}
 			
 			control = toolkit.createText(composite, val, SWT.FLAT | SWT.READ_ONLY);
@@ -160,12 +168,20 @@ public class DurationEditor extends AbstractAttributeEditor {
 					//1:30
 					setValue((parts[0].isEmpty() ? 0 : Integer.parseInt(parts[0])), (parts[1].isEmpty() ? 0 : Integer.parseInt(parts[1])));
 					return;
-				} else if (mixed.matches("^(?:\\d*\\.)?\\d+$")) { //$NON-NLS-1$
-					//.30 or 0.30 or 0
-					setValue(Float.parseFloat(mixed));
+				} else if (mixed.matches(
+							String.format(
+								"^(?:\\d*\\%1$s)?\\d+$"
+								, ((DecimalFormat)DecimalFormat.getInstance())
+										.getDecimalFormatSymbols().getDecimalSeparator()
+								)
+							)
+						) { //$NON-NLS-1$
+					//.30 or 0.30 or 0 (or other locale-specific separators)
+					NumberFormat nf = NumberFormat.getInstance();
+					setValue(nf.parse(mixed).floatValue());
 					return;
 				}
-			} catch(NumberFormatException e) {
+			} catch(ParseException e) {
 				
 			}
 		}

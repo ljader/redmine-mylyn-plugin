@@ -146,11 +146,11 @@ public class EstimatedEditor extends AbstractAttributeEditor {
 		float value = 0;
 		if(!val.isEmpty()) {
 			try {
-				
-				value = Float.parseFloat(val);
+				NumberFormat nf = NumberFormat.getInstance();
+				value = nf.parse(val).floatValue();
 				value *= 100;
 				
-			} catch (NumberFormatException e) {
+			} catch (ParseException e) {
 				IStatus status = RedmineCorePlugin.toStatus(e, Messages.ERRMSG_INVALID_REDMINE_HOURS, getTaskAttribute().getValue());
 				StatusHandler.log(status);
 			}

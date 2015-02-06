@@ -1,5 +1,7 @@
 package net.sf.redmine_mylyn.api.query;
 
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -163,9 +165,10 @@ public enum QueryField implements IQueryField {
 		@Override
 		public boolean isValid(String value) {
 			try {
-				Float.parseFloat(value);
+				NumberFormat nf = NumberFormat.getInstance();
+				nf.parse(value);
 				return true;
-			} catch (NumberFormatException e) {
+			} catch (ParseException e) {
 				return false;
 			}
 		}

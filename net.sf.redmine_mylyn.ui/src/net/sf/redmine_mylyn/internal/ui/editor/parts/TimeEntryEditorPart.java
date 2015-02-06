@@ -1,6 +1,8 @@
 package net.sf.redmine_mylyn.internal.ui.editor.parts;
 
 import java.text.DateFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -68,10 +70,14 @@ public class TimeEntryEditorPart extends AbstractTaskEditorPart {
 		if(totalAttribute!=null && !totalAttribute.getValue().isEmpty()) {
 
 			if (!totalAttribute.getValue().isEmpty()) {
-				float fHours = Float.parseFloat(totalAttribute.getValue());
-				
-				iMinutes = (int)(60.f * (fHours - (int)fHours));
-				iHours = (int)fHours;
+				NumberFormat nf = NumberFormat.getInstance();
+				try {
+					float fHours = nf.parse(totalAttribute.getValue()).floatValue();
+					iMinutes = (int)(60.f * (fHours - (int)fHours));
+					iHours = (int)fHours;
+				} catch (ParseException e) {
+					// do nothing
+				}
 			}
 
 		}
