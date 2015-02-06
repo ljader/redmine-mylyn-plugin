@@ -37,7 +37,12 @@ public class DurationEditor extends AbstractAttributeEditor {
 
 	private final static Pattern VALIDATION_REGEX1 = Pattern.compile("^\\d*(?::(?:[0-5][0-9]?)?)?$");  //$NON-NLS-1$
 	
-	private final static Pattern VALIDATION_REGEX2 = Pattern.compile("^\\d*(?:\\.(?:\\d*)?)?$");  //$NON-NLS-1$
+	private final static Pattern VALIDATION_REGEX2 = Pattern.compile(
+			String.format(
+			"^\\d*(?:\\%1$s(?:\\d*)?)?$",
+					((DecimalFormat)DecimalFormat.getInstance())
+					.getDecimalFormatSymbols().getDecimalSeparator()
+					));  //$NON-NLS-1$
 	
 	Text text;
 	
