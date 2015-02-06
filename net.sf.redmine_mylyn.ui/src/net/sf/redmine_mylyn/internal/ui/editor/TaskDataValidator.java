@@ -1,5 +1,7 @@
 package net.sf.redmine_mylyn.internal.ui.editor;
 
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -78,8 +80,9 @@ public class TaskDataValidator {
 		if (attribute != null) {
 			if (!attribute.getValue().trim().isEmpty()) {
 				try {
-					Double.valueOf(attribute.getValue().trim());
-				} catch (NumberFormatException e) {
+					NumberFormat nf = NumberFormat.getInstance();
+					nf.parse(attribute.getValue().trim()).doubleValue();
+				} catch (ParseException e) {
 					collector.add(attribute, RedmineAttribute.ESTIMATED.getLabel() + Messages.ERRMSG_FLOAT);
 				}
 			}
@@ -91,8 +94,9 @@ public class TaskDataValidator {
 		if (attribute != null) {
 			if (!attribute.getValue().trim().isEmpty()) {
 				try {
-					Double.valueOf(attribute.getValue().trim());
-				} catch (NumberFormatException e) {
+					NumberFormat nf = NumberFormat.getInstance();
+					nf.parse(attribute.getValue().trim());
+				} catch (ParseException e) {
 					collector.add(attribute, RedmineAttribute.TIME_ENTRY_HOURS.getLabel() + Messages.ERRMSG_FLOAT);
 				}
 
@@ -169,13 +173,18 @@ public class TaskDataValidator {
 	protected boolean validateCustomAttributeType(String value, CustomField customField) {
 		try {
 			switch (customField.getFieldFormat()) {
-			case FLOAT: Double.valueOf(value); break;
+			case FLOAT: 
+				NumberFormat nf = NumberFormat.getInstance();
+				nf.parse(value);
 			case INT: Integer.valueOf(value); break;
 			default: return true;
 			}
 		} catch (NumberFormatException e) {
 			return false;
+		} catch (ParseException e) {
+			return false;
 		}
+		
 		return true;
 	}
 	

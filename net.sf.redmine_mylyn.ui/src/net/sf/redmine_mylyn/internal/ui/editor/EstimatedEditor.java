@@ -1,5 +1,8 @@
 package net.sf.redmine_mylyn.internal.ui.editor;
 
+import java.text.NumberFormat;
+import java.text.ParseException;
+
 import net.sf.redmine_mylyn.core.RedmineCorePlugin;
 import net.sf.redmine_mylyn.internal.ui.Images;
 import net.sf.redmine_mylyn.internal.ui.Messages;
@@ -120,9 +123,20 @@ public class EstimatedEditor extends AbstractAttributeEditor {
 
 	private void setValue(String val) {
 		if(!val.equals(getTaskAttribute().getValue())) {
-			if(Float.valueOf(val) == 0) {
+			
+			NumberFormat nf = NumberFormat.getInstance();
+			float value = 0;
+
+			try {
+				value = nf.parse(val).floatValue();
+			} catch (ParseException parsex) {
+				// do nothing
+			}
+
+			if(value == 0) {
 				val = "";
 			}
+
 			getTaskAttribute().setValue(val);
 			attributeChanged();
 		}
