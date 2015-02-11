@@ -1,6 +1,7 @@
 package net.sf.redmine_mylyn.internal.core;
 
 import java.lang.reflect.Field;
+import java.text.NumberFormat;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -392,7 +393,13 @@ public class IssueMapper {
 					case PROGRESS:field.setInt(issue, taskAttribute.getValue().isEmpty() ? 0 : Integer.parseInt(taskAttribute.getValue())); break;
 					case ESTIMATED:
 						if (!taskAttribute.getValue().isEmpty())
-							field.set(issue, new Float(taskAttribute.getValue()));
+							try {
+								NumberFormat nf = NumberFormat.getInstance();
+								Float value = nf.parse(taskAttribute.getValue()).floatValue();
+								field.set(issue, value);
+							} catch (NumberFormatException nfex) {
+								// Do nothing
+							}
 						break;
 					default:
 						if(redmineAttribute.getType().equals(TaskAttribute.TYPE_SINGLE_SELECT) || redmineAttribute.getType().equals(TaskAttribute.TYPE_PERSON) || redmineAttribute.getType().equals(IRedmineConstants.EDITOR_TYPE_PERSON) || redmineAttribute==RedmineAttribute.PARENT) {
