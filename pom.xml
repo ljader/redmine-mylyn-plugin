@@ -168,6 +168,19 @@
 				<platform-version>[4.4,4.5)</platform-version>
 			</properties>
 		</profile>
+		<profile>
+			<id>platform-mars</id>
+			<activation>
+				<property>
+					<name>platform-version-name</name>
+					<value>mars</value>
+				</property>
+			</activation>
+			<properties>
+				<eclipse-site>http://download.eclipse.org/releases/mars</eclipse-site>
+				<platform-version>[4.5,4.6)</platform-version>
+			</properties>
+		</profile>
 	</profiles>
 
 </project>
