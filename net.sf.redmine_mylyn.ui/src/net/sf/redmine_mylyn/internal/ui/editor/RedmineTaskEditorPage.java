@@ -62,6 +62,7 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 	private final TaskDataModelListener trackerAttributeListener;
 	private final TaskDataModelListener validatorAttributeListener;
 	private final TaskDataModelListener statusAttributeListener;
+	private final TaskDataModelListener customListener;
 
 	private TaskDataValidator validator;
 //	
@@ -85,8 +86,7 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 		trackerAttributeListener = new TrackerTaskDataModelListener();
 		validatorAttributeListener = new ValidatorTaskDataModelListener();
 		statusAttributeListener = new StatusTaskDataModelListener();
-		
-		
+		customListener = new TaskDataModelListenerExtension();
 	}
 	
 	
@@ -102,6 +102,7 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 		getModel().addModelListener(trackerAttributeListener);
 		getModel().addModelListener(validatorAttributeListener);
 		getModel().addModelListener(statusAttributeListener);
+		getModel().addModelListener(customListener);
 	}
 	
 	@Override
@@ -110,6 +111,7 @@ public class RedmineTaskEditorPage extends AbstractTaskEditorPage {
 		getModel().removeModelListener(trackerAttributeListener);
 		getModel().removeModelListener(validatorAttributeListener);
 		getModel().removeModelListener(statusAttributeListener);
+		getModel().removeModelListener(customListener);
 		
 		super.dispose();
 	}

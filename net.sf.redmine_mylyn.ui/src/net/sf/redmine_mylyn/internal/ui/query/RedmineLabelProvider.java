@@ -11,13 +11,17 @@ import org.eclipse.jface.viewers.LabelProvider;
 public class RedmineLabelProvider extends LabelProvider {
 	
 	private String title = null;
+	private final ProjectProvider projectProvider;
 	
-	public RedmineLabelProvider() {
-		super();
+	public RedmineLabelProvider(String title, ProjectProvider projectProvider) {
+		this(projectProvider);
+		this.title = title;
 	}
 
-	public RedmineLabelProvider(String title) {
-		this.title = title;
+	public RedmineLabelProvider(
+			ProjectProvider projectProvider) {
+		super();
+		this.projectProvider = projectProvider;
 	}
 
 	@Override
@@ -27,7 +31,7 @@ public class RedmineLabelProvider extends LabelProvider {
 			if(storedQuery.getProjectId()<1) {
 				return MessageFormat.format(Messages.LBL_X_ALL_PROJECTS, storedQuery.getName());
 			} else {
-				return MessageFormat.format(Messages.LBL_X_PROJECT_X, storedQuery.getName(), storedQuery.getProjectId());
+				return MessageFormat.format(Messages.LBL_X_PROJECT_X, storedQuery.getName(), projectProvider.getProjects().getById(storedQuery.getProjectId()).getName());
 			}
 		}
 		
@@ -42,5 +46,4 @@ public class RedmineLabelProvider extends LabelProvider {
 		
 		return super.getText(element);
 	}
-
 }

@@ -18,10 +18,10 @@ public class Users extends AbstractPropertyContainer<User> {
 	private static final long serialVersionUID = 1L;
 
 	protected List<User> users;
-	
+
 	protected HashMap<String, User> usersByLogin;
-	
-	
+
+
 	@Override
 	@XmlElement(name="user")
 	protected List<User> getModifiableList() {
@@ -29,10 +29,15 @@ public class Users extends AbstractPropertyContainer<User> {
 			users = new ArrayList<User>() {
 
 				private static final long serialVersionUID = 1L;
-				
+
 				@Override
-				public boolean add(User e) {
-					getUsersByLogin().put(e.getLogin(), e);
+				public boolean add(final User e) {
+					final String login = e.getLogin();
+					if (login.isEmpty()) {
+						getUsersByLogin().put(e.getName(), e);
+					} else {
+						getUsersByLogin().put(login, e);
+					}
 					return super.add(e);
 				}
 			};
@@ -40,7 +45,7 @@ public class Users extends AbstractPropertyContainer<User> {
 		return users;
 	}
 
-	public User getByLogin(String login) {
+	public User getByLogin(final String login) {
 		return usersByLogin==null ? null : usersByLogin.get(login);
 	}
 
@@ -50,5 +55,5 @@ public class Users extends AbstractPropertyContainer<User> {
 		}
 		return usersByLogin;
 	}
-	
+
 }

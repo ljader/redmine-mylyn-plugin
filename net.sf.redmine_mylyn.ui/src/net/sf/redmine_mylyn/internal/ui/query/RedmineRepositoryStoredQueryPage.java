@@ -2,6 +2,7 @@ package net.sf.redmine_mylyn.internal.ui.query;
 
 import net.sf.redmine_mylyn.api.exception.RedmineApiErrorException;
 import net.sf.redmine_mylyn.api.model.Configuration;
+import net.sf.redmine_mylyn.api.model.container.Projects;
 import net.sf.redmine_mylyn.api.query.CompareOperator;
 import net.sf.redmine_mylyn.api.query.Query;
 import net.sf.redmine_mylyn.api.query.QueryField;
@@ -27,7 +28,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-public class RedmineRepositoryStoredQueryPage extends AbstractRedmineRepositoryQueryPage {
+public class RedmineRepositoryStoredQueryPage extends AbstractRedmineRepositoryQueryPage implements ProjectProvider {
 
 	private Composite pageComposite;
 	
@@ -52,7 +53,8 @@ public class RedmineRepositoryStoredQueryPage extends AbstractRedmineRepositoryQ
 		
 		queryViewer = new ComboViewer(pageComposite, SWT.BORDER | SWT.READ_ONLY);
 		queryViewer.setContentProvider(new RedmineContentProvider(Messages.CREATE_QUERY));
-		queryViewer.setLabelProvider(new RedmineLabelProvider(Messages.CREATE_QUERY));
+		final RedmineLabelProvider labelProvider = new RedmineLabelProvider(Messages.CREATE_QUERY, this);
+		queryViewer.setLabelProvider(labelProvider);
 		queryViewer.setInput(Messages.CREATE_QUERY);
 		queryViewer.getControl().setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
 		queryViewer.addSelectionChangedListener(new ISelectionChangedListener() {
@@ -172,5 +174,10 @@ public class RedmineRepositoryStoredQueryPage extends AbstractRedmineRepositoryQ
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public Projects getProjects() {
+		return getConfiguration().getProjects();
 	}
 }

@@ -30,28 +30,28 @@ public class RedminePersonEditor extends AbstractAttributeEditor {
 	protected Text text;
 
 	protected RedminePersonProposalProvider contentProposalProvider;
-//	private final TaskDataModelListener modelListener;
+	//	private final TaskDataModelListener modelListener;
 
-	public RedminePersonEditor(TaskDataModel manager, TaskAttribute taskAttribute) {
+	public RedminePersonEditor(final TaskDataModel manager, final TaskAttribute taskAttribute) {
 		super(manager, taskAttribute);
 		setLayoutHint(new LayoutHint(RowSpan.SINGLE, ColumnSpan.SINGLE));
 
-//		modelListener = new TaskDataModelListener() {
-//			@Override
-//			public void attributeChanged(TaskDataModelEvent event) {
-//				if(event.getTaskAttribute().getId().equals(getTaskAttribute().getId())) {
-//					IRepositoryPerson person = getAttributeMapper().getRepositoryPerson(event.getTaskAttribute());
-//					String personString = RedmineUtil.formatUserPresentation(person); 
-//					if (!text.getText().equals(personString)) {
-//						text.setText(personString);
-//					}
-//				}
-//			}
-//		};
+		//		modelListener = new TaskDataModelListener() {
+		//			@Override
+		//			public void attributeChanged(TaskDataModelEvent event) {
+		//				if(event.getTaskAttribute().getId().equals(getTaskAttribute().getId())) {
+		//					IRepositoryPerson person = getAttributeMapper().getRepositoryPerson(event.getTaskAttribute());
+		//					String personString = RedmineUtil.formatUserPresentation(person);
+		//					if (!text.getText().equals(personString)) {
+		//						text.setText(personString);
+		//					}
+		//				}
+		//			}
+		//		};
 	}
-	
+
 	@Override
-	public void createControl(Composite parent, FormToolkit toolkit) {
+	public void createControl(final Composite parent, final FormToolkit toolkit) {
 		if (isReadOnly()) {
 			text = new Text(parent, SWT.FLAT | SWT.READ_ONLY);
 			text.setData(FormToolkit.KEY_DRAW_BORDER, Boolean.FALSE);
@@ -61,38 +61,39 @@ public class RedminePersonEditor extends AbstractAttributeEditor {
 			text = toolkit.createText(parent, getValue(), SWT.FLAT);
 			text.setToolTipText(getDescription());
 			text.addModifyListener(new ModifyListener() {
-				public void modifyText(ModifyEvent e) {
+				@Override
+				public void modifyText(final ModifyEvent e) {
 					setValue(text.getText());
 				}
 			});
 		}
 		toolkit.adapt(text, false, false);
 		setControl(text);
-		
+
 		attachContentProposalProvider();
 
-//		text.addDisposeListener(new DisposeListener() {
-//			@Override
-//			public void widgetDisposed(DisposeEvent e) {
-//				getModel().removeModelListener(modelListener);
-//			}
-//		});
-//		getModel().addModelListener(modelListener);
-}
+		//		text.addDisposeListener(new DisposeListener() {
+		//			@Override
+		//			public void widgetDisposed(DisposeEvent e) {
+		//				getModel().removeModelListener(modelListener);
+		//			}
+		//		});
+		//		getModel().addModelListener(modelListener);
+	}
 
 	public String getValue() {
 		return RedmineUtil.formatUserPresentation(getAttributeMapper().getRepositoryPerson(getTaskAttribute()));
 	}
 
-	public void setValue(String text) {
+	public void setValue(final String text) {
 		if (text.isEmpty()) {
 			getTaskAttribute().setValue(text);
 			attributeChanged();
 		} else {
-			
-			String value = RedmineUtil.findUserLogin(text);
+
+			final String value = RedmineUtil.findUserLogin(text);
 			if(value!=null && !value.isEmpty()) {
-				IRepositoryPerson person = getModel().getTaskRepository().createPerson(value);
+				final IRepositoryPerson person = getModel().getTaskRepository().createPerson(value);
 				getAttributeMapper().setRepositoryPerson(getTaskAttribute(), person);
 				attributeChanged();
 			}
@@ -102,26 +103,33 @@ public class RedminePersonEditor extends AbstractAttributeEditor {
 
 	@Override
 	public void refresh() {
-		Map<String, String> persons = getAttributeMapper().getOptions(getTaskAttribute());
+		final Map<String, String> persons = getAttributeMapper().getOptions(getTaskAttribute());
 		contentProposalProvider.setProposals(persons);
-		
+
 		if (!persons.containsKey(getTaskAttribute().getValue())) {
 			text.setText("");
+		} else {
+			text.setText(RedmineUtil.formatUserPresentation(getAttributeMapper().getRepositoryPerson(getTaskAttribute())));
 		}
 	}
-	
+
+	@Override
+	protected boolean shouldAutoRefresh() {
+		return true;
+	}
+
 	private void attachContentProposalProvider() {
-		Map<String, String> persons = getAttributeMapper().getOptions(getTaskAttribute());
-		
+		final Map<String, String> persons = getAttributeMapper().getOptions(getTaskAttribute());
+
 		contentProposalProvider = new RedminePersonProposalProvider(getModel().getTask(), getTaskAttribute().getTaskData(), persons);
-		ILabelProvider labelPropsalProvider = new RedminePersonProposalLabelProvider();
-		
-		ContentAssistCommandAdapter adapter = new ContentAssistCommandAdapter(text,
+		final ILabelProvider labelPropsalProvider = new RedminePersonProposalLabelProvider();
+
+		final ContentAssistCommandAdapter adapter = new ContentAssistCommandAdapter(text,
 				new TextContentAdapter(), contentProposalProvider,
 				ITextEditorActionDefinitionIds.CONTENT_ASSIST_PROPOSALS, new char[0], true);
-		
+
 		adapter.setLabelProvider(labelPropsalProvider);
 		adapter.setProposalAcceptanceStyle(ContentProposalAdapter.PROPOSAL_REPLACE);
-		
+
 	}
 }

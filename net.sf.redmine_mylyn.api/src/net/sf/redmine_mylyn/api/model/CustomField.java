@@ -15,78 +15,81 @@ import net.sf.redmine_mylyn.api.query.QueryFilter;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name="customField", propOrder={
-		"type", 
-		"fieldFormat", 
-		"minLength", 
-		"maxLength", 
-		"regexp", 
-		"possibleValues", 
-		"defaultValue", 
-		"isRequired", 
-		"isFilter", 
-		"isForAll"})
+		"type",
+		"fieldFormat",
+		"minLength",
+		"maxLength",
+		"regexp",
+		"possibleValues",
+		"defaultValue",
+		"isRequired",
+		"isFilter",
+		"isForAll",
+"isMultiple"})
 public class CustomField extends Property implements IQueryField {
-	
+
 	private static final long serialVersionUID = 1L;
 
 	public enum Type {IssueCustomField, TimeEntryCustomField};
 
 	public enum Format {
 		@XmlEnumValue("string")
-		STRING, 
+		STRING,
 		@XmlEnumValue("text")
-		TEXT, 
+		TEXT,
 		@XmlEnumValue("int")
-		INT, 
+		INT,
 		@XmlEnumValue("float")
-		FLOAT, 
+		FLOAT,
 		@XmlEnumValue("list")
-		LIST, 
+		LIST,
 		@XmlEnumValue("date")
-		DATE, 
+		DATE,
 		@XmlEnumValue("bool")
 		BOOL,
 		@XmlEnumValue("version")
 		VERSION,
 		@XmlEnumValue("user")
 		USER;
-		
+
 		public String getLabel() {
 			return name().toLowerCase();
 		}
-		
+
 		public boolean isListType() {
 			return this==LIST || this==VERSION || this==USER;
 		}
 	};
 
 	private Type type;
-	
+
 	private Format fieldFormat;
-	
+
 	@XmlElementWrapper(name="possibleValues")
 	@XmlElement(name="possibleValue")
 	private List<String> possibleValues;
-	
+
 	private String regexp;
-	
+
 	private int minLength;
 
 	private int maxLength;
-	
+
 	private boolean isRequired;
-	
+
 	private boolean isForAll;
 
 	private boolean isFilter;
-	
+
 	private String defaultValue;
+
+	private boolean isMultiple;
 
 	public Type getType() {
 		return type;
 	}
 
-	public void setType(Type type) {
+	public void setType(final Type type) {
 		this.type = type;
 	}
 
@@ -94,7 +97,7 @@ public class CustomField extends Property implements IQueryField {
 		return fieldFormat;
 	}
 
-	public void setFieldFormat(Format fieldFormat) {
+	public void setFieldFormat(final Format fieldFormat) {
 		this.fieldFormat = fieldFormat;
 	}
 
@@ -102,7 +105,7 @@ public class CustomField extends Property implements IQueryField {
 		return possibleValues;
 	}
 
-	public void setPossibleValues(List<String> possibleValues) {
+	public void setPossibleValues(final List<String> possibleValues) {
 		this.possibleValues = possibleValues;
 	}
 
@@ -110,7 +113,7 @@ public class CustomField extends Property implements IQueryField {
 		return regexp;
 	}
 
-	public void setRegexp(String regexp) {
+	public void setRegexp(final String regexp) {
 		this.regexp = regexp;
 	}
 
@@ -118,7 +121,7 @@ public class CustomField extends Property implements IQueryField {
 		return minLength;
 	}
 
-	public void setMinLength(int minLength) {
+	public void setMinLength(final int minLength) {
 		this.minLength = minLength;
 	}
 
@@ -126,7 +129,7 @@ public class CustomField extends Property implements IQueryField {
 		return maxLength;
 	}
 
-	public void setMaxLength(int maxLength) {
+	public void setMaxLength(final int maxLength) {
 		this.maxLength = maxLength;
 	}
 
@@ -134,7 +137,7 @@ public class CustomField extends Property implements IQueryField {
 		return isRequired;
 	}
 
-	public void setRequired(boolean isRequired) {
+	public void setRequired(final boolean isRequired) {
 		this.isRequired = isRequired;
 	}
 
@@ -142,7 +145,7 @@ public class CustomField extends Property implements IQueryField {
 		return isForAll;
 	}
 
-	public void setForAll(boolean isForAll) {
+	public void setForAll(final boolean isForAll) {
 		this.isForAll = isForAll;
 	}
 
@@ -150,7 +153,7 @@ public class CustomField extends Property implements IQueryField {
 		return isFilter && getFieldFormat()!=Format.USER && getFieldFormat()!=Format.VERSION;
 	}
 
-	public void setFilter(boolean isFilter) {
+	public void setFilter(final boolean isFilter) {
 		this.isFilter = isFilter;
 	}
 
@@ -158,7 +161,7 @@ public class CustomField extends Property implements IQueryField {
 		return defaultValue;
 	}
 
-	public void setDefaultValue(String defaultValue) {
+	public void setDefaultValue(final String defaultValue) {
 		this.defaultValue = defaultValue;
 	}
 
@@ -176,7 +179,7 @@ public class CustomField extends Property implements IQueryField {
 	public boolean isCrossProjectUsable() {
 		return isForAll;
 	}
-	
+
 	public QueryField getQueryField() {
 		if(isFilter()) {
 			switch (getFieldFormat()) {
@@ -187,10 +190,14 @@ public class CustomField extends Property implements IQueryField {
 			case TEXT: return QueryField.TEXT_TYPE;
 			case INT: return QueryField.INT_TYPE;
 			case FLOAT: return QueryField.FLOAT_TYPE;
-			
+
 			default: return null;
 			}
 		}
 		return null;
+	}
+
+	public boolean isMultiple() {
+		return isMultiple;
 	}
 }

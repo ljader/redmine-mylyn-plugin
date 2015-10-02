@@ -20,25 +20,25 @@ public interface IRedmineApiClient {
 	public Configuration getConfiguration();
 
 	public RedmineServerVersion detectServerVersion(IProgressMonitor monitor) throws RedmineApiErrorException;
-	
+
 	public void updateConfiguration(IProgressMonitor monitor) throws RedmineApiErrorException;
-	
+
 	public int[] getUpdatedIssueIds(int[] issues, Date updatedSince, IProgressMonitor monitor) throws RedmineApiErrorException;
-	
+
 	public Issue getIssue(int id, IProgressMonitor monitor) throws RedmineApiErrorException;
-	
+
 	public Issue[] getIssues(IProgressMonitor monitor, int... issueIds) throws RedmineApiErrorException;
-	
+
 	public Issue[] query(Query query, IProgressMonitor monitor) throws RedmineApiErrorException;
-	
+
 	public Issue createIssue(Issue issue, IRedmineApiErrorCollector errorCollector, IProgressMonitor monitor) throws RedmineApiInvalidDataException, RedmineApiErrorException;
 
-	public void updateIssue(Issue issue, String comment, TimeEntry timeEntry, IRedmineApiErrorCollector errorCollector, IProgressMonitor monitor) throws RedmineApiInvalidDataException, RedmineApiErrorException;
+	public void updateIssue(Issue issue, String comment, Date lastModified, TimeEntry timeEntry, IRedmineApiErrorCollector errorCollector, IProgressMonitor monitor) throws RedmineApiInvalidDataException, RedmineApiErrorException;
 
 	public void updateIssue(int issueId, Map<RedmineApiIssueProperty, String> issueValues, String comment, TimeEntry timeEntry, IRedmineApiErrorCollector errorCollector, IProgressMonitor monitor) throws RedmineApiInvalidDataException, RedmineApiErrorException;
 
 	public InputStream getAttachmentContent(int attachmentId, String fileName, IProgressMonitor monitor) throws RedmineApiErrorException;
-	
+
 	public void uploadAttachment(int issueId, Attachment attachment, InputStream content, String comment, IRedmineApiErrorCollector errorCollector, IProgressMonitor monitor) throws RedmineApiInvalidDataException, RedmineApiErrorException;
 
 }

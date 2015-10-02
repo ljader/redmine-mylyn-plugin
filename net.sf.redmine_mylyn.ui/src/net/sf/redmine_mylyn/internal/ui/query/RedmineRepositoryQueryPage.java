@@ -14,6 +14,7 @@ import net.sf.redmine_mylyn.api.model.Configuration;
 import net.sf.redmine_mylyn.api.model.CustomField;
 import net.sf.redmine_mylyn.api.model.Project;
 import net.sf.redmine_mylyn.api.model.Tracker;
+import net.sf.redmine_mylyn.api.model.container.Projects;
 import net.sf.redmine_mylyn.api.query.CompareOperator;
 import net.sf.redmine_mylyn.api.query.IQueryField;
 import net.sf.redmine_mylyn.api.query.Query;
@@ -47,7 +48,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-public class RedmineRepositoryQueryPage extends AbstractRedmineRepositoryQueryPage {
+public class RedmineRepositoryQueryPage extends AbstractRedmineRepositoryQueryPage implements ProjectProvider {
 
 	private static final String TITLE = Messages.CREATE_QUERY;
 	
@@ -182,7 +183,7 @@ public class RedmineRepositoryQueryPage extends AbstractRedmineRepositoryQueryPa
 			}
 			
 			ListViewer list = new ListViewer(parent, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
-			list.setLabelProvider(new RedmineLabelProvider(constrArg));
+			list.setLabelProvider(new RedmineLabelProvider(constrArg, this));
 			list.setContentProvider(new RedmineContentProvider(constrArg));
 			list.getControl().setEnabled(false);
 			
@@ -211,7 +212,7 @@ public class RedmineRepositoryQueryPage extends AbstractRedmineRepositoryQueryPa
 
 		String defaultValue = definition.isRequired() ? null : Messages.DISABLED;
 		combo.setContentProvider(new RedmineContentProvider(defaultValue));
-		combo.setLabelProvider(new RedmineLabelProvider());
+		combo.setLabelProvider(new RedmineLabelProvider(this));
 		combo.setInput(definition.getCompareOperators());
 		combo.setSelection(new StructuredSelection(combo.getElementAt(0)));
 		
@@ -498,6 +499,11 @@ public class RedmineRepositoryQueryPage extends AbstractRedmineRepositoryQueryPa
 	@Override
 	public String getQueryTitle() {
 		return (titleText != null) ? titleText.getText() : Messages.QUERY_TITLE_FALLBACK;
+	}
+
+	@Override
+	public Projects getProjects() {
+		return configuration.getProjects();
 	}
 	
 }

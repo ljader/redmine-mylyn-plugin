@@ -29,33 +29,33 @@ public class RedminePersonProposalProvider implements IContentProposalProvider {
 
 	private Set<String> addressSet = null;
 
-	private String repositoryUrl;
+	private final String repositoryUrl;
 
-	private String connectorKind;
+	private final String connectorKind;
 
 	private Map<String, String> proposals;
-	
+
 	private Configuration configuration;
 
-	public RedminePersonProposalProvider(ITask task, TaskData taskData) {
+	public RedminePersonProposalProvider(final ITask task, final TaskData taskData) {
 		repositoryUrl = taskData.getRepositoryUrl();
 		connectorKind = taskData.getConnectorKind();
 
 		if (repositoryUrl != null && connectorKind != null) {
 
-			TaskRepository repository = TasksUi.getRepositoryManager().getRepository(connectorKind, repositoryUrl);
+			final TaskRepository repository = TasksUi.getRepositoryManager().getRepository(connectorKind, repositoryUrl);
 			if (repository != null) {
 
-				AbstractRepositoryConnector connector = TasksUi.getRepositoryConnector(connectorKind);
+				final AbstractRepositoryConnector connector = TasksUi.getRepositoryConnector(connectorKind);
 				if (connector!=null && connector instanceof RedmineRepositoryConnector) {
 					try {
 						configuration = ((RedmineRepositoryConnector)connector).getClientManager().getClient(repository).getConfiguration();
-					} catch (RedmineStatusException e) {
+					} catch (final RedmineStatusException e) {
 						RedmineUiPlugin.getLogService(getClass()).error(e, "Can't fetch repository configuration"); //$NON-NLS-1$
 					}
 				}
-				
-				AuthenticationCredentials credentials = repository.getCredentials(AuthenticationType.REPOSITORY);
+
+				final AuthenticationCredentials credentials = repository.getCredentials(AuthenticationType.REPOSITORY);
 				if (credentials != null && credentials.getUserName().length() > 0) {
 					currentUser = credentials.getUserName();
 				}
@@ -63,43 +63,44 @@ public class RedminePersonProposalProvider implements IContentProposalProvider {
 		}
 	}
 
-	public RedminePersonProposalProvider(ITask task, TaskData taskData, Map<String, String> proposals) {
+	public RedminePersonProposalProvider(final ITask task, final TaskData taskData, final Map<String, String> proposals) {
 		this(task, taskData);
 		this.proposals = proposals;
-		
+
 	}
-	
-	public void setProposals( Map<String, String> proposals ) {
+
+	public void setProposals( final Map<String, String> proposals ) {
 		this.proposals = proposals;
-		this.addressSet = null;
+		addressSet = null;
 	}
-	
-	public IContentProposal[] getProposals(String contents, int position) {
+
+	@Override
+	public IContentProposal[] getProposals(final String contents, final int position) {
 		if (contents == null) {
 			throw new IllegalArgumentException();
 		}
 
 
-		String searchText = contents.toLowerCase();
+		final String searchText = contents.toLowerCase();
 
-		Set<String> addressSet = new HashSet<String>();
-		
-		for (String address : getAddressSet()) {
+		final Set<String> addressSet = new HashSet<String>();
+
+		for (final String address : getAddressSet()) {
 			if (address.toLowerCase().contains(searchText)) {
 				addressSet.add(address);
 			}
 		}
-		
-		IContentProposal[] result = new IContentProposal[addressSet.size()];
+
+		final IContentProposal[] result = new IContentProposal[addressSet.size()];
 		int i = 0;
 		for (final String address : addressSet) {
 			result[i++] =  new RedminePersonContentProposal(
 					address,
-					currentUser != null && address.contains(currentUser), 
+					currentUser != null && address.contains(currentUser),
 					address,
 					address.length());
 		}
-		
+
 		Arrays.sort(result);
 		return result;
 	}
@@ -110,16 +111,21 @@ public class RedminePersonProposalProvider implements IContentProposalProvider {
 		}
 
 		addressSet = new HashSet<String>();
-		
+
 		if (proposals != null && !proposals.isEmpty()) {
-			for (Entry<String, String> entry : proposals.entrySet()) {
-				
-				String name = entry.getValue();
+			for (final Entry<String, String> entry : proposals.entrySet()) {
+
+				final String name = entry.getValue();
 				if (name!=null && !name.isEmpty()) {
 					User user = null;
-					
+
 					if (configuration!=null && (user=configuration.getUsers().getById(RedmineUtil.parseIntegerId(entry.getKey())))!=null) {
-						addressSet.add(RedmineUtil.formatUserPresentation(user.getLogin(), name));
+						final String login = user.getLogin();
+						if (login.isEmpty()) {
+							addressSet.add(RedmineUtil.formatUserPresentation(name, name));
+						} else {
+							addressSet.add(RedmineUtil.formatUserPresentation(user.getLogin(), name));
+						}
 					} else {
 						addressSet.add(RedmineUtil.formatUserPresentation(entry.getKey(), name));
 					}
