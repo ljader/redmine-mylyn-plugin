@@ -27,12 +27,12 @@
 
 	<properties>
 		<tycho-version>0.20.0</tycho-version>
-		<platform-version-name>indigo</platform-version-name>
+		<platform-version-name>juno</platform-version-name>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<eclipse-site>http://download.eclipse.org/releases/${platform-version-name}</eclipse-site>
 		<mylyn-site>http://download.eclipse.org/mylyn/releases/latest</mylyn-site>
-		<orbit-site>http://download.eclipse.org/tools/orbit/downloads/drops/R20110523182458/repository/</orbit-site>
-		<aspectj-site>http://download.eclipse.org/tools/ajdt/37/dev/update</aspectj-site>
+		<orbit-site>http://download.eclipse.org/tools/orbit/downloads/drops/R20130118183705/repository/</orbit-site>
+		<aspectj-site>http://download.eclipse.org/tools/ajdt/43/update</aspectj-site>
 	</properties>
 	
 	<repositories>
