@@ -26,7 +26,7 @@
 	</modules>
 
 	<properties>
-		<tycho-version>0.20.0</tycho-version>
+		<tycho-version>0.23.1</tycho-version>
 		<platform-version-name>juno</platform-version-name>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<eclipse-site>http://download.eclipse.org/releases/${platform-version-name}</eclipse-site>
