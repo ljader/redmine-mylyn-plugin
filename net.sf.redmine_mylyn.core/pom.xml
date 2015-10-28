@@ -18,7 +18,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>aspectj-maven-plugin</artifactId>
-				<version>1.4</version>
+				<version>1.7</version>
 				<configuration>
 					<verbose>true</verbose>
 					<complianceLevel>1.6</complianceLevel>
