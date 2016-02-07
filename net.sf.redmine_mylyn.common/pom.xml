@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>net.sf.redmine_mylyn</groupId>
 		<artifactId>net.sf.redmine_mylyn.parent</artifactId>
-		<version>0.4.0.201602071631</version>
+		<version>0.4.1-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>net.sf.redmine_mylyn.common</artifactId>
