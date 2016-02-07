@@ -35,6 +35,12 @@
 		<aspectj-site>http://download.eclipse.org/tools/ajdt/43/update</aspectj-site>
 	</properties>
 	
+	<scm>
+		<connection>scm:git:git://github.com/ljader/redmine-mylyn-plugin.git</connection>
+		<developerConnection>scm:git:git@github.com:ljader/redmine-mylyn-plugin.git</developerConnection>
+		<url>https://github.com/ljader/redmine-mylyn-plugin</url>
+	</scm>
+
 	<repositories>
 		<repository>
 			<id>eclipse-platform</id>
