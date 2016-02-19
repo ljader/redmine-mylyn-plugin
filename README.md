@@ -55,6 +55,10 @@ Plugin Installation
 
 3. Add Task Repository of type Redmine and provide redmine Url with Login and Password
 
+Development
+-------------------------
+
+See the [CONTRIBUTING.md](CONTRIBUTING.md).
 
 Licence
 -------------------------
