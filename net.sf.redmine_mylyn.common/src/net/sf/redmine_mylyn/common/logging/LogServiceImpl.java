@@ -2,9 +2,9 @@ package net.sf.redmine_mylyn.common.logging;
 
 import java.text.MessageFormat;
 
-import net.sf.redmine_mylyn.internal.common.logging.ExtendedLogServiceImpl;
+// import net.sf.redmine_mylyn.internal.common.logging.ExtendedLogServiceImpl;
 
-import org.eclipse.equinox.log.ExtendedLogService;
+// import org.eclipse.equinox.log.ExtendedLogService;
 import org.osgi.framework.Bundle;
 import org.osgi.service.log.LogService;
 
@@ -25,9 +25,9 @@ public class LogServiceImpl implements ILogService {
 			instance = new LogServiceImpl();
 		}
 		
-		if(instance.logService!=null && instance.logService instanceof ExtendedLogService) {
-			return new ExtendedLogServiceImpl((ExtendedLogService)instance.logService, bundle, loggerName);
-		}
+//		if(instance.logService!=null && instance.logService instanceof ExtendedLogService) {
+//			return new ExtendedLogServiceImpl((ExtendedLogService)instance.logService, bundle, loggerName);
+//		}
 		
 		return instance;
 	}

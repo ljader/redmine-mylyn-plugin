@@ -34,7 +34,6 @@
       <import plugin="org.eclipse.ui.editors" version="3.5.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.osgi.services" version="3.2.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.jface.text"/>
-      <import plugin="org.eclipse.equinox.log" version="1.2.0" match="greaterOrEqual"/>
       
       <import plugin="net.sf.redmine_mylyn.common" version="0.4.0" match="greaterOrEqual"/>
       <import plugin="net.sf.redmine_mylyn.api" version="0.4.0" match="greaterOrEqual"/>

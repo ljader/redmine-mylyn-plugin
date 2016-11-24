@@ -5,7 +5,7 @@ import net.sf.redmine_mylyn.common.logging.ILogService;
 import net.sf.redmine_mylyn.common.logging.LogServiceImpl;
 
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.equinox.log.ExtendedLogEntry;
+// import org.eclipse.equinox.log.ExtendedLogEntry;
 import org.osgi.framework.Bundle;
 import org.osgi.service.log.LogEntry;
 import org.osgi.service.log.LogListener;
@@ -73,9 +73,9 @@ public class LogWriter implements LogListener {
 		}
 		
 		String loggerName = null;
-		if(entry instanceof ExtendedLogEntry) {
-			loggerName = ((ExtendedLogEntry)entry).getLoggerName();
-		}
+//		if(entry instanceof ExtendedLogEntry) {
+//			loggerName = ((ExtendedLogEntry)entry).getLoggerName();
+//		}
 		
 		if(loggerName==null) {
 			loggerName = "RedmineConnector"; //$NON-NLS-1$
