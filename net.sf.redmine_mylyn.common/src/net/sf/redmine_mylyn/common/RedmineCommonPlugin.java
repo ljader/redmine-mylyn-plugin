@@ -1,6 +1,5 @@
 package net.sf.redmine_mylyn.common;
 
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.Bundle;
@@ -33,10 +32,6 @@ public class RedmineCommonPlugin extends Plugin {
 	
 	public static RedmineCommonPlugin getDefault() {
 		return plugin;
-	}
-
-	public IPath getLogFilePath() {
-		return getStateLocation().append("redmine_connector.log"); //$NON-NLS-1$
 	}
 }
 
