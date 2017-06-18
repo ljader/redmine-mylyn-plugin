@@ -55,6 +55,36 @@ Plugin Installation
 
 3. Add Task Repository of type Redmine and provide redmine Url with Login and Password
 
+Troubleshooting
+-------------------------
+
+To manipulate log levels for plugin classes, place your logback.xml file in following path:
+
+		{workspace}/.metadata/.plugins/net.sf.redmine_mylyn.common/logback.xml
+
+In your custom logback.xml you can denote log file location using:
+
+		<file>${rmc.logfile}</file>
+		or
+		<file>${rmc.logdir}/redmine_connector_monday.log</file>
+In both cases the log file will be created next to your logback.xml file, only the log filename will be different.
+FYI HTTP traffic is not logged through SLF4j/Logback, since http-commons-3.x uses Common Logging
+and the "jcl-over-slf4j" jar is not attached to this plugin.
+
+Sample logback.xml content
+
+	<configuration>
+		<appender name="FILE" class="ch.qos.logback.core.FileAppender">
+			<file>${rmc.logfile}</file>
+			<layout class="ch.qos.logback.classic.PatternLayout">
+				<Pattern>%date %level %logger{10} %msg%n</Pattern>
+			</layout>
+		</appender>
+		<logger name="net.sf.redmine_mylyn" level="DEBUG" >
+			<appender-ref ref="FILE" />
+		</logger>
+	</configuration>
+
 Development
 -------------------------
 
