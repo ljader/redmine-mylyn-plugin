@@ -17,7 +17,7 @@ public class RedmineCommonPlugin extends Plugin {
 		plugin = this;
 
 		Bundle logBundle = Platform.getBundle("org.eclipse.equinox.log"); //$NON-NLS-1$
-		if (logBundle.getState()==Bundle.RESOLVED) {
+		if (logBundle != null && logBundle.getState()==Bundle.RESOLVED) {
 			logBundle.start();
 		}
 
