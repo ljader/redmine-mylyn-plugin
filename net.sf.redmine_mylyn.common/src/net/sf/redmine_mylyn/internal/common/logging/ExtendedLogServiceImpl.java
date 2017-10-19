@@ -10,6 +10,9 @@ import org.osgi.framework.Bundle;
 import org.osgi.service.log.LogService;
 
 
+/**
+ * Logs entries via Equinox extended logging class (named Logger)
+ */
 public class ExtendedLogServiceImpl implements ILogService {
 
 	private Logger logger;

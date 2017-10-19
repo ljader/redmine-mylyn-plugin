@@ -1,5 +1,6 @@
 package net.sf.redmine_mylyn.internal.common.logging;
 
+import java.io.File;
 import net.sf.redmine_mylyn.common.RedmineCommonPlugin;
 import net.sf.redmine_mylyn.common.logging.ILogService;
 import net.sf.redmine_mylyn.common.logging.LogServiceImpl;
@@ -18,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
+import ch.qos.logback.core.util.StatusPrinter;
 
 public class LogWriter implements LogListener {
 
@@ -42,20 +44,30 @@ public class LogWriter implements LogListener {
 		
 		if (loggerFactory instanceof LoggerContext) {
 			LoggerContext ctx = (LoggerContext)loggerFactory;
-			IPath path = RedmineCommonPlugin.getDefault().getLogFilePath();
-			
+
+			IPath logDir = RedmineCommonPlugin.getDefault().getStateLocation();
+			IPath logFile = logDir.append("redmine_connector.log"); //$NON-NLS-1$
+
 			try {
 				JoranConfigurator configurator = new JoranConfigurator();
 				configurator.setContext(ctx);
 				
 				ctx.reset();
-				ctx.putProperty("rmc.logfile", path.toString()); //$NON-NLS-1$
+				ctx.putProperty("rmc.logdir", logDir.toString()); //$NON-NLS-1$
+				//setting old property as fallback
+				ctx.putProperty("rmc.logfile", logFile.toString()); //$NON-NLS-1$
 				
-				configurator.doConfigure(getClass().getResourceAsStream("/logback.xml")); //$NON-NLS-1$
+				File customLogbackConfig = new File(logDir.toFile(), "logback.xml"); //$NON-NLS-1$
+				if (customLogbackConfig.isFile()) {
+					configurator.doConfigure(customLogbackConfig);
+				} else {
+					configurator.doConfigure(getClass().getResourceAsStream("/logback.xml")); //$NON-NLS-1$
+				}
 			} catch (JoranException e) {
 				ILogService logService = LogServiceImpl.getInstance(RedmineCommonPlugin.getDefault().getBundle(), LogWriter.class);
 				logService.error(e, "Logback configuration failed"); //$NON-NLS-1$
 			}
+			StatusPrinter.printInCaseOfErrorsOrWarnings(ctx);
 		}
 	}
 	
@@ -72,10 +84,7 @@ public class LogWriter implements LogListener {
 			configureLogback();
 		}
 		
-		String loggerName = null;
-		if(entry instanceof ExtendedLogEntry) {
-			loggerName = ((ExtendedLogEntry)entry).getLoggerName();
-		}
+		String loggerName = obtainLoggerNameIfSupportedFrom(entry);
 		
 		if(loggerName==null) {
 			loggerName = "RedmineConnector"; //$NON-NLS-1$
@@ -90,5 +99,13 @@ public class LogWriter implements LogListener {
 		}
 		
 		
+	}
+
+	private String obtainLoggerNameIfSupportedFrom(LogEntry entry) {
+		if (entry instanceof ExtendedLogEntry) {
+			return ((ExtendedLogEntry) entry).getLoggerName();
+		} else {
+			return null;
+		}
 	}
 }
