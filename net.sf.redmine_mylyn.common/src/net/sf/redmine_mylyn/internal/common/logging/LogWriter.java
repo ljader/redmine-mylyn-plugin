@@ -84,10 +84,7 @@ public class LogWriter implements LogListener {
 			configureLogback();
 		}
 		
-		String loggerName = null;
-		if(entry instanceof ExtendedLogEntry) {
-			loggerName = ((ExtendedLogEntry)entry).getLoggerName();
-		}
+		String loggerName = obtainLoggerNameIfSupportedFrom(entry);
 		
 		if(loggerName==null) {
 			loggerName = "RedmineConnector"; //$NON-NLS-1$
@@ -102,5 +99,13 @@ public class LogWriter implements LogListener {
 		}
 		
 		
+	}
+
+	private String obtainLoggerNameIfSupportedFrom(LogEntry entry) {
+		if (entry instanceof ExtendedLogEntry) {
+			return ((ExtendedLogEntry) entry).getLoggerName();
+		} else {
+			return null;
+		}
 	}
 }

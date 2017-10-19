@@ -20,18 +20,31 @@ public class LogServiceImpl implements ILogService {
 	}
 	
 	
+	/**
+	 * Get instance of our plugin's log service<br>
+	 * If OSGI injects ExtendedLogService, the returned service will use OSGI named loggers to log messages<br>
+	 * (like in regular logging frameworks e.g log4j)
+	 * 
+	 * @param bundle The bundles associated with this log service.
+	 * @param loggerName class which emits the message
+	 * @return the service; never null
+	 */
 	public static ILogService getInstance(Bundle bundle, Class<?> loggerName) {
 		if(instance==null) {
 			instance = new LogServiceImpl();
 		}
 		
-		if(instance.logService!=null && instance.logService instanceof ExtendedLogService) {
+		if (injectedLogServiceSupportsNamedLoggers()) {
 			return new ExtendedLogServiceImpl((ExtendedLogService)instance.logService, bundle, loggerName);
 		}
 		
 		return instance;
 	}
 	
+	private static boolean injectedLogServiceSupportsNamedLoggers() {
+		return instance.logService != null && (instance.logService instanceof ExtendedLogService);
+	}
+
 	public synchronized void setLogService(LogService logService) {
 		this.logService = logService;
 	}
