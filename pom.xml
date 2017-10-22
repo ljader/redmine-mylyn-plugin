@@ -131,8 +131,6 @@
 						</dependency>
 					</dependencies>
 				</plugin>
-			</plugins>
-			<plugins>
 				<plugin>
 					<groupId>org.eclipse.tycho</groupId>
 					<artifactId>tycho-compiler-plugin</artifactId>
