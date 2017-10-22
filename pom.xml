@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<prerequisites>
-		<maven>3.0</maven>
+		<maven>3.3.9</maven>
 	</prerequisites>
 
 	<groupId>net.sf.redmine_mylyn</groupId>
@@ -26,7 +26,8 @@
 	</modules>
 
 	<properties>
-		<tycho-version>0.25.0</tycho-version>
+		<tycho-version>0.26.0</tycho-version>
+		<unleash-version>2.6.0</unleash-version>
 		<platform-version-name>neon</platform-version-name>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<eclipse-site>http://download.eclipse.org/releases/${platform-version-name}</eclipse-site>
@@ -117,6 +118,20 @@
 		</plugins>		
 		
 		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>com.itemis.maven.plugins</groupId>
+					<artifactId>unleash-maven-plugin</artifactId>
+					<version>${unleash-version}</version>
+					<dependencies>
+						<dependency>
+							<groupId>com.itemis.maven.plugins</groupId>
+							<artifactId>unleash-scm-provider-git</artifactId>
+							<version>${unleash-version}</version>
+						</dependency>
+					</dependencies>
+				</plugin>
+			</plugins>
 			<plugins>
 				<plugin>
 					<groupId>org.eclipse.tycho</groupId>
