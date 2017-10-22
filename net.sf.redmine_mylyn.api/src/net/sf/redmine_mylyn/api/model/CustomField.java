@@ -49,8 +49,10 @@ public class CustomField extends Property implements IQueryField {
 		@XmlEnumValue("version")
 		VERSION,
 		@XmlEnumValue("user")
-		USER;
-		
+		USER,
+		@XmlEnumValue("link")
+		LINK;
+
 		public String getLabel() {
 			return name().toLowerCase();
 		}

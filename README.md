@@ -1,16 +1,20 @@
 
-Description
+Redmine-Mylyn integration
 -------------------------
 
-All original code come from http://sourceforge.net/projects/redmin-mylyncon/
+Redmine-Mylyn integration for Eclipse allows you to manage your Redmine issues straight from Eclipse.
 
-Aim of this fork is to provide git mirror of above repository as well as place for my own work.
-Pull requests will be warm welcomed and served with cold beer ;).
+Using the integration you can:
+
+* create and update issues
+* comment, reassign or close issues
+* filter issues based on the their attributes
+* receive notifications on new or updated issues 
 
 Build status on Travis CI:
 [![Build Status](https://travis-ci.org/ljader/redmine-mylyn-plugin.svg)](https://travis-ci.org/ljader/redmine-mylyn-plugin)
 
-Redmine-Mylyn integration
+Installation
 -------------------------
 
 Redmine-Mylyn integration requires 2 components to work:
@@ -26,13 +30,13 @@ and the client side component a plugin. Confusion persists unto this day.
 Connector Installation
 -------------------------
 
-1. Install connectior inside Redmine server
+1. Install connector inside Redmine server
     
     For Redmine 2.x install Connector from:
     [http://danmunn.github.io/redmine_mylyn_connector/](http://danmunn.github.io/redmine_mylyn_connector/)
      
     For Redmine 3.x install Connector from:
-    [TODO Link](http://google.com)
+    [https://github.com/joaopedrotaveira/redmine_mylyn_connector](https://github.com/joaopedrotaveira/redmine_mylyn_connector#installation)
      
 2. Enable REST API in Redmine server
 
@@ -89,6 +93,16 @@ Development
 -------------------------
 
 See the [CONTRIBUTING.md](CONTRIBUTING.md).
+
+Description of origin
+-------------------------
+
+All original code come from http://sourceforge.net/projects/redmin-mylyncon/
+
+If you need Redmine 1.x compatibility, please check the SourceForge plugin and connector.
+
+Aim of this fork is to provide git mirror of above repository as well as place for my own work.
+Pull requests will be warm welcomed and served with cold beer ;).
 
 Licence
 -------------------------

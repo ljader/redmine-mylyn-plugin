@@ -176,6 +176,11 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 			TaskData taskData = new TaskData(getAttributeMapper(repository), RedmineCorePlugin.REPOSITORY_KIND, repository.getRepositoryUrl(), issue.getId() + ""); //$NON-NLS-1$
 			createAttributes(repository, taskData, issue, configuration);
 			createOperations(taskData, issue, configuration);
+						
+			// explicitly set the task key from the id
+			// https://bugs.eclipse.org/bugs/show_bug.cgi?id=497412
+			// https://github.com/ljader/redmine-mylyn-plugin/issues/76
+			getAttribute(taskData, TaskAttribute.TASK_KEY).setValue(issue.getId() + "");
 
 			IssueMapper.updateTaskData(repository, taskData, configuration, issue);
 			return taskData;
@@ -183,6 +188,13 @@ public class RedmineTaskDataHandler extends AbstractTaskDataHandler {
 			IStatus status = RedmineCorePlugin.toStatus(e, e.getMessage());
 			throw new CoreException(status);
 		}
+	}
+
+	private TaskAttribute getAttribute(TaskData data, String key) {
+		TaskAttribute attribute = data.getRoot().getAttribute(key);
+		if (attribute == null)
+			attribute = data.getRoot().createAttribute(key);
+		return attribute;
 	}
 
 	private void createAttributes(TaskRepository repository, TaskData data, Issue issue,  Configuration configuration) throws RedmineStatusException {

@@ -10,7 +10,7 @@
 
 	<groupId>net.sf.redmine_mylyn</groupId>
 	<artifactId>net.sf.redmine_mylyn.parent</artifactId>
-	<version>0.5.0-SNAPSHOT</version>
+	<version>0.5.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	
 	<modules>
@@ -26,13 +26,13 @@
 	</modules>
 
 	<properties>
-		<tycho-version>0.23.1</tycho-version>
-		<platform-version-name>juno</platform-version-name>
+		<tycho-version>0.25.0</tycho-version>
+		<platform-version-name>neon</platform-version-name>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<eclipse-site>http://download.eclipse.org/releases/${platform-version-name}</eclipse-site>
 		<mylyn-site>http://download.eclipse.org/mylyn/releases/latest</mylyn-site>
-		<orbit-site>http://download.eclipse.org/tools/orbit/downloads/drops/R20130118183705/repository/</orbit-site>
-		<aspectj-site>http://download.eclipse.org/tools/ajdt/43/update</aspectj-site>
+		<orbit-site>http://download.eclipse.org/tools/orbit/downloads/drops/R20160520211859/repository/</orbit-site>
+		<aspectj-site>http://download.eclipse.org/tools/ajdt/46/dev/update</aspectj-site>
 	</properties>
 	
 	<scm>
@@ -168,16 +168,16 @@
 			</properties>
 		</profile>
 		<profile>
-			<id>platform-juno</id>
+			<id>platform-neon</id>
 			<activation>
 				<property>
 					<name>platform-version-name</name>
-					<value>juno</value>
+					<value>neon</value>
 				</property>
 			</activation>
 			<properties>
-				<eclipse-site>http://download.eclipse.org/releases/juno</eclipse-site>
-				<platform-version>[3.8,4.3)</platform-version>
+				<eclipse-site>http://download.eclipse.org/releases/neon</eclipse-site>
+				<platform-version>[3.8,4.6)</platform-version>
 			</properties>
 		</profile>
 		<profile>
