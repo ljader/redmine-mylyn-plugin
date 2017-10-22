@@ -3,7 +3,7 @@
    <description url="http://opensource.ljader.pl/update-site/redmine-mylyn-plugin/nightly/">
       Provides Task List integration, offline support and rich editing for the open source Redmine project management.
    </description>
-   <feature url="features/net.sf.redmine_mylyn.feature_0.5.0.qualifier.jar" id="net.sf.redmine_mylyn.feature" version="0.5.0.qualifier">
+   <feature url="features/net.sf.redmine_mylyn.feature_0.5.1.qualifier.jar" id="net.sf.redmine_mylyn.feature" version="0.5.1.qualifier">
       <category name="mylyn_integration"/>
    </feature>
    <category-def name="mylyn_integration" label="Mylyn Integration"/>
