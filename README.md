@@ -32,7 +32,7 @@ Connector Installation
     [http://danmunn.github.io/redmine_mylyn_connector/](http://danmunn.github.io/redmine_mylyn_connector/)
      
     For Redmine 3.x install Connector from:
-    [TODO Link](http://google.com)
+    [https://github.com/joaopedrotaveira/redmine_mylyn_connector](https://github.com/joaopedrotaveira/redmine_mylyn_connector#installation)
      
 2. Enable REST API in Redmine server
 
