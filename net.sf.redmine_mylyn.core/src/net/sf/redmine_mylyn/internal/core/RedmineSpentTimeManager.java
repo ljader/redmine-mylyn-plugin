@@ -148,7 +148,7 @@ public class RedmineSpentTimeManager implements IRedmineSpentTimeManager {
 		long uncapturedSpentTime  = readLongAttribute(task, UNCAPTURED_SPENT_TIME);
 		
 		if(newElapsedTime < oldElapsedTime) {
-			uncapturedSpentTime = newElapsedTime;
+			return;
 		} else {
 			uncapturedSpentTime += newElapsedTime-oldElapsedTime;
 		}
